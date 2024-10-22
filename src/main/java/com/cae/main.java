@@ -2,11 +2,12 @@ package com.cae;
 
 public class main {
     public static void main(String[] args) {
-        String filePath = "D:\\idea_workspace\\java01\\src\\main\\resources\\config.yaml";
-        DamengDB db = new DamengDB(filePath);
+        String filePath = "D:/code/JavaProject/CAE2_java-interface/src/main/resources/config.yaml";
+        CAE db = new CAE(filePath);
 
-        // æµ‹è¯•æ’å…¥
-        if(db.executeSelectInsert("INSERT INTO basic_ship_information_DB.ship_data_info (\n" +
+
+        // ²âÊÔ²åÈë
+        if(db.Insert("INSERT INTO basic_ship_information_DB.ship_data_info (\n" +
                 "    SHIP_DATA_ID, \n" +
                 "    SHIP_NAME, \n" +
                 "    SHIP_TYPE, \n" +
@@ -17,31 +18,31 @@ public class main {
                 "    CLASSIFICATION_SOCIETY\n" +
                 ") VALUES (\n" +
                 "    7082003, \n" +
-                "    'èˆªæµ·3å·', \n" +
-                "    'æ²¹èˆ¹3', \n" +
+                "    'º½º£3ºÅ', \n" +
+                "    'ÓÍ´¬3', \n" +
                 "    TO_DATE('2020-10-03', 'YYYY-MM-DD'), \n" +
                 "    24.3, \n" +
-                "    'èˆªè¿æœ‰é™å…¬å¸', \n" +
+                "    'º½ÔËÓĞÏŞ¹«Ë¾', \n" +
                 "    TO_DATE('2020-11-03', 'YYYY-MM-DD'), \n" +
-                "    'ä¸­å›½èˆ¹çº§ç¤¾CSS'\n" +
+                "    'ÖĞ¹ú´¬¼¶ÉçCSS'\n" +
                 ");")){
             System.out.println("INSERT SUCCESS!");
         };
 
-        //æµ‹è¯•æŸ¥è¯¢
+        //²âÊÔ²éÑ¯
         ResultSetWrapper rsWrapper = new ResultSetWrapper();
         if (db.executeSelectQueryV2("SELECT * FROM basic_ship_information_DB.ship_data_info;",rsWrapper)) {
             //db.displayResultSet(rsWrapper);
             db.closeResultSet(rsWrapper);
         }
 
-        // æµ‹è¯•åˆ é™¤
-        if(db.executeSelectDelete("DELETE FROM basic_ship_information_DB.ship_data_info WHERE ship_data_id = 7082003")){
+        // ²âÊÔÉ¾³ı
+        if(db.Delete("DELETE FROM basic_ship_information_DB.ship_data_info WHERE ship_data_id = 7082003")){
             System.out.println("DELETE SUCCESS!");
         };
 
-        // æµ‹è¯•æ›´æ–°
-        if(db.executeSelectUpdate("UPDATE basic_ship_information_DB.ship_data_info SET speed_service = 24.0 WHERE ship_data_id = 7082001;")){
+        // ²âÊÔ¸üĞÂ
+        if(db.Update("UPDATE basic_ship_information_DB.ship_data_info SET speed_service = 24.0 WHERE ship_data_id = 7082001;")){
             System.out.println("UPDATE SUCCESS!");
         };
 
