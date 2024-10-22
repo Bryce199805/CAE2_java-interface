@@ -9,25 +9,82 @@ import java.util.Optional;
 
 import org.yaml.snakeyaml.Yaml;
 
-public class DamengDB {
+public class CAE {
     private static final String JDBC_DRIVER = "dm.jdbc.driver.DmDriver";
     private Connection conn;
     private Yaml yaml;
 
-    public DamengDB(String filePath) {
-        // è¯»å– YAML é…ç½®æ–‡ä»¶
+// ===== Private Method
+
+    private void displayResultSetV2(ResultSetWrapper rsWrapper, List<Integer> colTypes) {
+        if (rsWrapper == null) {
+            System.err.println("ResultSet is null. No data to display.");
+            return;
+        }
+        try {
+            // È¡µÃ½á¹û¼¯ÔªÊı¾İ
+            ResultSetMetaData rsmd = rsWrapper.getRs().getMetaData();
+            // È¡µÃ½á¹û¼¯Ëù°üº¬µÄÁĞÊı
+            int numCols = rsmd.getColumnCount();
+            // ÏÔÊ¾ÁĞ±êÍ·
+            for (int i = 1; i <= numCols; i++) {
+                if (i > 1) {
+                    System.out.print(",");
+                }
+                System.out.print(rsmd.getColumnLabel(i));
+            }
+            System.out.println("");
+
+            // ÊµÏÖÏÔÊ¾½á¹û¼¯µÄÂß¼­
+            while (rsWrapper.getRs().next()) {
+                // ±éÀúÃ¿Ò»ĞĞÊı¾İ²¢´òÓ¡
+                for (int i = 0; i <= numCols; i++) {
+                    switch (colTypes.get(i)) {
+                        case 0: // string
+                            System.out.print(rsWrapper.getRs().getString(i) + " ");
+                            break;
+                        case 1: // int
+                            System.out.print(rsWrapper.getRs().getInt(i) + " ");
+                            break;
+                        case 2: // float
+                            System.out.print(rsWrapper.getRs().getFloat(i) + " ");
+                            break;
+                        case 3: // double
+                            System.out.print(rsWrapper.getRs().getDouble(i) + " ");
+                            break;
+                    }
+                    //System.out.println();
+                }
+                System.out.println("");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error displaying ResultSet: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isValidSQLCommand(String sql, String type) {
+        String trimmedSQL = sql.trim().toLowerCase();
+        return trimmedSQL.startsWith(type);
+    }
+
+// ===== Public Method
+
+    public CAE(String filePath) {
+        // ¶ÁÈ¡ YAML ÅäÖÃÎÄ¼ş
         yaml = new Yaml();
         try (FileReader reader = new FileReader(new File(filePath))) {
             Object dataConfig = yaml.load(reader);
+
             if (dataConfig == null) {
                 System.out.println("Open config file: " + filePath + " failed.");
                 System.exit(1);
             }
 
-            // åŠ è½½ JDBC é©±åŠ¨
+            // ¼ÓÔØ JDBC Çı¶¯
             Class.forName(JDBC_DRIVER);
 
-            // ç¡®ä¿ dataConfig æ˜¯ä¸€ä¸ª Map
+            // È·±£ dataConfig ÊÇÒ»¸ö Map
             if (!(dataConfig instanceof Map)) {
                 System.out.println("Config file format is incorrect. Expected a Map.");
                 System.exit(1);
@@ -35,31 +92,32 @@ public class DamengDB {
 
             Map<String, Object> configMap = (Map<String, Object>) dataConfig;
 
-            // è·å–æ•°æ®åº“é…ç½®
+            // »ñÈ¡Êı¾İ¿âÅäÖÃ
             Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) configMap.get("database"));
 
-            // å®‰å…¨è·å–é…ç½®ä¿¡æ¯
+            // °²È«»ñÈ¡ÅäÖÃĞÅÏ¢
             String server = databaseConfig.map(m -> m.get("server")).orElse(null);
             String username = databaseConfig.map(m -> m.get("username")).orElse(null);
             String password = databaseConfig.map(m -> m.get("passwd")).orElse(null);
-            System.out.println(server);
-            System.out.println(username);
-            System.out.println(password);
+//            System.out.println(server);
+//            System.out.println(username);
+//            System.out.println(password);
 
             if (server == null || username == null || password == null) {
                 System.out.println("Missing required configuration in the config file.");
                 System.exit(1);
             }
 
+            // todo passwd Î´À´ĞèÒª¼ÓÃÜ
 
-            // å»ºç«‹è¿æ¥
+            // ½¨Á¢Á¬½Ó
             String url = "jdbc:dm://" + server;
             conn = DriverManager.getConnection(url, username, password);
             conn.setAutoCommit(true);
             System.out.println("========== JDBC: connect to server success! ==========");
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("[FAIL]conn databaseï¼š" + e.getMessage());
+            System.out.println("[FAIL]conn database: " + e.getMessage());
         }
     }
 
@@ -75,19 +133,19 @@ public class DamengDB {
         }
     }
 
-    public boolean executeSelectQuery(String sql,ResultSetWrapper rsWrapper) {
+    public boolean Query(String sql, ResultSetWrapper rsWrapper) {
         System.out.println("-------------- Query --------------");
         if (!isValidSQLCommand(sql, "select")) {
             System.out.println("illegal statement.");
             return false;
         }
         try (PreparedStatement stmt = conn.prepareStatement(sql)){
-            //æ‰§è¡ŒæŸ¥è¯¢
+            //Ö´ĞĞ²éÑ¯
             rsWrapper.setRs(stmt.executeQuery());
 
             System.out.println("query success!");
             displayResultSet(rsWrapper);
-            // å…³é—­è¯­å¥
+            // ¹Ø±ÕÓï¾ä
             stmt.close();
             return true;
         } catch (SQLException e) {
@@ -97,9 +155,7 @@ public class DamengDB {
         }
     }
 
-
-
-    public boolean executeSelectUpdate(String sql) {
+    public boolean Update(String sql) {
         System.out.println("-------------- Update --------------");
         if (!isValidSQLCommand(sql, "update")) {
             System.out.println("illegal statement.");
@@ -110,7 +166,7 @@ public class DamengDB {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("update success!");
-                // å…³é—­è¯­å¥
+                // ¹Ø±ÕÓï¾ä
                 stmt.close();
                 return true;
             } else {
@@ -123,7 +179,7 @@ public class DamengDB {
         }
     }
 
-    public boolean executeSelectDelete(String sql) {
+    public boolean Delete(String sql) {
         System.out.println("-------------- Delete --------------");
         if (!isValidSQLCommand(sql, "delete")) {
             System.out.println("illegal statement.");
@@ -134,7 +190,7 @@ public class DamengDB {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("delete success!");
-                // å…³é—­è¯­å¥
+                // ¹Ø±ÕÓï¾ä
                 stmt.close();
                 return true;
             } else {
@@ -147,7 +203,7 @@ public class DamengDB {
         }
     }
 
-    public boolean executeSelectInsert(String sql) {
+    public boolean Insert(String sql) {
         System.out.println("-------------- Insert --------------");
         if (!isValidSQLCommand(sql, "insert")) {
             System.out.println("illegal statement.");
@@ -158,7 +214,7 @@ public class DamengDB {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("insert success!");
-                // å…³é—­è¯­å¥
+                // ¹Ø±ÕÓï¾ä
                 stmt.close();
                 return true;
             } else {
@@ -170,7 +226,6 @@ public class DamengDB {
             return false;
         }
     }
-
 
     public boolean executeSelectQueryV2(String sql, ResultSetWrapper rsWrapper) {
         System.out.println("-------------- Query --------------");
@@ -183,23 +238,23 @@ public class DamengDB {
         try (PreparedStatement stmt = conn.prepareStatement(sql)){
             rsWrapper.setRs(stmt.executeQuery());
 
-            // è·å–åˆ—æ•°
+            // »ñÈ¡ÁĞÊı
             int colNumber = rsWrapper.getRs().getMetaData().getColumnCount();
 
-            // è·å–åˆ—ç±»å‹
+            // »ñÈ¡ÁĞÀàĞÍ
             for (int i = 1; i <= colNumber; i++) {
                 int type = rsWrapper.getRs().getMetaData().getColumnType(i);
                 colTypes.add(type);
             }
 
-            // æ˜¾ç¤ºåˆ—æ ‡å¤´
+            // ÏÔÊ¾ÁĞ±êÍ·
             for (int i = 1; i <= colNumber; i++) {
                 System.out.printf("%-30s", rsWrapper.getRs().getMetaData().getColumnLabel(i));
                 //System.out.print(rsWrapper.getRs().getMetaData().getColumnLabel(i));
             }
             System.out.println("");
 
-            // å¤„ç†æ¯ä¸€è¡Œè®°å½•
+            // ´¦ÀíÃ¿Ò»ĞĞ¼ÇÂ¼
             while (rsWrapper.getRs().next()) {
                 for (int i = 1; i <= colNumber; i++) {
                     int type = colTypes.get(i - 1);
@@ -228,7 +283,7 @@ public class DamengDB {
                 System.out.println();
             }
             //displayResultSetV2(rsWrapper,colTypes);
-            // å…³é—­è¯­å¥
+            // ¹Ø±ÕÓï¾ä
             stmt.close();
             System.out.println("query success!");
             return true;
@@ -238,76 +293,13 @@ public class DamengDB {
         }
     }
 
-    private void displayResultSetV2(ResultSetWrapper rsWrapper, List<Integer> colTypes) {
-        if (rsWrapper == null) {
-            System.err.println("ResultSet is null. No data to display.");
-            return;
-        }
-        try {
-            // å–å¾—ç»“æœé›†å…ƒæ•°æ®
-            ResultSetMetaData rsmd = rsWrapper.getRs().getMetaData();
-            // å–å¾—ç»“æœé›†æ‰€åŒ…å«çš„åˆ—æ•°
-            int numCols = rsmd.getColumnCount();
-            // æ˜¾ç¤ºåˆ—æ ‡å¤´
-            for (int i = 1; i <= numCols; i++) {
-                if (i > 1) {
-                    System.out.print(",");
-                }
-                System.out.print(rsmd.getColumnLabel(i));
-            }
-            System.out.println("");
-
-            // å®ç°æ˜¾ç¤ºç»“æœé›†çš„é€»è¾‘
-            while (rsWrapper.getRs().next()) {
-                // éå†æ¯ä¸€è¡Œæ•°æ®å¹¶æ‰“å°
-                    for (int i = 0; i <= numCols; i++) {
-                        switch (colTypes.get(i)) {
-                            case 0: // string
-                                System.out.print(rsWrapper.getRs().getString(i) + " ");
-                                break;
-                            case 1: // int
-                                System.out.print(rsWrapper.getRs().getInt(i) + " ");
-                                break;
-                            case 2: // float
-                                System.out.print(rsWrapper.getRs().getFloat(i) + " ");
-                                break;
-                            case 3: // double
-                                System.out.print(rsWrapper.getRs().getDouble(i) + " ");
-                                break;
-                        }
-                    //System.out.println();
-                }
-                System.out.println("");
-            }
-        } catch (SQLException e) {
-            System.err.println("Error displaying ResultSet: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-
-    public void printResult(List<List<String>> res) {
-        for (List<String> row : res) {
-            for (String col : row) {
-                System.out.print(col + " ");
-            }
-            System.out.println();
-        }
-    }
-
-
-    private boolean isValidSQLCommand(String sql, String type) {
-        String trimmedSQL = sql.trim().toLowerCase();
-        return trimmedSQL.startsWith(type);
-    }
-
     public void connectTest(String filePath) {
         try (FileReader reader = new FileReader(new File(filePath))) {
             Object dataConfig = yaml.load(reader);
             if (dataConfig == null) {
                 System.out.println("Open config File: test failed.");
             }
-            // ç¡®ä¿ dataConfig æ˜¯ä¸€ä¸ª Map
+            // È·±£ dataConfig ÊÇÒ»¸ö Map
             if (!(dataConfig instanceof Map)) {
                 System.out.println("Config file format is incorrect. Expected a Map.");
                 return;
@@ -315,10 +307,10 @@ public class DamengDB {
 
             Map<String, Object> configMap = (Map<String, Object>) dataConfig;
 
-            // è·å–æ•°æ®åº“é…ç½®
+            // »ñÈ¡Êı¾İ¿âÅäÖÃ
             Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) configMap.get("database"));
 
-            // å®‰å…¨è·å–é…ç½®ä¿¡æ¯
+            // °²È«»ñÈ¡ÅäÖÃĞÅÏ¢
             String server = databaseConfig.map(m -> m.get("server")).orElse(null);
             String username = databaseConfig.map(m -> m.get("username")).orElse(null);
 
@@ -333,20 +325,21 @@ public class DamengDB {
             e.printStackTrace();
         }
     }
-    /* æ˜¾ç¤ºç»“æœé›†
-     * @param rs ç»“æœé›†å¯¹è±¡
-     * @throws SQLException å¼‚å¸¸ */
+
+    /* ÏÔÊ¾½á¹û¼¯
+     * @param rs ½á¹û¼¯¶ÔÏó
+     * @throws SQLException Òì³£ */
     public void displayResultSet(ResultSetWrapper rs){
         if (rs == null) {
             System.err.println("ResultSet is null. No data to display.");
             return;
         }
         try {
-            // å–å¾—ç»“æœé›†å…ƒæ•°æ®
+            // È¡µÃ½á¹û¼¯ÔªÊı¾İ
             ResultSetMetaData rsmd = rs.getRs().getMetaData();
-            // å–å¾—ç»“æœé›†æ‰€åŒ…å«çš„åˆ—æ•°
+            // È¡µÃ½á¹û¼¯Ëù°üº¬µÄÁĞÊı
             int numCols = rsmd.getColumnCount();
-            // æ˜¾ç¤ºåˆ—æ ‡å¤´
+            // ÏÔÊ¾ÁĞ±êÍ·
             for (int i = 1; i <= numCols; i++) {
                 if (i > 1) {
                     System.out.print(",");
@@ -355,9 +348,9 @@ public class DamengDB {
             }
             System.out.println("");
 
-            // å®ç°æ˜¾ç¤ºç»“æœé›†çš„é€»è¾‘
+            // ÊµÏÖÏÔÊ¾½á¹û¼¯µÄÂß¼­
             while (rs.getRs().next()) {
-                // éå†æ¯ä¸€è¡Œæ•°æ®å¹¶æ‰“å°
+                // ±éÀúÃ¿Ò»ĞĞÊı¾İ²¢´òÓ¡
                 for (int i = 1; i <= numCols; i++) {
                     if (i > 1) {
                         System.out.print("\t");
@@ -371,7 +364,7 @@ public class DamengDB {
             e.printStackTrace();
         }
     }
-    // å…³é—­ ResultSet
+    // ¹Ø±Õ ResultSet
     public void closeResultSet(ResultSetWrapper rs) {
         if (rs != null) {
             try {
@@ -382,6 +375,5 @@ public class DamengDB {
             }
         }
     }
-
 }
 
