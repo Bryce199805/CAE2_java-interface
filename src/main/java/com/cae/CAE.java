@@ -16,7 +16,7 @@ public class CAE {
     private PreparedStatement stmt;
 
     public CAE(String filePath) {
-        // è¯»å– YAML é…ç½®æ–‡ä»¶
+        // ¶ÁÈ¡ YAML ÅäÖÃÎÄ¼ş
         yaml = new Yaml();
         try (FileReader reader = new FileReader(new File(filePath))) {
             Object dataConfig = yaml.load(reader);
@@ -25,10 +25,10 @@ public class CAE {
                 System.exit(1);
             }
 
-            // åŠ è½½ JDBC é©±åŠ¨
+            // ¼ÓÔØ JDBC Çı¶¯
             Class.forName(JDBC_DRIVER);
 
-            // ç¡®ä¿ dataConfig æ˜¯ä¸€ä¸ª Map
+            // È·±£ dataConfig ÊÇÒ»¸ö Map
             if (!(dataConfig instanceof Map)) {
                 System.out.println("Config file format is incorrect. Expected a Map.");
                 System.exit(1);
@@ -36,10 +36,10 @@ public class CAE {
 
             Map<String, Object> configMap = (Map<String, Object>) dataConfig;
 
-            // è·å–æ•°æ®åº“é…ç½®
+            // »ñÈ¡Êı¾İ¿âÅäÖÃ
             Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) configMap.get("database"));
 
-            // å®‰å…¨è·å–é…ç½®ä¿¡æ¯
+            // °²È«»ñÈ¡ÅäÖÃĞÅÏ¢
             String server = databaseConfig.map(m -> m.get("server")).orElse(null);
             String username = databaseConfig.map(m -> m.get("username")).orElse(null);
             String password = databaseConfig.map(m -> m.get("passwd")).orElse(null);
@@ -53,14 +53,14 @@ public class CAE {
             }
 
 
-            // å»ºç«‹è¿æ¥
+            // ½¨Á¢Á¬½Ó
             String url = "jdbc:dm://" + server;
             conn = DriverManager.getConnection(url, username, password);
             conn.setAutoCommit(true);
             System.out.println("========== JDBC: connect to server success! ==========");
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("[FAIL]conn databaseï¼š" + e.getMessage());
+            System.out.println("[FAIL]conn database£º" + e.getMessage());
         }
     }
 
@@ -72,10 +72,10 @@ public class CAE {
         }
         try {
             stmt = conn.prepareStatement(sql);
-            //æ‰§è¡ŒæŸ¥è¯¢
+            //Ö´ĞĞ²éÑ¯
             rsWrapper.setRs(stmt.executeQuery());
             System.out.println("query success!");
-            // å…³é—­è¯­å¥
+            // ¹Ø±ÕÓï¾ä
             //stmt.close();
             return true;
         } catch (SQLException e) {
@@ -97,7 +97,7 @@ public class CAE {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("update success!");
-                // å…³é—­è¯­å¥
+                // ¹Ø±ÕÓï¾ä
                 stmt.close();
                 return true;
             } else {
@@ -122,7 +122,7 @@ public class CAE {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("delete success!");
-                // å…³é—­è¯­å¥
+                // ¹Ø±ÕÓï¾ä
                 stmt.close();
                 return true;
             } else {
@@ -147,7 +147,7 @@ public class CAE {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("insert success!");
-                // å…³é—­è¯­å¥
+                // ¹Ø±ÕÓï¾ä
                 stmt.close();
                 return true;
             } else {
@@ -160,9 +160,9 @@ public class CAE {
         }
     }
 
-    /* æ˜¾ç¤ºç»“æœé›†
-     * @param rs ç»“æœé›†å¯¹è±¡
-     * @throws SQLException å¼‚å¸¸ */
+    /* ÏÔÊ¾½á¹û¼¯
+     * @param rs ½á¹û¼¯¶ÔÏó
+     * @throws SQLException Òì³£ */
     public void Display(ResultSetWrapper rsWrapper) {
         if (rsWrapper.getRs() == null) {
             System.err.println("ResultSet is null. No data to display.");
@@ -170,11 +170,11 @@ public class CAE {
         }
         try {
             List<Integer> colTypes = new ArrayList<>();
-            // å–å¾—ç»“æœé›†å…ƒæ•°æ®
+            // È¡µÃ½á¹û¼¯ÔªÊı¾İ
             ResultSetMetaData rsmd = rsWrapper.getRs().getMetaData();
-            // å–å¾—ç»“æœé›†æ‰€åŒ…å«çš„åˆ—æ•°
+            // È¡µÃ½á¹û¼¯Ëù°üº¬µÄÁĞÊı
             int numCols = rsmd.getColumnCount();
-            // è·å–åˆ—ç±»å‹   // æ˜¾ç¤ºåˆ—æ ‡å¤´
+            // »ñÈ¡ÁĞÀàĞÍ   // ÏÔÊ¾ÁĞ±êÍ·
             for (int i = 1; i <= numCols; i++) {
                 int type = rsWrapper.getRs().getMetaData().getColumnType(i);
                 colTypes.add(type);
@@ -183,7 +183,7 @@ public class CAE {
             System.out.println("");
 
 
-            // å¤„ç†æ¯ä¸€è¡Œè®°å½•
+            // ´¦ÀíÃ¿Ò»ĞĞ¼ÇÂ¼
             while (rsWrapper.getRs().next()) {
                 for (int i = 1; i <= numCols; i++) {
                     int type = colTypes.get(i - 1);
@@ -225,7 +225,7 @@ public class CAE {
             if (dataConfig == null) {
                 System.out.println("Open config File: test failed.");
             }
-            // ç¡®ä¿ dataConfig æ˜¯ä¸€ä¸ª Map
+            // È·±£ dataConfig ÊÇÒ»¸ö Map
             if (!(dataConfig instanceof Map)) {
                 System.out.println("Config file format is incorrect. Expected a Map.");
                 return;
@@ -233,10 +233,10 @@ public class CAE {
 
             Map<String, Object> configMap = (Map<String, Object>) dataConfig;
 
-            // è·å–æ•°æ®åº“é…ç½®
+            // »ñÈ¡Êı¾İ¿âÅäÖÃ
             Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) configMap.get("database"));
 
-            // å®‰å…¨è·å–é…ç½®ä¿¡æ¯
+            // °²È«»ñÈ¡ÅäÖÃĞÅÏ¢
             String server = databaseConfig.map(m -> m.get("server")).orElse(null);
             String username = databaseConfig.map(m -> m.get("username")).orElse(null);
 
@@ -252,13 +252,13 @@ public class CAE {
         }
     }
 
-    // å…³é—­è¯­å¥å¥æŸ„  å…³é—­æ•°æ®å¯¹è±¡
+    // ¹Ø±ÕÓï¾ä¾ä±ú  ¹Ø±ÕÊı¾İ¶ÔÏó
     public void Set_close(ResultSetWrapper rsWrapper) {
         if (rsWrapper != null) {
             try {
-                // å…³é—­è¯­å¥
+                // ¹Ø±ÕÓï¾ä
                 stmt.close();
-                //å…³é—­ç»“æœé›†
+                //¹Ø±Õ½á¹û¼¯
                 rsWrapper.getRs().close();
             } catch (SQLException e) {
                 System.err.println("Error closing ResultSet: " + e.getMessage());
@@ -267,7 +267,7 @@ public class CAE {
         }
     }
 
-    //å…³é—­è¿æ¥
+    //¹Ø±ÕÁ¬½Ó
     public void Conn_close() {
         try {
             if (conn != null && !conn.isClosed()) {
