@@ -43,9 +43,6 @@ public class CAE {
             String server = databaseConfig.map(m -> m.get("server")).orElse(null);
             String username = databaseConfig.map(m -> m.get("username")).orElse(null);
             String password = databaseConfig.map(m -> m.get("passwd")).orElse(null);
-//            System.out.println(server);
-//            System.out.println(username);
-//            System.out.println(password);
 
             if (server == null || username == null || password == null) {
                 System.out.println("Missing required configuration in the config file.");
