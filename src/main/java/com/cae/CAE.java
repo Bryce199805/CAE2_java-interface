@@ -43,15 +43,14 @@ public class CAE {
             String server = databaseConfig.map(m -> m.get("server")).orElse(null);
             String username = databaseConfig.map(m -> m.get("username")).orElse(null);
             String password = databaseConfig.map(m -> m.get("passwd")).orElse(null);
-            System.out.println(server);
-            System.out.println(username);
-            System.out.println(password);
+//            System.out.println(server);
+//            System.out.println(username);
+//            System.out.println(password);
 
             if (server == null || username == null || password == null) {
                 System.out.println("Missing required configuration in the config file.");
                 System.exit(1);
             }
-
 
             // 建立连接
             String url = "jdbc:dm://" + server;
@@ -65,18 +64,19 @@ public class CAE {
     }
 
     public boolean Query(String sql,ResultSetWrapper rsWrapper) {
+
         System.out.println("-------------- Query --------------");
+
         if (!isValidSQLCommand(sql, "select")) {
             System.out.println("illegal statement.");
             return false;
         }
+
         try {
             stmt = conn.prepareStatement(sql);
             //执行查询
             rsWrapper.setRs(stmt.executeQuery());
             System.out.println("query success!");
-            // 关闭语句
-            //stmt.close();
             return true;
         } catch (SQLException e) {
             System.err.println("Error executing query: " + e.getMessage());
@@ -87,6 +87,7 @@ public class CAE {
 
     public boolean Update(String sql) {
         System.out.println("-------------- Update --------------");
+
         if (!isValidSQLCommand(sql, "update")) {
             System.out.println("illegal statement.");
             return false;
@@ -112,6 +113,7 @@ public class CAE {
 
     public boolean Delete(String sql) {
         System.out.println("-------------- Delete --------------");
+
         if (!isValidSQLCommand(sql, "delete")) {
             System.out.println("illegal statement.");
             return false;
@@ -219,41 +221,41 @@ public class CAE {
         return trimmedSQL.startsWith(type);
     }
 
-    public void connectTest(String filePath) {
-        try (FileReader reader = new FileReader(new File(filePath))) {
-            Object dataConfig = yaml.load(reader);
-            if (dataConfig == null) {
-                System.out.println("Open config File: test failed.");
-            }
-            // 确保 dataConfig 是一个 Map
-            if (!(dataConfig instanceof Map)) {
-                System.out.println("Config file format is incorrect. Expected a Map.");
-                return;
-            }
-
-            Map<String, Object> configMap = (Map<String, Object>) dataConfig;
-
-            // 获取数据库配置
-            Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) configMap.get("database"));
-
-            // 安全获取配置信息
-            String server = databaseConfig.map(m -> m.get("server")).orElse(null);
-            String username = databaseConfig.map(m -> m.get("username")).orElse(null);
-
-            if (server == null || username == null) {
-                System.out.println("Missing required configuration in the config file.");
-                return;
-            }
-
-            System.out.println("Server: " + server);
-            System.out.println("Username: " + username);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    public void connectTest(String filePath) {
+//        try (FileReader reader = new FileReader(new File(filePath))) {
+//            Object dataConfig = yaml.load(reader);
+//            if (dataConfig == null) {
+//                System.out.println("Open config File: test failed.");
+//            }
+//            // 确保 dataConfig 是一个 Map
+//            if (!(dataConfig instanceof Map)) {
+//                System.out.println("Config file format is incorrect. Expected a Map.");
+//                return;
+//            }
+//
+//            Map<String, Object> configMap = (Map<String, Object>) dataConfig;
+//
+//            // 获取数据库配置
+//            Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) configMap.get("database"));
+//
+//            // 安全获取配置信息
+//            String server = databaseConfig.map(m -> m.get("server")).orElse(null);
+//            String username = databaseConfig.map(m -> m.get("username")).orElse(null);
+//
+//            if (server == null || username == null) {
+//                System.out.println("Missing required configuration in the config file.");
+//                return;
+//            }
+//
+//            System.out.println("Server: " + server);
+//            System.out.println("Username: " + username);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     // 关闭语句句柄  关闭数据对象
-    public void Set_close(ResultSetWrapper rsWrapper) {
+    public void setClose(ResultSetWrapper rsWrapper) {
         if (rsWrapper != null) {
             try {
                 // 关闭语句
@@ -268,7 +270,7 @@ public class CAE {
     }
 
     //关闭连接
-    public void Conn_close() {
+    public void connClose() {
         try {
             if (conn != null && !conn.isClosed()) {
                 conn.close();
