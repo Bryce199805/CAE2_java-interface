@@ -1,10 +1,11 @@
-package com.cae;
+package com.TestJar;
+import com.cae.CAE;
+import com.cae.ResultSetWrapper;
 
-import java.sql.SQLException;
 
 public class main {
-    public static void main(String[] args) throws SQLException {
-        String filePath = "D:\\code\\JavaProject\\CAE2_java-interface\\src\\main\\resources\\config.yaml";
+    public static void main(String[] args) {
+        String filePath = "D:\\idea_workspace\\TestJar\\src\\main\\resources\\config.yaml";
         CAE db = new CAE(filePath);
 
         // 测试删除
@@ -12,13 +13,14 @@ public class main {
 //            System.out.println("DELETE SUCCESS!");
 //        };
 
+        //json字段的查询，中文key的情况
         ResultSetWrapper rsWrapper = new ResultSetWrapper();
         if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.AnchorType') = '类型';", rsWrapper)){
             System.out.println("QUERY SUCCESS!");
             db.Display(rsWrapper);
         };
 
-        if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.\"测试中文\"') = '测试值';", rsWrapper)){
+        if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.CapacityPerson') = '容量(人)';", rsWrapper)){
             System.out.println("QUERY SUCCESS!");
             db.Display(rsWrapper);
         };
@@ -45,6 +47,12 @@ public class main {
 //                ");")){
 //            System.out.println("INSERT SUCCESS!");
 //        };
+
+        //测试查询--设备库
+        if (db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWrapper)) {
+            db.Display(rsWrapper);
+            db.setClose(rsWrapper);
+        };
 
         //测试查询
         if (db.Query("SELECT * FROM basic_ship_information_DB.ship_data_info;",rsWrapper)) {
