@@ -8,6 +8,27 @@
     <artifactId>TestJar</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -15,28 +36,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.cae</groupId>
-            <artifactId>CAE</artifactId>
-            <version>1.0</version>
-            <systemPath>${project.basedir}/lib/CAE-1.0.jar</systemPath>
-            <scope>system</scope>
-        </dependency>
-
-<!--        <dependency>
-            <groupId>com.cae</groupId>
-            <artifactId>CAE</artifactId>
-            <version>1.0</version>
-            <systemPath>${project.basedir}/lib/CAE-1.0-encrypted.jar</systemPath>
-            <scope>system</scope>
-        </dependency>-->
-        <!-- https://mvnrepository.com/artifact/io.minio/minio -->
-        <dependency>
-            <groupId>io.minio</groupId>
-            <artifactId>minio</artifactId>
-            <version>8.5.12</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
         <dependency>
             <groupId>org.yaml</groupId>
