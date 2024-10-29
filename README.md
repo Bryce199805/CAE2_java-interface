@@ -1,6 +1,6 @@
 # JAVA Interface
 
-## 注意编码格式
+## 编码标准
 GB18030
 
 ## JDK11开发

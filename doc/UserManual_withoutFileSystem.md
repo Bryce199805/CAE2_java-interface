@@ -122,19 +122,23 @@ public boolean Query(String sql, ResultSetWrapper rsWrapper)
 - 返回值类型：boolean，如果查询成功，则返回true，否则返回false。
 
 - 特别注意的是，针对特定JSON值的查询。
-  - 可以调用JSON_VALUE()这一SQL函数，从JSON字符串中提取标量值。此函数会返回一个与JSON字符串中指定路径匹配的值。如果路径不存在或不是一条有效的路径，则会返回NULL。
+  - 可以调用JSON_VALUE()这一SQL函数，从JSON字符串中提取标量值。此函数会返回一个与JSON字符串中指定路径匹配的值。如果路径不存在或不是一条有效的路径，则会返回NULL。以下是一个包含中文key的SQL语句的demo样例：
+  
+    ```sql
+    "select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.\"中文测试\"') = '测试值';"
+    ```
+  
   - JSON_VALUE(字段名, $.键名) = 对应值 ，以如下查询语句为案例，即，指定 `SPECIAL_ATTRIBUTE`字段内的JSON对象在 `CapacityPerson`键下的值为字符串 `'容量(人)'`时的记录
-
-
-```java
-CAE db = new CAE(filePath);
-ResultSetWrapper rsWrapper = new ResultSetWrapper();
-//进行相关json字段的查询，并打印结果
-if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.CapacityPerson') = '容量(人)';", rsWrapper)){
-    System.out.println("QUERY SUCCESS!");
-    db.Display(rsWrapper);
-};
-```
+  
+    ```java
+    CAE db = new CAE(filePath);
+    ResultSetWrapper rsWrapper = new ResultSetWrapper();
+    //进行相关json字段的查询，并打印结果
+    if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.CapacityPerson') = '容量(人)';", rsWrapper)){
+        System.out.println("QUERY SUCCESS!");
+        db.Display(rsWrapper);
+    };
+    ```
 
 
 
@@ -300,32 +304,36 @@ db.connClose();
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+     <!-- 模型版本 -->
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>org.example</groupId>
-    <artifactId>TestJar</artifactId>
-    <version>1.0-SNAPSHOT</version>
-
+    
+	<!-- Maven坐标系统中的三个必填属性 -->
+    <groupId>org.example</groupId>  <!-- 项目组织名 -->
+    <artifactId>TestJar</artifactId>  <!-- 项目内部名称 -->
+    <version>1.0-SNAPSHOT</version>  <!-- 项目版本号，SNAPSHOT表示快照版本 -->
+	
+    <!-- 属性设置 -->
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <project.build.sourceEncoding>GB18030</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>  <!-- 编译器源代码兼容性 -->
+        <maven.compiler.target>11</maven.compiler.target>  <!-- 编译器目标代码兼容性 -->
+        <project.build.sourceEncoding>GB18030</project.build.sourceEncoding>  <!-- 源文件编码 -->
     </properties>
-
+	
+    <!-- jar包依赖关系 -->
     <dependencies>
         <dependency>
-            <groupId>com.cae</groupId>
-            <artifactId>CAE</artifactId>
-            <version>1.0</version>
-            <systemPath>${project.basedir}/lib/CAE-1.0.jar</systemPath>
-            <scope>system</scope>
+            <groupId>com.cae</groupId>  <!-- 依赖的项目组织名 -->
+            <artifactId>CAE</artifactId>   <!-- 依赖的项目内部名称 -->
+            <version>1.0</version>   <!-- 依赖的版本号 -->
+            <systemPath>${project.basedir}/lib/CAE-1.0.jar</systemPath>  <!-- 本地系统的路径 -->
+            <scope>system</scope>  <!-- 依赖的作用域，system表示依赖在本地系统上 -->
         </dependency>
     </dependencies>
     
 </project>
 ```
 
-- 你可以使用以下代码语句导入CAE类和ResultSetWrapper类
+- 使用以下代码语句导入CAE类和ResultSetWrapper类
 
   ```
   import com.cae.CAE;
@@ -375,12 +383,19 @@ public class main {
             System.out.println("UPDATE SUCCESS!");
         };
 
-        //json字段的查询，中文key的情况
+        //json字段查询的案例
         ResultSetWrapper rsWrapper = new ResultSetWrapper();
+        if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.\"中文测试\"') = '测试值';", rsWrapper)){
+            System.out.println("QUERY SUCCESS!");
+            db.Display(rsWrapper);
+        };
+        
+        //测试json字段的查询
         if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.AnchorType') = '类型';", rsWrapper)){
             System.out.println("QUERY SUCCESS!");
             db.Display(rsWrapper);
         };
+        
 
         //测试查询--关键设备库
         if (db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWrapper)) {
