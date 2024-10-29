@@ -131,9 +131,9 @@ CAE db = new CAE(filePath);
 ResultSetWrapper rsWrapper = new ResultSetWrapper();
 //进行相关json字段的查询，并打印结果
 if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.CapacityPerson') = '容量(人)';", rsWrapper)){
-            System.out.println("QUERY SUCCESS!");
-            db.Display(rsWrapper);
-        };
+    System.out.println("QUERY SUCCESS!");
+    db.Display(rsWrapper);
+};
 ```
 
 
@@ -153,10 +153,9 @@ public boolean Update(String sql)
 ```java
 CAE db = new CAE(filePath);
 //测试更新，并打印更新成功信息
-if(db.Update("UPDATE basic_ship_information_DB.ship_data_info SET speed_service = 24.0 WHERE ship_data_id = 7082001;")){            
-			System.out.println("UPDATE SUCCESS!");
-            };
-
+if(db.Update("UPDATE SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF SET SYSTEM = '内燃机2' WHERE EQUIP_ID = 'LJ-2';")){
+    System.out.println("UPDATE SUCCESS!");
+};
 ```
 
 
@@ -176,9 +175,9 @@ public boolean Delete(String sql)
 ```java
 CAE db = new CAE(filePath);
 //测试删除，并打印删除成功信息
-        if(db.Delete("DELETE FROM basic_ship_information_DB.ship_data_info WHERE ship_data_id = 7082003")){
-            System.out.println("DELETE SUCCESS!");
-        };
+if(db.Delete("DELETE FROM SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF WHERE EQUIP_ID = 'LJ-2';")){
+    System.out.println("DELETE SUCCESS!");
+};
 ```
 
 
@@ -198,27 +197,25 @@ public boolean Insert(String sql)
 ```java
 CAE db = new CAE(filePath);
 //测试插入，并打印插入成功信息
-if(db.Insert("INSERT INTO basic_ship_information_DB.ship_data_info (\n" +
-      "    SHIP_DATA_ID, \n" +
-      "    SHIP_NAME, \n" +
-      "    SHIP_TYPE, \n" +
-      "    BUILT, \n" +
-      "    SPEED_SERVICE, \n" +
-      "    OWNER, \n" +
-      "    CLASSIFICATION_DATA, \n" +
-      "    CLASSIFICATION_SOCIETY\n" +
-      ") VALUES (\n" +
-      "    7082001, \n" +
-      "    '航海3号', \n" +
-      "    '油船3', \n" +
-      "    TO_DATE('2020-10-03', 'YYYY-MM-DD'), \n" +
-      "    24.3, \n" +
-      "    '航运有限公司', \n" +
-      "    TO_DATE('2020-11-03', 'YYYY-MM-DD'), \n" +
-      "    '中国船级社CSS'\n" +
-      ");")){
-            System.out.println("INSERT SUCCESS!");
-        };
+if(db.Insert("INSERT INTO SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF (\n" +
+     "    EQUIP_ID,\n" +
+     "    MAJOR,\n" +
+     "    SYSTEM,\n" +
+     "    CATEGORY,\n" +
+     "    SPECIAL_ATTRIBUTE,\n" +
+     "    REMARK,\n" +
+     "    RECORD\n" +
+     ") VALUES (\n" +
+     "    'LJ-2',\n" +
+     "    '轮机',\n" +
+     "    '内燃机',\n" +
+     "    '主机',\n" +
+     "    '{\"cylinderNum\":\"缸数\",\"cylinderDiameter\":\"缸径(mm)\",\"stroke\":\"冲程(mm)\",\"ratedPower\":\"额定功率(kW)\",\"ratedSpeed\":\"额定转速(rpm)\",\"smcrPower\":\"SMCR功率(kW)\",\"smcrSpeed\":\"SMCR转速(rpm)\",\"smcrFuelUsed\":\"SMCR油耗(g/kWh)\",\"ncrPower\":\"NCR功率(kW)\",\"ncrSpeed\":\"NCR转速(rpm)\",\"ncrFuelUsed\":\"NCR油耗(g/kWh)\",\"greaseFuelUsed\":\"滑油油耗(kg/d)\",\"cylinderFuelUsed\":\"汽缸油耗(g/kWh)\",\"oilPump\":\"供油泵(m3/h)\",\"oilPumpHead\":\"供油泵压头(bar)\",\"stressPump\":\"增压泵(m3/h)\",\"stressPumpHead\":\"增压泵压头(bar)\",\"greasePump\":\"滑油泵(m3/h)\",\"greasePumpHead\":\"滑油泵压头(bar)\",\"greaseTank\":\"滑油循环舱(m3)\",\"greasePurifierFlow\":\"滑油分油机流量(L/h)\",\"middleHeatExchange\":\"中央热交换量(kW)\",\"middleWaterFlow\":\"中央冷却水流量(m3/h)\",\"cylinderHeatExchange\":\"缸套热交换量(kW)\",\"cylinderWaterFlow\":\"缸套冷却水流量(m3/h)\",\"greaseHeatExchange\":\"滑油热交换量(kW)\",\"greaseWaterFlow\":\"滑油冷却水流量(m3/h)\",\"airPump\":\"空压机(Nm3/h)\",\"airBottle\":\"空气瓶(m3)\",\"exhaustDiameter\":\"排气管径(mm)\"}',\n" +
+    "    NULL, \n" +
+    "    NULL  \n" +
+    ");")){
+    System.out.println("INSERT SUCCESS!");
+};
 ```
 
 
@@ -239,9 +236,9 @@ public void Display(ResultSetWrapper rsWrapper)
 CAE db = new CAE(filePath);
 ResultSetWrapper rsWrapper = new ResultSetWrapper();
 //测试查询，并打印结果集
-if (db.Query("SELECT * FROM basic_ship_information_DB.ship_data_info;",rsWrapper)) {
+if (db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWrapper)) {
     db.Display(rsWrapper);
-   };
+};
 ```
 
 
@@ -262,10 +259,10 @@ public void setClose(ResultSetWrapper rsWrapper)
 CAE db = new CAE(filePath);
 ResultSetWrapper rsWrapper = new ResultSetWrapper();
 //测试查询，并打印结果集，关闭查询语句句柄，结果集
-if (db.Query("SELECT * FROM basic_ship_information_DB.ship_data_info;",rsWrapper)) {
+if (db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWrapper)) {
     db.Display(rsWrapper);
     db.setClose(rsWrapper);
-   };
+};
 ```
 
 
@@ -396,7 +393,6 @@ public class main {
             System.out.println("DELETE SUCCESS!");
         };
 
-//        db.connectTest(filePath);
         db.connClose();
     }
 }
