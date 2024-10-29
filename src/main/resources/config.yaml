@@ -2,8 +2,3 @@ database:
   server: "222.27.255.211:15236"
   username: "SYSDBA"
   passwd: "SYSDBA"
-
-minio:
-  endpoint: "222.27.255.211:19000"
-  username: "fileadmin"
-  passwd: "fileadmin"
