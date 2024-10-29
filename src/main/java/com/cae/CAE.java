@@ -16,7 +16,7 @@ public class CAE {
     private PreparedStatement stmt;
 
     public CAE(String filePath) {
-        // ��ȡ YAML �����ļ�
+        // 读取 YAML 配置文件
         yaml = new Yaml();
         try (FileReader reader = new FileReader(new File(filePath))) {
             Object dataConfig = yaml.load(reader);
@@ -25,10 +25,10 @@ public class CAE {
                 System.exit(1);
             }
 
-            // ���� JDBC ����
+            // 加载 JDBC 驱动
             Class.forName(JDBC_DRIVER);
 
-            // ȷ�� dataConfig ��һ�� Map
+            // 确保 dataConfig 是一个 Map
             if (!(dataConfig instanceof Map)) {
                 System.out.println("Config file format is incorrect. Expected a Map.");
                 System.exit(1);
@@ -36,10 +36,10 @@ public class CAE {
 
             Map<String, Object> configMap = (Map<String, Object>) dataConfig;
 
-            // ��ȡ���ݿ�����
+            // 获取数据库配置
             Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) configMap.get("database"));
 
-            // ��ȫ��ȡ������Ϣ
+            // 安全获取配置信息
             String server = databaseConfig.map(m -> m.get("server")).orElse(null);
             String username = databaseConfig.map(m -> m.get("username")).orElse(null);
             String password = databaseConfig.map(m -> m.get("passwd")).orElse(null);
@@ -49,14 +49,14 @@ public class CAE {
                 System.exit(1);
             }
 
-            // ��������
+            // 建立连接
             String url = "jdbc:dm://" + server;
             conn = DriverManager.getConnection(url, username, password);
             conn.setAutoCommit(true);
             System.out.println("========== JDBC: connect to server success! ==========");
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("[FAIL]conn database��" + e.getMessage());
+            System.out.println("[FAIL]conn database：" + e.getMessage());
         }
     }
 
@@ -71,7 +71,7 @@ public class CAE {
 
         try {
             stmt = conn.prepareStatement(sql);
-            //ִ�в�ѯ
+            //执行查询
             rsWrapper.setRs(stmt.executeQuery());
             System.out.println("query success!");
             return true;
@@ -95,7 +95,7 @@ public class CAE {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("update success!");
-                // �ر����
+                // 关闭语句
                 stmt.close();
                 return true;
             } else {
@@ -121,7 +121,7 @@ public class CAE {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("delete success!");
-                // �ر����
+                // 关闭语句
                 stmt.close();
                 return true;
             } else {
@@ -146,7 +146,7 @@ public class CAE {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("insert success!");
-                // �ر����
+                // 关闭语句
                 stmt.close();
                 return true;
             } else {
@@ -159,9 +159,9 @@ public class CAE {
         }
     }
 
-    /* ��ʾ�����
-     * @param rs ���������
-     * @throws SQLException �쳣 */
+    /* 显示结果集
+     * @param rs 结果集对象
+     * @throws SQLException 异常 */
     public void Display(ResultSetWrapper rsWrapper) {
         if (rsWrapper.getRs() == null) {
             System.err.println("ResultSet is null. No data to display.");
@@ -169,11 +169,11 @@ public class CAE {
         }
         try {
             List<Integer> colTypes = new ArrayList<>();
-            // ȡ�ý����Ԫ����
+            // 取得结果集元数据
             ResultSetMetaData rsmd = rsWrapper.getRs().getMetaData();
-            // ȡ�ý����������������
+            // 取得结果集所包含的列数
             int numCols = rsmd.getColumnCount();
-            // ��ȡ������   // ��ʾ�б�ͷ
+            // 获取列类型   // 显示列标头
             for (int i = 1; i <= numCols; i++) {
                 int type = rsWrapper.getRs().getMetaData().getColumnType(i);
                 colTypes.add(type);
@@ -182,7 +182,7 @@ public class CAE {
             System.out.println("");
 
 
-            // ����ÿһ�м�¼
+            // 处理每一行记录
             while (rsWrapper.getRs().next()) {
                 for (int i = 1; i <= numCols; i++) {
                     int type = colTypes.get(i - 1);
@@ -224,7 +224,7 @@ public class CAE {
 //            if (dataConfig == null) {
 //                System.out.println("Open config File: test failed.");
 //            }
-//            // ȷ�� dataConfig ��һ�� Map
+//            // 确保 dataConfig 是一个 Map
 //            if (!(dataConfig instanceof Map)) {
 //                System.out.println("Config file format is incorrect. Expected a Map.");
 //                return;
@@ -232,10 +232,10 @@ public class CAE {
 //
 //            Map<String, Object> configMap = (Map<String, Object>) dataConfig;
 //
-//            // ��ȡ���ݿ�����
+//            // 获取数据库配置
 //            Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) configMap.get("database"));
 //
-//            // ��ȫ��ȡ������Ϣ
+//            // 安全获取配置信息
 //            String server = databaseConfig.map(m -> m.get("server")).orElse(null);
 //            String username = databaseConfig.map(m -> m.get("username")).orElse(null);
 //
@@ -251,13 +251,13 @@ public class CAE {
 //        }
 //    }
 
-    // �ر������  �ر����ݶ���
+    // 关闭语句句柄  关闭数据对象
     public void setClose(ResultSetWrapper rsWrapper) {
         if (rsWrapper != null) {
             try {
-                // �ر����
+                // 关闭语句
                 stmt.close();
-                //�رս����
+                //关闭结果集
                 rsWrapper.getRs().close();
             } catch (SQLException e) {
                 System.err.println("Error closing ResultSet: " + e.getMessage());
@@ -266,7 +266,7 @@ public class CAE {
         }
     }
 
-    //�ر�����
+    //关闭连接
     public void connClose() {
         try {
             if (conn != null && !conn.isClosed()) {
