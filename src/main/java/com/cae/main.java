@@ -1,6 +1,4 @@
-package com.TestJar;
-import com.cae.CAE;
-import com.cae.ResultSetWrapper;
+package com.cae;
 
 
 public class main {
