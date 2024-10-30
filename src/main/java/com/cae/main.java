@@ -3,7 +3,7 @@ package com.cae;
 
 public class main {
     public static void main(String[] args) {
-        String filePath = "D:\\idea_workspace\\TestJar\\src\\main\\resources\\config.yaml";
+        String filePath = "D:\\idea_workspace\\TestJar\\src\\main\\resources\\interface-config.yaml";
         CAE db = new CAE(filePath);
 
         // ≤‚ ‘≤Â»Î
