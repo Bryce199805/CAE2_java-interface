@@ -1,102 +1,102 @@
-# JavaÊı¾İ½Ó¿ÚÓÃ»§ÊÖ²á
+# Javaæ•°æ®æ¥å£ç”¨æˆ·æ‰‹å†Œ
 
 ```
-JavaÊı¾İ½Ó¿ÚÎªÓÃ»§Ìá¹©Ö±½Ó²Ù×÷´ïÃÎÊı¾İ¿âµÄÏà¹ØAPI½Ó¿Ú£¬±ãÓÚÓµÓĞ¹ÜÀíÔ±È¨ÏŞµÄÓÃ»§¶ÔÊı¾İ¿âÖĞÏà¹Ø¿â±í½øĞĞÔöÉ¾¸Ä²é²Ù×÷¡£
+Javaæ•°æ®æ¥å£ä¸ºç”¨æˆ·æä¾›ç›´æ¥æ“ä½œè¾¾æ¢¦æ•°æ®åº“çš„ç›¸å…³APIæ¥å£ï¼Œä¾¿äºæ‹¥æœ‰ç®¡ç†å‘˜æƒé™çš„ç”¨æˆ·å¯¹æ•°æ®åº“ä¸­ç›¸å…³åº“è¡¨è¿›è¡Œå¢åˆ æ”¹æŸ¥æ“ä½œã€‚
 ```
 
-### Ä¿Â¼ËµÃ÷
+### ç›®å½•è¯´æ˜
 
-- **CAE-v0.1.jar** °üº¬Êı¾İ½Ó¿ÚËù´ò°üµÄ¿âÎÄ¼şÒÔ¼°Ïà¹ØÒÀÀµ
-- **UserManual-JavaInterface.md** ¼´±¾ÎÄµµ£¬JavaÊı¾İ½Ó¿ÚÓÃ»§ÊÖ²á
-- **interface-config.yaml** Êı¾İ¿âÅäÖÃ²ÎÊıÎÄ¼ş
+- **CAE-v0.1.jar** åŒ…å«æ•°æ®æ¥å£æ‰€æ‰“åŒ…çš„åº“æ–‡ä»¶ä»¥åŠç›¸å…³ä¾èµ–
+- **UserManual-JavaInterface.md** å³æœ¬æ–‡æ¡£ï¼ŒJavaæ•°æ®æ¥å£ç”¨æˆ·æ‰‹å†Œ
+- **interface-config.yaml** æ•°æ®åº“é…ç½®å‚æ•°æ–‡ä»¶
 
-### »·¾³ÅäÖÃ
+### ç¯å¢ƒé…ç½®
 
-- **ÖĞÎÄ±àÂë**£ºÇëÉèÖÃÎª`gb18030`¡£
+- **ä¸­æ–‡ç¼–ç **ï¼šè¯·è®¾ç½®ä¸º`gb18030`ã€‚
 
-- **ÅäÖÃĞÅÏ¢**£ºÇë½«`config.yaml`ÖĞµÄÅäÖÃĞÅÏ¢ĞŞ¸ÄÎª±¾»ú¶ÔÓ¦µÄĞÅÏ¢¡£
+- **é…ç½®ä¿¡æ¯**ï¼šè¯·å°†`config.yaml`ä¸­çš„é…ç½®ä¿¡æ¯ä¿®æ”¹ä¸ºæœ¬æœºå¯¹åº”çš„ä¿¡æ¯ã€‚
 
   ### **config.yaml**
 
 ```json
 database:
-  server: "222.27.255.211:15236"  # Êı¾İ¿â·şÎñµØÖ· ip:port
-  username: "SYSDBA"              # Êı¾İ¿âÓÃ»§Ãû
-  passwd: "SYSDBA"                # Êı¾İ¿âÃÜÂë
+  server: "222.27.255.211:15236"  # æ•°æ®åº“æœåŠ¡åœ°å€ ip:port
+  username: "SYSDBA"              # æ•°æ®åº“ç”¨æˆ·å
+  passwd: "SYSDBA"                # æ•°æ®åº“å¯†ç 
 ```
 
 ------
 
-## API ÓÃ»§ÊÖ²á
+## API ç”¨æˆ·æ‰‹å†Œ
 
 ```java
-API°üÀ¨CAEÀàºÍResultSetWrapperÀà
+APIåŒ…æ‹¬CAEç±»å’ŒResultSetWrapperç±»
 ```
 
 #### Class ResultSetWrapper
 
-`ResultSetWrapper` ÀàÓÃÓÚ°ü×° `ResultSet` ¶ÔÏó£¬Ìá¹©ÁËÒ»ÖÖ·½±ãµÄ·½Ê½À´¹ÜÀíºÍ·ÃÎÊ `ResultSet` ¶ÔÏó¡£
+`ResultSetWrapper` ç±»ç”¨äºåŒ…è£… `ResultSet` å¯¹è±¡ï¼Œæä¾›äº†ä¸€ç§æ–¹ä¾¿çš„æ–¹å¼æ¥ç®¡ç†å’Œè®¿é—® `ResultSet` å¯¹è±¡ã€‚
 
-##### ³ÉÔ±±äÁ¿
+##### æˆå‘˜å˜é‡
 
-- rs£ºResultÀàĞÍ£¬ÓÃÓÚ´æ´¢²éÑ¯½á¹û¼¯¡£
+- rsï¼šResultç±»å‹ï¼Œç”¨äºå­˜å‚¨æŸ¥è¯¢ç»“æœé›†ã€‚
 
-##### ¹¹Ôìº¯Êı
+##### æ„é€ å‡½æ•°
 
 ```java
 ResultSetWrapper()
 ```
 
-³õÊ¼»¯ResultSetWrapper¶ÔÏóÎªnull¡£
+åˆå§‹åŒ–ResultSetWrapperå¯¹è±¡ä¸ºnullã€‚
 
-- ²ÎÊıÁĞ±í£ºÎŞ
-- ·µ»ØÀàĞÍ£ºÎŞ
+- å‚æ•°åˆ—è¡¨ï¼šæ— 
+- è¿”å›ç±»å‹ï¼šæ— 
 
 
 
-##### setRs·½·¨
+##### setRsæ–¹æ³•
 
-ÉèÖÃResultSetWrapperÖĞµÄResultSet½á¹û¼¯¶ÔÏó£¬½«´«ÈëµÄResultSetWrapper¶ÔÏó¸³Öµ¸ø³ÉÔ±±äÁ¿rs¡£
+è®¾ç½®ResultSetWrapperä¸­çš„ResultSetç»“æœé›†å¯¹è±¡ï¼Œå°†ä¼ å…¥çš„ResultSetWrapperå¯¹è±¡èµ‹å€¼ç»™æˆå‘˜å˜é‡rsã€‚
 
 ```java
 public void setRs(ResultSet rs)
 ```
 
-- ²ÎÊıÁĞ±í£º
-  - rs£ºResultSetÀàĞÍ£¬ÒªÉèÖÃµÄResultSet¶ÔÏó¡£
-- ·µ»ØÀàĞÍ£ºvoid
+- å‚æ•°åˆ—è¡¨ï¼š
+  - rsï¼šResultSetç±»å‹ï¼Œè¦è®¾ç½®çš„ResultSetå¯¹è±¡ã€‚
+- è¿”å›ç±»å‹ï¼švoid
 
 
 
-##### getRs·½·¨
+##### getRsæ–¹æ³•
 
-»ñÈ¡ResultSetWrapperÖĞµÄResultSet½á¹û¼¯¶ÔÏó¡£
+è·å–ResultSetWrapperä¸­çš„ResultSetç»“æœé›†å¯¹è±¡ã€‚
 
 ```java
 public ResultSet getRs()
 ```
 
-- ²ÎÊıÁĞ±í£ºÎŞ¡£
-- ·µ»ØÀàĞÍ£ºResultSetÀàĞÍ£¬·µ»Øµ±Ç°°ü×°µÄResultSet¶ÔÏó¡£
+- å‚æ•°åˆ—è¡¨ï¼šæ— ã€‚
+- è¿”å›ç±»å‹ï¼šResultSetç±»å‹ï¼Œè¿”å›å½“å‰åŒ…è£…çš„ResultSetå¯¹è±¡ã€‚
 
 
 
 #### Class CAE
 
-`CAE` Àà·â×°ÁË¶ÔÊı¾İ¿â²Ù×÷µÄ»ù±¾ÔöÉ¾¸Ä²é·½·¨£¬²¢Ìá¹©ÁË¶Ô²éÑ¯½á¹ûµÄ´òÓ¡·½·¨ÓÃÓÚÑéÖ¤¡£
+`CAE` ç±»å°è£…äº†å¯¹æ•°æ®åº“æ“ä½œçš„åŸºæœ¬å¢åˆ æ”¹æŸ¥æ–¹æ³•ï¼Œå¹¶æä¾›äº†å¯¹æŸ¥è¯¢ç»“æœçš„æ‰“å°æ–¹æ³•ç”¨äºéªŒè¯ã€‚
 
-##### ¹¹Ôìº¯Êı
+##### æ„é€ å‡½æ•°
 
 ```java
 public CAE(String filePath)
 ```
 
-³õÊ¼»¯ `CAE` ÀàµÄ¶ÔÏó£¬²¢´ÓÖ¸¶¨µÄ yamlÎÄ¼şÖĞ¼ÓÔØÊı¾İ¿âÅäÖÃ¡£´ËÍâ£¬Ëü»¹»á³¢ÊÔ¼ÓÔØ JDBC Çı¶¯³ÌĞò£¬²¢½âÎöÊı¾İ¿âÅäÖÃĞÅÏ¢£¬½¨Á¢Êı¾İ¿âÁ¬½Ó¡£
+åˆå§‹åŒ– `CAE` ç±»çš„å¯¹è±¡ï¼Œå¹¶ä»æŒ‡å®šçš„ yamlæ–‡ä»¶ä¸­åŠ è½½æ•°æ®åº“é…ç½®ã€‚æ­¤å¤–ï¼Œå®ƒè¿˜ä¼šå°è¯•åŠ è½½ JDBC é©±åŠ¨ç¨‹åºï¼Œå¹¶è§£ææ•°æ®åº“é…ç½®ä¿¡æ¯ï¼Œå»ºç«‹æ•°æ®åº“è¿æ¥ã€‚
 
-- ĞÎ²ÎÁĞ±í
-  - **filePath**£ºStringÀàĞÍ£¬yamlÅäÖÃÎÄ¼şµØÖ·¡£
+- å½¢å‚åˆ—è¡¨
+  - **filePath**ï¼šStringç±»å‹ï¼Œyamlé…ç½®æ–‡ä»¶åœ°å€ã€‚
 
-- ·µ»ØÖµÀàĞÍ£ºÎŞ
+- è¿”å›å€¼ç±»å‹ï¼šæ— 
 
 ```java
 String filePath = "xxx/config.yaml";
@@ -105,34 +105,34 @@ CAE db = new CAE(filePath);
 
 
 
-##### Query·½·¨
+##### Queryæ–¹æ³•
 
-´Ë·½·¨ÓÃÓÚÖ´ĞĞ SQL ²éÑ¯Óï¾ä£¬²¢½«²éÑ¯½á¹û·â×°µ½ `ResultSetWrapper` ¶ÔÏóÖĞ¡£
+æ­¤æ–¹æ³•ç”¨äºæ‰§è¡Œ SQL æŸ¥è¯¢è¯­å¥ï¼Œå¹¶å°†æŸ¥è¯¢ç»“æœå°è£…åˆ° `ResultSetWrapper` å¯¹è±¡ä¸­ã€‚
 
 ```java
 public boolean Query(String sql, ResultSetWrapper rsWrapper)
 ```
 
-- ĞÎ²ÎÁĞ±í
-  - **sql**£ºĞèÒªÖ´ĞĞµÄ`SELECT`ÀàĞÍµÄSQLÓï¾ä¡£
-  - **rsWrapper**£º½á¹û¼¯°ü×°Æ÷¶ÔÏó£¬ÓÃÓÚ´æ·Å²éÑ¯½á¹û¡£
+- å½¢å‚åˆ—è¡¨
+  - **sql**ï¼šéœ€è¦æ‰§è¡Œçš„`SELECT`ç±»å‹çš„SQLè¯­å¥ã€‚
+  - **rsWrapper**ï¼šç»“æœé›†åŒ…è£…å™¨å¯¹è±¡ï¼Œç”¨äºå­˜æ”¾æŸ¥è¯¢ç»“æœã€‚
 
-- ·µ»ØÖµÀàĞÍ£ºboolean£¬Èç¹û²éÑ¯³É¹¦£¬Ôò·µ»Øtrue£¬·ñÔò·µ»Øfalse¡£
+- è¿”å›å€¼ç±»å‹ï¼šbooleanï¼Œå¦‚æœæŸ¥è¯¢æˆåŠŸï¼Œåˆ™è¿”å›trueï¼Œå¦åˆ™è¿”å›falseã€‚
 
-- ÌØ±ğ×¢ÒâµÄÊÇ£¬Õë¶ÔÌØ¶¨JSONÖµµÄ²éÑ¯¡£
-  - ¿ÉÒÔµ÷ÓÃJSON_VALUE()ÕâÒ»SQLº¯Êı£¬´ÓJSON×Ö·û´®ÖĞÌáÈ¡±êÁ¿Öµ¡£´Ëº¯Êı»á·µ»ØÒ»¸öÓëJSON×Ö·û´®ÖĞÖ¸¶¨Â·¾¶Æ¥ÅäµÄÖµ¡£Èç¹ûÂ·¾¶²»´æÔÚ»ò²»ÊÇÒ»ÌõÓĞĞ§µÄÂ·¾¶£¬Ôò»á·µ»ØNULL¡£ÒÔÏÂÊÇÒ»¸ö°üº¬ÖĞÎÄkeyµÄSQLÓï¾äµÄdemoÑùÀı£º
+- ç‰¹åˆ«æ³¨æ„çš„æ˜¯ï¼Œé’ˆå¯¹ç‰¹å®šJSONå€¼çš„æŸ¥è¯¢ã€‚
+  - å¯ä»¥è°ƒç”¨JSON_VALUE()è¿™ä¸€SQLå‡½æ•°ï¼Œä»JSONå­—ç¬¦ä¸²ä¸­æå–æ ‡é‡å€¼ã€‚æ­¤å‡½æ•°ä¼šè¿”å›ä¸€ä¸ªä¸JSONå­—ç¬¦ä¸²ä¸­æŒ‡å®šè·¯å¾„åŒ¹é…çš„å€¼ã€‚å¦‚æœè·¯å¾„ä¸å­˜åœ¨æˆ–ä¸æ˜¯ä¸€æ¡æœ‰æ•ˆçš„è·¯å¾„ï¼Œåˆ™ä¼šè¿”å›NULLã€‚ä»¥ä¸‹æ˜¯ä¸€ä¸ªåŒ…å«ä¸­æ–‡keyçš„SQLè¯­å¥çš„demoæ ·ä¾‹ï¼š
   
     ```sql
-    "select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.\"ÖĞÎÄ²âÊÔ\"') = '²âÊÔÖµ';"
+    "select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.\"ä¸­æ–‡æµ‹è¯•\"') = 'æµ‹è¯•å€¼';"
     ```
   
-  - JSON_VALUE(×Ö¶ÎÃû, $.¼üÃû) = ¶ÔÓ¦Öµ £¬ÒÔÈçÏÂ²éÑ¯Óï¾äÎª°¸Àı£¬¼´£¬Ö¸¶¨ `SPECIAL_ATTRIBUTE`×Ö¶ÎÄÚµÄJSON¶ÔÏóÔÚ `CapacityPerson`¼üÏÂµÄÖµÎª×Ö·û´® `'ÈİÁ¿(ÈË)'`Ê±µÄ¼ÇÂ¼
+  - JSON_VALUE(å­—æ®µå, $.é”®å) = å¯¹åº”å€¼ ï¼Œä»¥å¦‚ä¸‹æŸ¥è¯¢è¯­å¥ä¸ºæ¡ˆä¾‹ï¼Œå³ï¼ŒæŒ‡å®š `SPECIAL_ATTRIBUTE`å­—æ®µå†…çš„JSONå¯¹è±¡åœ¨ `CapacityPerson`é”®ä¸‹çš„å€¼ä¸ºå­—ç¬¦ä¸² `'å®¹é‡(äºº)'`æ—¶çš„è®°å½•
   
     ```java
     CAE db = new CAE(filePath);
     ResultSetWrapper rsWrapper = new ResultSetWrapper();
-    //½øĞĞÏà¹Øjson×Ö¶ÎµÄ²éÑ¯£¬²¢´òÓ¡½á¹û
-    if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.CapacityPerson') = 'ÈİÁ¿(ÈË)';", rsWrapper)){
+    //è¿›è¡Œç›¸å…³jsonå­—æ®µçš„æŸ¥è¯¢ï¼Œå¹¶æ‰“å°ç»“æœ
+    if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.CapacityPerson') = 'å®¹é‡(äºº)';", rsWrapper)){
         System.out.println("QUERY SUCCESS!");
         db.Display(rsWrapper);
     };
@@ -140,43 +140,43 @@ public boolean Query(String sql, ResultSetWrapper rsWrapper)
 
 
 
-##### Update·½·¨
+##### Updateæ–¹æ³•
 
-Ö´ĞĞÓÃ»§Ìá¹©µÄ`UPDATE`ÀàĞÍSQLÓï¾ä£¬¶ÔÏà¹Ø¼ÇÂ¼½øĞĞ¸üĞÂ²Ù×÷¡£
+æ‰§è¡Œç”¨æˆ·æä¾›çš„`UPDATE`ç±»å‹SQLè¯­å¥ï¼Œå¯¹ç›¸å…³è®°å½•è¿›è¡Œæ›´æ–°æ“ä½œã€‚
 
 ```java
 public boolean Update(String sql)
 ```
 
-- ĞÎ²ÎÁĞ±í£º
-  - **sql**£ºStringÀàĞÍ£¬ĞèÒªÖ´ĞĞµÄ`UPDATE`ÀàĞÍµÄSQLÓï¾ä¡£
-- ·µ»ØÀàĞÍ£ºbooleanÀàĞÍ£¬Èç¹û¸üĞÂ³É¹¦Ôò·µ»Øtrue£¬·ñÔò·µ»Øfalse¡£
+- å½¢å‚åˆ—è¡¨ï¼š
+  - **sql**ï¼šStringç±»å‹ï¼Œéœ€è¦æ‰§è¡Œçš„`UPDATE`ç±»å‹çš„SQLè¯­å¥ã€‚
+- è¿”å›ç±»å‹ï¼šbooleanç±»å‹ï¼Œå¦‚æœæ›´æ–°æˆåŠŸåˆ™è¿”å›trueï¼Œå¦åˆ™è¿”å›falseã€‚
 
 ```java
 CAE db = new CAE(filePath);
-//²âÊÔ¸üĞÂ£¬²¢´òÓ¡¸üĞÂ³É¹¦ĞÅÏ¢
-if(db.Update("UPDATE SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF SET SYSTEM = 'ÄÚÈ¼»ú2' WHERE EQUIP_ID = 'LJ-2';")){
+//æµ‹è¯•æ›´æ–°ï¼Œå¹¶æ‰“å°æ›´æ–°æˆåŠŸä¿¡æ¯
+if(db.Update("UPDATE SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF SET SYSTEM = 'å†…ç‡ƒæœº2' WHERE EQUIP_ID = 'LJ-2';")){
     System.out.println("UPDATE SUCCESS!");
 };
 ```
 
 
 
-##### Delete·½·¨
+##### Deleteæ–¹æ³•
 
-Ö´ĞĞÓÃ»§Ìá¹©µÄ`DELETE`ÀàĞÍSQLÓï¾ä£¬¶ÔÏà¹Ø¼ÇÂ¼½øĞĞÉ¾³ı²Ù×÷¡£
+æ‰§è¡Œç”¨æˆ·æä¾›çš„`DELETE`ç±»å‹SQLè¯­å¥ï¼Œå¯¹ç›¸å…³è®°å½•è¿›è¡Œåˆ é™¤æ“ä½œã€‚
 
 ```java
 public boolean Delete(String sql)
 ```
 
-- ĞÎ²ÎÁĞ±í£º
-  - **sql**£ºStringÀàĞÍ£¬ĞèÒªÖ´ĞĞµÄ`DELETE`ÀàĞÍµÄSQLÓï¾ä¡£
-- ·µ»ØÀàĞÍ£ºbooleanÀàĞÍ£¬Èç¹ûÉ¾³ı³É¹¦Ôò·µ»Øtrue£¬·ñÔò·µ»Øfalse¡£
+- å½¢å‚åˆ—è¡¨ï¼š
+  - **sql**ï¼šStringç±»å‹ï¼Œéœ€è¦æ‰§è¡Œçš„`DELETE`ç±»å‹çš„SQLè¯­å¥ã€‚
+- è¿”å›ç±»å‹ï¼šbooleanç±»å‹ï¼Œå¦‚æœåˆ é™¤æˆåŠŸåˆ™è¿”å›trueï¼Œå¦åˆ™è¿”å›falseã€‚
 
 ```java
 CAE db = new CAE(filePath);
-//²âÊÔÉ¾³ı£¬²¢´òÓ¡É¾³ı³É¹¦ĞÅÏ¢
+//æµ‹è¯•åˆ é™¤ï¼Œå¹¶æ‰“å°åˆ é™¤æˆåŠŸä¿¡æ¯
 if(db.Delete("DELETE FROM SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF WHERE EQUIP_ID = 'LJ-2';")){
     System.out.println("DELETE SUCCESS!");
 };
@@ -184,21 +184,21 @@ if(db.Delete("DELETE FROM SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF WHERE EQU
 
 
 
-##### Insert·½·¨
+##### Insertæ–¹æ³•
 
-Ö´ĞĞÓÃ»§Ìá¹©µÄ`INSERT`ÀàĞÍSQLÓï¾ä£¬Ïò¿â±íÖĞ½øĞĞ¼òµ¥µÄ²åÈë¹¦ÄÜ¡£
+æ‰§è¡Œç”¨æˆ·æä¾›çš„`INSERT`ç±»å‹SQLè¯­å¥ï¼Œå‘åº“è¡¨ä¸­è¿›è¡Œç®€å•çš„æ’å…¥åŠŸèƒ½ã€‚
 
 ```java
 public boolean Insert(String sql)
 ```
 
-- ĞÎ²ÎÁĞ±í£º
-  - **sql**£ºStringÀàĞÍ£¬ĞèÒªÖ´ĞĞµÄ`INSERT`ÀàĞÍµÄSQLÓï¾ä¡£
-- ·µ»ØÀàĞÍ£ºbooleanÀàĞÍ£¬²åÈë³É¹¦Ôò·µ»Øtrue£¬·ñÔò·µ»Øfalse¡£
+- å½¢å‚åˆ—è¡¨ï¼š
+  - **sql**ï¼šStringç±»å‹ï¼Œéœ€è¦æ‰§è¡Œçš„`INSERT`ç±»å‹çš„SQLè¯­å¥ã€‚
+- è¿”å›ç±»å‹ï¼šbooleanç±»å‹ï¼Œæ’å…¥æˆåŠŸåˆ™è¿”å›trueï¼Œå¦åˆ™è¿”å›falseã€‚
 
 ```java
 CAE db = new CAE(filePath);
-//²âÊÔ²åÈë£¬²¢´òÓ¡²åÈë³É¹¦ĞÅÏ¢
+//æµ‹è¯•æ’å…¥ï¼Œå¹¶æ‰“å°æ’å…¥æˆåŠŸä¿¡æ¯
 if(db.Insert("INSERT INTO SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF (\n" +
      "    EQUIP_ID,\n" +
      "    MAJOR,\n" +
@@ -209,10 +209,10 @@ if(db.Insert("INSERT INTO SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF (\n" +
      "    RECORD\n" +
      ") VALUES (\n" +
      "    'LJ-2',\n" +
-     "    'ÂÖ»ú',\n" +
-     "    'ÄÚÈ¼»ú',\n" +
-     "    'Ö÷»ú',\n" +
-     "    '{\"cylinderNum\":\"¸×Êı\",\"cylinderDiameter\":\"¸×¾¶(mm)\",\"stroke\":\"³å³Ì(mm)\",\"ratedPower\":\"¶î¶¨¹¦ÂÊ(kW)\",\"ratedSpeed\":\"¶î¶¨×ªËÙ(rpm)\",\"smcrPower\":\"SMCR¹¦ÂÊ(kW)\",\"smcrSpeed\":\"SMCR×ªËÙ(rpm)\",\"smcrFuelUsed\":\"SMCRÓÍºÄ(g/kWh)\",\"ncrPower\":\"NCR¹¦ÂÊ(kW)\",\"ncrSpeed\":\"NCR×ªËÙ(rpm)\",\"ncrFuelUsed\":\"NCRÓÍºÄ(g/kWh)\",\"greaseFuelUsed\":\"»¬ÓÍÓÍºÄ(kg/d)\",\"cylinderFuelUsed\":\"Æû¸×ÓÍºÄ(g/kWh)\",\"oilPump\":\"¹©ÓÍ±Ã(m3/h)\",\"oilPumpHead\":\"¹©ÓÍ±ÃÑ¹Í·(bar)\",\"stressPump\":\"ÔöÑ¹±Ã(m3/h)\",\"stressPumpHead\":\"ÔöÑ¹±ÃÑ¹Í·(bar)\",\"greasePump\":\"»¬ÓÍ±Ã(m3/h)\",\"greasePumpHead\":\"»¬ÓÍ±ÃÑ¹Í·(bar)\",\"greaseTank\":\"»¬ÓÍÑ­»·²Õ(m3)\",\"greasePurifierFlow\":\"»¬ÓÍ·ÖÓÍ»úÁ÷Á¿(L/h)\",\"middleHeatExchange\":\"ÖĞÑëÈÈ½»»»Á¿(kW)\",\"middleWaterFlow\":\"ÖĞÑëÀäÈ´Ë®Á÷Á¿(m3/h)\",\"cylinderHeatExchange\":\"¸×Ì×ÈÈ½»»»Á¿(kW)\",\"cylinderWaterFlow\":\"¸×Ì×ÀäÈ´Ë®Á÷Á¿(m3/h)\",\"greaseHeatExchange\":\"»¬ÓÍÈÈ½»»»Á¿(kW)\",\"greaseWaterFlow\":\"»¬ÓÍÀäÈ´Ë®Á÷Á¿(m3/h)\",\"airPump\":\"¿ÕÑ¹»ú(Nm3/h)\",\"airBottle\":\"¿ÕÆøÆ¿(m3)\",\"exhaustDiameter\":\"ÅÅÆø¹Ü¾¶(mm)\"}',\n" +
+     "    'è½®æœº',\n" +
+     "    'å†…ç‡ƒæœº',\n" +
+     "    'ä¸»æœº',\n" +
+     "    '{\"cylinderNum\":\"ç¼¸æ•°\",\"cylinderDiameter\":\"ç¼¸å¾„(mm)\",\"stroke\":\"å†²ç¨‹(mm)\",\"ratedPower\":\"é¢å®šåŠŸç‡(kW)\",\"ratedSpeed\":\"é¢å®šè½¬é€Ÿ(rpm)\",\"smcrPower\":\"SMCRåŠŸç‡(kW)\",\"smcrSpeed\":\"SMCRè½¬é€Ÿ(rpm)\",\"smcrFuelUsed\":\"SMCRæ²¹è€—(g/kWh)\",\"ncrPower\":\"NCRåŠŸç‡(kW)\",\"ncrSpeed\":\"NCRè½¬é€Ÿ(rpm)\",\"ncrFuelUsed\":\"NCRæ²¹è€—(g/kWh)\",\"greaseFuelUsed\":\"æ»‘æ²¹æ²¹è€—(kg/d)\",\"cylinderFuelUsed\":\"æ±½ç¼¸æ²¹è€—(g/kWh)\",\"oilPump\":\"ä¾›æ²¹æ³µ(m3/h)\",\"oilPumpHead\":\"ä¾›æ²¹æ³µå‹å¤´(bar)\",\"stressPump\":\"å¢å‹æ³µ(m3/h)\",\"stressPumpHead\":\"å¢å‹æ³µå‹å¤´(bar)\",\"greasePump\":\"æ»‘æ²¹æ³µ(m3/h)\",\"greasePumpHead\":\"æ»‘æ²¹æ³µå‹å¤´(bar)\",\"greaseTank\":\"æ»‘æ²¹å¾ªç¯èˆ±(m3)\",\"greasePurifierFlow\":\"æ»‘æ²¹åˆ†æ²¹æœºæµé‡(L/h)\",\"middleHeatExchange\":\"ä¸­å¤®çƒ­äº¤æ¢é‡(kW)\",\"middleWaterFlow\":\"ä¸­å¤®å†·å´æ°´æµé‡(m3/h)\",\"cylinderHeatExchange\":\"ç¼¸å¥—çƒ­äº¤æ¢é‡(kW)\",\"cylinderWaterFlow\":\"ç¼¸å¥—å†·å´æ°´æµé‡(m3/h)\",\"greaseHeatExchange\":\"æ»‘æ²¹çƒ­äº¤æ¢é‡(kW)\",\"greaseWaterFlow\":\"æ»‘æ²¹å†·å´æ°´æµé‡(m3/h)\",\"airPump\":\"ç©ºå‹æœº(Nm3/h)\",\"airBottle\":\"ç©ºæ°”ç“¶(m3)\",\"exhaustDiameter\":\"æ’æ°”ç®¡å¾„(mm)\"}',\n" +
     "    NULL, \n" +
     "    NULL  \n" +
     ");")){
@@ -222,22 +222,22 @@ if(db.Insert("INSERT INTO SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF (\n" +
 
 
 
-##### Display·½·¨
+##### Displayæ–¹æ³•
 
-ÏÔÊ¾²éÑ¯½á¹û `ResultSetWrapper` ¶ÔÏóÖĞµÄÔªÊı¾İ£¬°üÀ¨ÁĞÊıºÍÃ¿ÁĞµÄÊı¾İÀàĞÍ£»ÏÔÊ¾ÁĞ±êÌâ£»±éÀú½á¹û¼¯ÖĞµÄÃ¿Ò»ĞĞ¼ÇÂ¼£¬²¢°´ÁĞÊı¾İÀàĞÍ¸ñÊ½»¯Êä³ö¡£
+æ˜¾ç¤ºæŸ¥è¯¢ç»“æœ `ResultSetWrapper` å¯¹è±¡ä¸­çš„å…ƒæ•°æ®ï¼ŒåŒ…æ‹¬åˆ—æ•°å’Œæ¯åˆ—çš„æ•°æ®ç±»å‹ï¼›æ˜¾ç¤ºåˆ—æ ‡é¢˜ï¼›éå†ç»“æœé›†ä¸­çš„æ¯ä¸€è¡Œè®°å½•ï¼Œå¹¶æŒ‰åˆ—æ•°æ®ç±»å‹æ ¼å¼åŒ–è¾“å‡ºã€‚
 
 ```java
 public void Display(ResultSetWrapper rsWrapper)
 ```
 
-- ĞÎ²ÎÁĞ±í£º
-  - **rsWrapper**£º`ResultSetWrapper` ÀàĞÍ£¬½á¹û¼¯°ü×°Æ÷¶ÔÏó£¬ÓÃÓÚÕ¹Ê¾²éÑ¯½á¹û¡£
-- ·µ»ØÀàĞÍ£ºvoid
+- å½¢å‚åˆ—è¡¨ï¼š
+  - **rsWrapper**ï¼š`ResultSetWrapper` ç±»å‹ï¼Œç»“æœé›†åŒ…è£…å™¨å¯¹è±¡ï¼Œç”¨äºå±•ç¤ºæŸ¥è¯¢ç»“æœã€‚
+- è¿”å›ç±»å‹ï¼švoid
 
 ```java
 CAE db = new CAE(filePath);
 ResultSetWrapper rsWrapper = new ResultSetWrapper();
-//²âÊÔ²éÑ¯£¬²¢´òÓ¡½á¹û¼¯
+//æµ‹è¯•æŸ¥è¯¢ï¼Œå¹¶æ‰“å°ç»“æœé›†
 if (db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWrapper)) {
     db.Display(rsWrapper);
 };
@@ -245,22 +245,22 @@ if (db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWra
 
 
 
-##### setClose·½·¨
+##### setCloseæ–¹æ³•
 
-Ö´ĞĞÍê²éÑ¯²Ù×÷Ö®ºó£¬¹Ø±ÕÓï¾ä¾ä±úºÍ½á¹û¼¯¡£
+æ‰§è¡Œå®ŒæŸ¥è¯¢æ“ä½œä¹‹åï¼Œå…³é—­è¯­å¥å¥æŸ„å’Œç»“æœé›†ã€‚
 
 ```java
 public void setClose(ResultSetWrapper rsWrapper)
 ```
 
-- ĞÎ²ÎÁĞ±í£º
-  - **rsWrapper**£º`ResultSetWrapper` ÀàĞÍ£¬½á¹û¼¯°ü×°Æ÷¶ÔÏó¡£
-- ·µ»ØÀàĞÍ£ºvoid
+- å½¢å‚åˆ—è¡¨ï¼š
+  - **rsWrapper**ï¼š`ResultSetWrapper` ç±»å‹ï¼Œç»“æœé›†åŒ…è£…å™¨å¯¹è±¡ã€‚
+- è¿”å›ç±»å‹ï¼švoid
 
 ```java
 CAE db = new CAE(filePath);
 ResultSetWrapper rsWrapper = new ResultSetWrapper();
-//²âÊÔ²éÑ¯£¬²¢´òÓ¡½á¹û¼¯£¬¹Ø±Õ²éÑ¯Óï¾ä¾ä±ú£¬½á¹û¼¯
+//æµ‹è¯•æŸ¥è¯¢ï¼Œå¹¶æ‰“å°ç»“æœé›†ï¼Œå…³é—­æŸ¥è¯¢è¯­å¥å¥æŸ„ï¼Œç»“æœé›†
 if (db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWrapper)) {
     db.Display(rsWrapper);
     db.setClose(rsWrapper);
@@ -269,20 +269,20 @@ if (db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWra
 
 
 
-##### connClose·½·¨
+##### connCloseæ–¹æ³•
 
-¹Ø±ÕÓëÊı¾İ¿âµÄÁ¬½Ó¡£
+å…³é—­ä¸æ•°æ®åº“çš„è¿æ¥ã€‚
 
 ```java
 public void connClose()
 ```
 
-- ²ÎÊıÁĞ±í£ºÎŞ
-- ·µ»ØÀàĞÍ£ºvoid
+- å‚æ•°åˆ—è¡¨ï¼šæ— 
+- è¿”å›ç±»å‹ï¼švoid
 
 ```java
 CAE db = new CAE(filePath);
-//¹Ø±ÕÊı¾İ¿âÁ¬½Ó
+//å…³é—­æ•°æ®åº“è¿æ¥
 db.connClose();
 ```
 
@@ -290,48 +290,48 @@ db.connClose();
 
 ------
 
-## Maven¹¹½¨Ö¸ÄÏÓë³ÌĞòÑùÀı
+## Mavenæ„å»ºæŒ‡å—ä¸ç¨‹åºæ ·ä¾‹
 
-#### ¹¹½¨Ö¸ÄÏ
+#### æ„å»ºæŒ‡å—
 
-- ĞÂ½¨libÎÄ¼ş¼Ğ£¬½«CAE-1.0.jar°ü·ÅÔÚ¸ÃÄ¿Â¼ÏÂ
-- ¼ÓÔØjar°üÒÔ¼°ÒÀÀµÇı¶¯£¬ÏÂÃæÊÇÒ»¸ö¼òµ¥µÄ`pom.xml`Ê¾Àı£¬ÓÃÓÚ¹¹½¨ºÍÔËĞĞJavaÏîÄ¿£º
+- æ–°å»ºlibæ–‡ä»¶å¤¹ï¼Œå°†CAE-v0.1.jaråŒ…æ”¾åœ¨è¯¥ç›®å½•ä¸‹
+- åŠ è½½jaråŒ…ä»¥åŠä¾èµ–é©±åŠ¨ï¼Œä¸‹é¢æ˜¯ä¸€ä¸ªç®€å•çš„`pom.xml`ç¤ºä¾‹ï¼Œç”¨äºæ„å»ºå’Œè¿è¡ŒJavaé¡¹ç›®ï¼š
 
 ```xml
 <?xml version="1.0" encoding="GB18030"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-     <!-- Ä£ĞÍ°æ±¾ -->
+     <!-- æ¨¡å‹ç‰ˆæœ¬ -->
     <modelVersion>4.0.0</modelVersion>
     
-	<!-- Maven×ø±êÏµÍ³ÖĞµÄÈı¸ö±ØÌîÊôĞÔ -->
-    <groupId>org.example</groupId>  <!-- ÏîÄ¿×éÖ¯Ãû -->
-    <artifactId>TestJar</artifactId>  <!-- ÏîÄ¿ÄÚ²¿Ãû³Æ -->
-    <version>1.0-SNAPSHOT</version>  <!-- ÏîÄ¿°æ±¾ºÅ£¬SNAPSHOT±íÊ¾¿ìÕÕ°æ±¾ -->
+	<!-- Mavenåæ ‡ç³»ç»Ÿä¸­çš„ä¸‰ä¸ªå¿…å¡«å±æ€§ -->
+    <groupId>org.example</groupId>  <!-- é¡¹ç›®ç»„ç»‡å -->
+    <artifactId>TestJar</artifactId>  <!-- é¡¹ç›®å†…éƒ¨åç§° -->
+    <version>1.0-SNAPSHOT</version>  <!-- é¡¹ç›®ç‰ˆæœ¬å·ï¼ŒSNAPSHOTè¡¨ç¤ºå¿«ç…§ç‰ˆæœ¬ -->
 	
-    <!-- ÊôĞÔÉèÖÃ -->
+    <!-- å±æ€§è®¾ç½® -->
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>  <!-- ±àÒëÆ÷Ô´´úÂë¼æÈİĞÔ -->
-        <maven.compiler.target>11</maven.compiler.target>  <!-- ±àÒëÆ÷Ä¿±ê´úÂë¼æÈİĞÔ -->
-        <project.build.sourceEncoding>GB18030</project.build.sourceEncoding>  <!-- Ô´ÎÄ¼ş±àÂë -->
+        <maven.compiler.source>11</maven.compiler.source>  <!-- ç¼–è¯‘å™¨æºä»£ç å…¼å®¹æ€§ -->
+        <maven.compiler.target>11</maven.compiler.target>  <!-- ç¼–è¯‘å™¨ç›®æ ‡ä»£ç å…¼å®¹æ€§ -->
+        <project.build.sourceEncoding>GB18030</project.build.sourceEncoding>  <!-- æºæ–‡ä»¶ç¼–ç  -->
     </properties>
 	
-    <!-- jar°üÒÀÀµ¹ØÏµ -->
+    <!-- jaråŒ…ä¾èµ–å…³ç³» -->
     <dependencies>
         <dependency>
-            <groupId>com.cae</groupId>  <!-- ÒÀÀµµÄÏîÄ¿×éÖ¯Ãû -->
-            <artifactId>CAE</artifactId>   <!-- ÒÀÀµµÄÏîÄ¿ÄÚ²¿Ãû³Æ -->
-            <version>v0.1</version>   <!-- ÒÀÀµµÄ°æ±¾ºÅ -->
-            <systemPath>${project.basedir}/lib/CAE-v0.1.jar</systemPath>  <!-- ±¾µØÏµÍ³µÄÂ·¾¶ -->
-            <scope>system</scope>  <!-- ÒÀÀµµÄ×÷ÓÃÓò£¬system±íÊ¾ÒÀÀµÔÚ±¾µØÏµÍ³ÉÏ -->
+            <groupId>com.cae</groupId>  <!-- ä¾èµ–çš„é¡¹ç›®ç»„ç»‡å -->
+            <artifactId>CAE</artifactId>   <!-- ä¾èµ–çš„é¡¹ç›®å†…éƒ¨åç§° -->
+            <version>v0.1</version>   <!-- ä¾èµ–çš„ç‰ˆæœ¬å· -->
+            <systemPath>${project.basedir}/lib/CAE-v0.1.jar</systemPath>  <!-- æœ¬åœ°ç³»ç»Ÿçš„è·¯å¾„ -->
+            <scope>system</scope>  <!-- ä¾èµ–çš„ä½œç”¨åŸŸï¼Œsystemè¡¨ç¤ºä¾èµ–åœ¨æœ¬åœ°ç³»ç»Ÿä¸Š -->
         </dependency>
     </dependencies>
     
 </project>
 ```
 
-- Ê¹ÓÃÒÔÏÂ´úÂëÓï¾äµ¼ÈëCAEÀàºÍResultSetWrapperÀà
+- ä½¿ç”¨ä»¥ä¸‹ä»£ç è¯­å¥å¯¼å…¥CAEç±»å’ŒResultSetWrapperç±»
 
   ```
   import com.cae.CAE;
@@ -340,9 +340,9 @@ db.connClose();
 
 
 
-#### ³ÌĞòÑùÀı
+#### ç¨‹åºæ ·ä¾‹
 
-ÏÂÃæÊÇÒ»¸ö¼òµ¥µÄÊ¾Àı£¬Õ¹Ê¾ÁËÈçºÎÊ¹ÓÃjar°üÖĞµÄ`CAE`ÀàÒÔ¼°`ResultSetWrapper`ÀàÀ´Ö´ĞĞ»ù±¾µÄÊı¾İ¿â²Ù×÷£º
+ä¸‹é¢æ˜¯ä¸€ä¸ªç®€å•çš„ç¤ºä¾‹ï¼Œå±•ç¤ºäº†å¦‚ä½•ä½¿ç”¨jaråŒ…ä¸­çš„`CAE`ç±»ä»¥åŠ`ResultSetWrapper`ç±»æ¥æ‰§è¡ŒåŸºæœ¬çš„æ•°æ®åº“æ“ä½œï¼š
 
 ```java
 package TestJar;
@@ -352,11 +352,11 @@ import com.cae.ResultSetWrapper;
 
 public class main {
     public static void main(String[] args) {
-        //configÎÄ¼şÂ·¾¶
+        //configæ–‡ä»¶è·¯å¾„
         String filePath = "D:\\idea_workspace\\TestJar\\src\\main\\resources\\config.yaml";
         CAE db = new CAE(filePath);
 
-        // ²âÊÔ²åÈë
+        // æµ‹è¯•æ’å…¥
         if(db.Insert("INSERT INTO SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF (\n" +
                 "    EQUIP_ID,\n" +
                 "    MAJOR,\n" +
@@ -367,42 +367,42 @@ public class main {
                 "    RECORD\n" +
                 ") VALUES (\n" +
                 "    'LJ-2',\n" +
-                "    'ÂÖ»ú',\n" +
-                "    'ÄÚÈ¼»ú',\n" +
-                "    'Ö÷»ú',\n" +
-                "    '{\"cylinderNum\":\"¸×Êı\",\"cylinderDiameter\":\"¸×¾¶(mm)\",\"stroke\":\"³å³Ì(mm)\",\"ratedPower\":\"¶î¶¨¹¦ÂÊ(kW)\",\"ratedSpeed\":\"¶î¶¨×ªËÙ(rpm)\",\"smcrPower\":\"SMCR¹¦ÂÊ(kW)\",\"smcrSpeed\":\"SMCR×ªËÙ(rpm)\",\"smcrFuelUsed\":\"SMCRÓÍºÄ(g/kWh)\",\"ncrPower\":\"NCR¹¦ÂÊ(kW)\",\"ncrSpeed\":\"NCR×ªËÙ(rpm)\",\"ncrFuelUsed\":\"NCRÓÍºÄ(g/kWh)\",\"greaseFuelUsed\":\"»¬ÓÍÓÍºÄ(kg/d)\",\"cylinderFuelUsed\":\"Æû¸×ÓÍºÄ(g/kWh)\",\"oilPump\":\"¹©ÓÍ±Ã(m3/h)\",\"oilPumpHead\":\"¹©ÓÍ±ÃÑ¹Í·(bar)\",\"stressPump\":\"ÔöÑ¹±Ã(m3/h)\",\"stressPumpHead\":\"ÔöÑ¹±ÃÑ¹Í·(bar)\",\"greasePump\":\"»¬ÓÍ±Ã(m3/h)\",\"greasePumpHead\":\"»¬ÓÍ±ÃÑ¹Í·(bar)\",\"greaseTank\":\"»¬ÓÍÑ­»·²Õ(m3)\",\"greasePurifierFlow\":\"»¬ÓÍ·ÖÓÍ»úÁ÷Á¿(L/h)\",\"middleHeatExchange\":\"ÖĞÑëÈÈ½»»»Á¿(kW)\",\"middleWaterFlow\":\"ÖĞÑëÀäÈ´Ë®Á÷Á¿(m3/h)\",\"cylinderHeatExchange\":\"¸×Ì×ÈÈ½»»»Á¿(kW)\",\"cylinderWaterFlow\":\"¸×Ì×ÀäÈ´Ë®Á÷Á¿(m3/h)\",\"greaseHeatExchange\":\"»¬ÓÍÈÈ½»»»Á¿(kW)\",\"greaseWaterFlow\":\"»¬ÓÍÀäÈ´Ë®Á÷Á¿(m3/h)\",\"airPump\":\"¿ÕÑ¹»ú(Nm3/h)\",\"airBottle\":\"¿ÕÆøÆ¿(m3)\",\"exhaustDiameter\":\"ÅÅÆø¹Ü¾¶(mm)\"}',\n" +
+                "    'è½®æœº',\n" +
+                "    'å†…ç‡ƒæœº',\n" +
+                "    'ä¸»æœº',\n" +
+                "    '{\"cylinderNum\":\"ç¼¸æ•°\",\"cylinderDiameter\":\"ç¼¸å¾„(mm)\",\"stroke\":\"å†²ç¨‹(mm)\",\"ratedPower\":\"é¢å®šåŠŸç‡(kW)\",\"ratedSpeed\":\"é¢å®šè½¬é€Ÿ(rpm)\",\"smcrPower\":\"SMCRåŠŸç‡(kW)\",\"smcrSpeed\":\"SMCRè½¬é€Ÿ(rpm)\",\"smcrFuelUsed\":\"SMCRæ²¹è€—(g/kWh)\",\"ncrPower\":\"NCRåŠŸç‡(kW)\",\"ncrSpeed\":\"NCRè½¬é€Ÿ(rpm)\",\"ncrFuelUsed\":\"NCRæ²¹è€—(g/kWh)\",\"greaseFuelUsed\":\"æ»‘æ²¹æ²¹è€—(kg/d)\",\"cylinderFuelUsed\":\"æ±½ç¼¸æ²¹è€—(g/kWh)\",\"oilPump\":\"ä¾›æ²¹æ³µ(m3/h)\",\"oilPumpHead\":\"ä¾›æ²¹æ³µå‹å¤´(bar)\",\"stressPump\":\"å¢å‹æ³µ(m3/h)\",\"stressPumpHead\":\"å¢å‹æ³µå‹å¤´(bar)\",\"greasePump\":\"æ»‘æ²¹æ³µ(m3/h)\",\"greasePumpHead\":\"æ»‘æ²¹æ³µå‹å¤´(bar)\",\"greaseTank\":\"æ»‘æ²¹å¾ªç¯èˆ±(m3)\",\"greasePurifierFlow\":\"æ»‘æ²¹åˆ†æ²¹æœºæµé‡(L/h)\",\"middleHeatExchange\":\"ä¸­å¤®çƒ­äº¤æ¢é‡(kW)\",\"middleWaterFlow\":\"ä¸­å¤®å†·å´æ°´æµé‡(m3/h)\",\"cylinderHeatExchange\":\"ç¼¸å¥—çƒ­äº¤æ¢é‡(kW)\",\"cylinderWaterFlow\":\"ç¼¸å¥—å†·å´æ°´æµé‡(m3/h)\",\"greaseHeatExchange\":\"æ»‘æ²¹çƒ­äº¤æ¢é‡(kW)\",\"greaseWaterFlow\":\"æ»‘æ²¹å†·å´æ°´æµé‡(m3/h)\",\"airPump\":\"ç©ºå‹æœº(Nm3/h)\",\"airBottle\":\"ç©ºæ°”ç“¶(m3)\",\"exhaustDiameter\":\"æ’æ°”ç®¡å¾„(mm)\"}',\n" +
                 "    NULL, \n" +
                 "    NULL  \n" +
                 ");")){
             System.out.println("INSERT SUCCESS!");
         };
 
-        // ²âÊÔ¸üĞÂ
-        if(db.Update("UPDATE SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF SET SYSTEM = 'ÄÚÈ¼»ú2' WHERE EQUIP_ID = 'LJ-2';")){
+        // æµ‹è¯•æ›´æ–°
+        if(db.Update("UPDATE SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF SET SYSTEM = 'å†…ç‡ƒæœº2' WHERE EQUIP_ID = 'LJ-2';")){
             System.out.println("UPDATE SUCCESS!");
         };
 
-        //json×Ö¶Î²éÑ¯µÄ°¸Àı
+        //jsonå­—æ®µæŸ¥è¯¢çš„æ¡ˆä¾‹
         ResultSetWrapper rsWrapper = new ResultSetWrapper();
-        if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.\"ÖĞÎÄ²âÊÔ\"') = '²âÊÔÖµ';", rsWrapper)){
+        if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.\"ä¸­æ–‡æµ‹è¯•\"') = 'æµ‹è¯•å€¼';", rsWrapper)){
             System.out.println("QUERY SUCCESS!");
             db.Display(rsWrapper);
         };
         
-        //²âÊÔjson×Ö¶ÎµÄ²éÑ¯
-        if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.AnchorType') = 'ÀàĞÍ';", rsWrapper)){
+        //æµ‹è¯•jsonå­—æ®µçš„æŸ¥è¯¢
+        if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.AnchorType') = 'ç±»å‹';", rsWrapper)){
             System.out.println("QUERY SUCCESS!");
             db.Display(rsWrapper);
         };
         
 
-        //²âÊÔ²éÑ¯--¹Ø¼üÉè±¸¿â
+        //æµ‹è¯•æŸ¥è¯¢--å…³é”®è®¾å¤‡åº“
         if (db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWrapper)) {
             db.Display(rsWrapper);
             db.setClose(rsWrapper);
         };
 
-        // ²âÊÔÉ¾³ı
+        // æµ‹è¯•åˆ é™¤
         if(db.Delete("DELETE FROM SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF WHERE EQUIP_ID = 'LJ-2';")){
             System.out.println("DELETE SUCCESS!");
         };
