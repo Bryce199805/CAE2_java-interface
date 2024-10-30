@@ -4,33 +4,66 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
-    <artifactId>TestJar</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>com.cae</groupId>
+    <artifactId>CAE</artifactId>
+    <version>v0.1</version>
+    <packaging>jar</packaging>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>GB18030</project.build.sourceEncoding>
     </properties>
-
     <dependencies>
 
+        <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
         <dependency>
-            <groupId>com.cae</groupId>
-            <artifactId>CAE</artifactId>
-            <version>1.0</version>
-            <systemPath>${project.basedir}/lib/CAE-1.0.jar</systemPath>
-            <scope>system</scope>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.0</version>
         </dependency>
 
-<!--        <dependency>
-            <groupId>com.cae</groupId>
-            <artifactId>CAE</artifactId>
-            <version>1.0</version>
-            <systemPath>${project.basedir}/lib/CAE-1.0-encrypted.jar</systemPath>
-            <scope>system</scope>
-        </dependency>-->
-
+        <!-- https://mvnrepository.com/artifact/com.dameng/Dm8JdbcDriver18 -->
+        <dependency>
+            <groupId>com.dameng</groupId>
+            <artifactId>Dm8JdbcDriver18</artifactId>
+            <version>8.1.1.49</version>
+        </dependency>
     </dependencies>
+
 </project>
+
+
