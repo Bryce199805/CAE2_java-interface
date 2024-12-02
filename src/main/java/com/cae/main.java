@@ -1,13 +1,38 @@
 package com.cae;
 
 
+import java.io.IOException;
+import java.io.InputStream;
+
 public class main {
     public static void main(String[] args) {
-        String filePath = "D:\\idea_workspace\\TestJar\\src\\main\\resources\\interface-config.yaml";
+        String filePath = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\src\\main\\resources\\interface-config.yaml";
         CAE db = new CAE(filePath);
+        CAE File = new CAE(filePath,true);
+        String localPath= "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test";
+        String uploadFile = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test\\7082001-横剖面面积曲线.jpg";
+
+        //测试下载单个文件
+        //File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081001");
+
+        //测试下载单个文件字符流
+        /*InputStream inputStream = File.GetFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081003");
+        try {
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+
+        //File.DeleteRecord("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","M7081004");
+
+        //测试删除
+        //File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081003");
+
+        //测试上传
+        File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081003");
 
         // 测试插入
-        if(db.Insert("INSERT INTO SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF (\n" +
+        /*if(db.Insert("INSERT INTO SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF (\n" +
                 "    EQUIP_ID,\n" +
                 "    MAJOR,\n" +
                 "    SYSTEM,\n" +
@@ -50,6 +75,6 @@ public class main {
             System.out.println("DELETE SUCCESS!");
         };
         
-        db.connClose();
+        db.connClose();*/
     }
 }
