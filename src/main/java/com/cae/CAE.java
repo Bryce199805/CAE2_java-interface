@@ -30,17 +30,17 @@ public class CAE {
     private Connection conn;
     private Yaml yaml;
     private PreparedStatement stmt;
-    private static final Logger logger = Logger.getLogger(CAE.class.getName());  //ÈÕÖ¾¼ÇÂ¼Æ÷
+    private static final Logger logger = Logger.getLogger(CAE.class.getName());  //æ—¥å¿—è®°å½•å™¨
     private MinioClient fileClient;
     private static final Map<String, Map<String, Set<String>>> fileDBMap = new HashMap<>();
     private static final Map<String,Map<String,String>> fileIDMap = new HashMap<>();
 
     static {
-        // fileIDMap ³õÊ¼»¯
+        // fileIDMap åˆå§‹åŒ–
         fileIDMap.put("HULL_MODEL_AND_INFORMATION_DB",
                 Collections.singletonMap("HULL_PARAMETER_INFO", "HULL_ID"));
 
-        // fileDBMap ³õÊ¼»¯
+        // fileDBMap åˆå§‹åŒ–
         fileDBMap.put("HULL_MODEL_AND_INFORMATION_DB",
                 Collections.singletonMap("HULL_PARAMETER_INFO",
                         new HashSet<>(Arrays.asList("TRANSVERSE_AREA_CURVE", "HULL_3D_MODEL", "OFFSETS_TABLE"))
@@ -48,7 +48,7 @@ public class CAE {
     }
 
     public CAE(String filePath) {
-        // ¶ÁÈ¡ YAML ÅäÖÃÎÄ¼ş
+        // è¯»å– YAML é…ç½®æ–‡ä»¶
         yaml = new Yaml();
         try (FileReader reader = new FileReader(new File(filePath))) {
             Object dataConfig = yaml.load(reader);
@@ -57,10 +57,10 @@ public class CAE {
                 System.exit(1);
             }
 
-            // ¼ÓÔØ JDBC Çı¶¯
+            // åŠ è½½ JDBC é©±åŠ¨
             Class.forName(JDBC_DRIVER);
 
-            // È·±£ dataConfig ÊÇÒ»¸ö Map
+            // ç¡®ä¿ dataConfig æ˜¯ä¸€ä¸ª Map
             if (!(dataConfig instanceof Map)) {
                 System.err.println("Config file format is incorrect. Expected a Map.");
                 System.exit(1);
@@ -68,63 +68,62 @@ public class CAE {
 
             Map<String, Object> configMap = (Map<String, Object>) dataConfig;
 
-            // »ñÈ¡Êı¾İ¿âÅäÖÃ
+            // è·å–æ•°æ®åº“é…ç½®
             Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) configMap.get("database"));
 
-            // °²È«»ñÈ¡ÅäÖÃĞÅÏ¢
+            // å®‰å…¨è·å–é…ç½®ä¿¡æ¯
             String server = databaseConfig.map(m -> m.get("server")).orElse(null);
             String username = databaseConfig.map(m -> m.get("username")).orElse(null);
             String password = databaseConfig.map(m -> m.get("passwd")).orElse(null);
 
-            System.out.println(hmacSHA256(password,"SYSDBA"));
+            System.out.println(hmacSHA256(password));
 
             if (server == null || username == null || password == null) {
                 System.err.println("Missing required configuration in the config file.");
                 System.exit(1);
             }
 
-            // ½¨Á¢´ïÃÎµÄÁ¬½Ó
+            // å»ºç«‹è¾¾æ¢¦çš„è¿æ¥
             String url = "jdbc:dm://" + server;
-            conn = DriverManager.getConnection(url, username, hmacSHA256(password,"SYSDBA"));
+            conn = DriverManager.getConnection(url, username, hmacSHA256(password));
             conn.setAutoCommit(true);
             System.out.println("========== JDBC: connect to DM server success! ==========");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("[FAIL]conn database£º" + e.getMessage());
+            System.err.println("[FAIL]conn databaseï¼š" + e.getMessage());
         }
     }
 
     /**
-     * HMAC-SHA256£¬Hash-based Message Authentication Code£¬ÊÇÒ»ÖÖ»ùÓÚ¹şÏ£º¯ÊıºÍÃÜÔ¿µÄÏûÏ¢ÈÏÖ¤ÂëËã·¨£¬ÓÃÓÚÈ·±£ÏûÏ¢µÄÍêÕûĞÔºÍÈÏÖ¤¡£
+     * HMAC-SHA256ï¼ŒHash-based Message Authentication Codeï¼Œæ˜¯ä¸€ç§åŸºäºå“ˆå¸Œå‡½æ•°å’Œå¯†é’¥çš„æ¶ˆæ¯è®¤è¯ç ç®—æ³•ï¼Œç”¨äºç¡®ä¿æ¶ˆæ¯çš„å®Œæ•´æ€§å’Œè®¤è¯ã€‚
      * <p>
-     * ÊäÈë£º´ı¼ÓÃÜµÄÃÜÂë
-     * Êä³ö£ºÓëSHA256Ò»ÖÂ
-     * Ó¦ÓÃ£ºÃÜÂë¹ÜÀí¡¢Êı×ÖÇ©Ãû¡¢ÎÄ¼şÍêÕûĞÔĞ£Ñé
-     * °²È«ĞÔ£º¡ï¡ï¡ï¡î¡î
+     * è¾“å…¥ï¼šå¾…åŠ å¯†çš„å¯†ç 
+     * è¾“å‡ºï¼šä¸SHA256ä¸€è‡´
+     * åº”ç”¨ï¼šå¯†ç ç®¡ç†ã€æ•°å­—ç­¾åã€æ–‡ä»¶å®Œæ•´æ€§æ ¡éªŒ
+     * å®‰å…¨æ€§ï¼šâ˜…â˜…â˜…â˜†â˜†
      *
-     * @param plainString Ã÷ÎÄÃÜÂë
-     * @param key         ÃØÔ¿
-     * @return cipherString ÃÜÎÄ
+     * @param plainString æ˜æ–‡å¯†ç 
+     * @return cipherString å¯†æ–‡
      */
-    private static String hmacSHA256(String plainString, String key) {
+    private static String hmacSHA256(String plainString) {
         String cipherString = null;
         try {
-            // Ö¸¶¨Ëã·¨
+            // æŒ‡å®šç®—æ³•
             String algorithm = "HmacSHA256";
-            // ´´½¨ÃÜÔ¿¹æ·¶
-            SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), algorithm);
-            // »ñÈ¡Mac¶ÔÏóÊµÀı
+            // åˆ›å»ºå¯†é’¥è§„èŒƒ
+            SecretKeySpec secretKeySpec = new SecretKeySpec("3G@ln$UOd8Ptf@XU".getBytes(StandardCharsets.UTF_8), algorithm);
+            // è·å–Macå¯¹è±¡å®ä¾‹
             Mac mac = Mac.getInstance(algorithm);
-            // ³õÊ¼»¯mac
+            // åˆå§‹åŒ–mac
             mac.init(secretKeySpec);
-            // ¼ÆËãmac
+            // è®¡ç®—mac
             byte[] macBytes = mac.doFinal(plainString.getBytes(StandardCharsets.UTF_8));
-            // Êä³öÎª16½øÖÆ×Ö·û´®
+            // è¾“å‡ºä¸º16è¿›åˆ¶å­—ç¬¦ä¸²
             StringBuilder sb = new StringBuilder();
             for (byte b : macBytes) {
                 sb.append(String.format("%02x", b));
             }
-            cipherString = sb.toString().substring(0, 10);
+            cipherString = sb.toString().substring(0, 32);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -133,7 +132,7 @@ public class CAE {
 
 
     public CAE(String FilePath,boolean xxx) {
-        // ¶ÁÈ¡ YAML ÅäÖÃÎÄ¼ş
+        // è¯»å– YAML é…ç½®æ–‡ä»¶
         yaml = new Yaml();
         try (FileReader reader = new FileReader(new File(FilePath))) {
             Object dataConfig = yaml.load(reader);
@@ -142,10 +141,10 @@ public class CAE {
                 System.exit(1);
             }
 
-            // ¼ÓÔØ JDBC Çı¶¯
+            // åŠ è½½ JDBC é©±åŠ¨
             Class.forName(JDBC_DRIVER);
 
-            // È·±£ dataConfig ÊÇÒ»¸ö Map
+            // ç¡®ä¿ dataConfig æ˜¯ä¸€ä¸ª Map
             if (!(dataConfig instanceof Map)) {
                 System.err.println("Config file format is incorrect. Expected a Map.");
                 System.exit(1);
@@ -153,16 +152,16 @@ public class CAE {
 
             Map<String, Object> configMap = (Map<String, Object>) dataConfig;
 
-            // »ñÈ¡Êı¾İ¿âÅäÖÃ
+            // è·å–æ•°æ®åº“é…ç½®
             Map<String, String> databaseConfig = (Map<String, String>) configMap.get("database");
-            // »ñÈ¡ filesystem ÅäÖÃĞÅÏ¢
+            // è·å– filesystem é…ç½®ä¿¡æ¯
             Map<String, String> fileConfig = (Map<String, String>) configMap.get("filesystem");
             if (fileConfig == null) {
                 System.err.println("Missing 'endpoint' configuration in the config file.");
                 System.exit(1);
             }
 
-            // °²È«»ñÈ¡ÅäÖÃĞÅÏ¢
+            // å®‰å…¨è·å–é…ç½®ä¿¡æ¯
             String server = databaseConfig.get("server");
             String username = databaseConfig.get("username");
             String password = databaseConfig.get("passwd");
@@ -172,13 +171,13 @@ public class CAE {
                 System.exit(1);
             }
 
-            // ½¨Á¢´ïÃÎµÄÁ¬½Ó
+            // å»ºç«‹è¾¾æ¢¦çš„è¿æ¥
             String url = "jdbc:dm://" + server;
-            conn = DriverManager.getConnection(url, username, hmacSHA256(password,"SYSDBA"));
+            conn = DriverManager.getConnection(url, username, hmacSHA256(password));
             conn.setAutoCommit(true);
             System.out.println("========== JDBC: connect to DM server success! ==========");
 
-            // »ñÈ¡¾ßÌåµÄ filesystem ÅäÖÃĞÅÏ¢
+            // è·å–å…·ä½“çš„ filesystem é…ç½®ä¿¡æ¯
             String endpoint = fileConfig.get("endpoint");
             String file_username = fileConfig.get("username");
             String file_password = fileConfig.get("passwd");
@@ -187,20 +186,21 @@ public class CAE {
                 System.err.println("Missing required configuration in the config file.");
                 System.exit(1);
             }
-            // ¼ì²é²¢²¹È« endpoint µÄĞ­ÒéÇ°×º
+            // æ£€æŸ¥å¹¶è¡¥å…¨ endpoint çš„åè®®å‰ç¼€
             if (!endpoint.startsWith("http://") && !endpoint.startsWith("https://")) {
-                endpoint = "http://" + endpoint; // Ä¬ÈÏÎª http£¬Èç¹ûĞèÒª https£¬Çë¸ü¸ÄÎª https://
+                endpoint = "http://" + endpoint; // é»˜è®¤ä¸º httpï¼Œå¦‚æœéœ€è¦ httpsï¼Œè¯·æ›´æ”¹ä¸º https://
             }
-            System.out.println(hmacSHA256(file_password,"fileadmin"));
-            // ÔÚ½¨Á¢ Minio Á¬½ÓÊ±£¬²¶»ñÍøÂçÁ¬½ÓÒì³£
+
+            System.out.println(hmacSHA256(file_password));
+            // åœ¨å»ºç«‹ Minio è¿æ¥æ—¶ï¼Œæ•è·ç½‘ç»œè¿æ¥å¼‚å¸¸
             try {
                 fileClient = MinioClient.builder()
                         .endpoint(endpoint)
-                        .credentials(file_username, hmacSHA256(file_password, "fileadmin"))
+                        .credentials(file_username, hmacSHA256(file_password))
                         .build();
 
-                // ³¢ÊÔÁ¬½Ó Minio ÒÔÈ·±£ÄÜ¹»Á¬½Ó³É¹¦
-                fileClient.listBuckets();  // ³¢ÊÔÁĞ³öÍ°£¬²âÊÔÁ¬½ÓÊÇ·ñ³É¹¦
+                // å°è¯•è¿æ¥ Minio ä»¥ç¡®ä¿èƒ½å¤Ÿè¿æ¥æˆåŠŸ
+                fileClient.listBuckets();  // å°è¯•åˆ—å‡ºæ¡¶ï¼Œæµ‹è¯•è¿æ¥æ˜¯å¦æˆåŠŸ
                 System.out.println("========== Minio: connect to CAE_FILE server success! ==========");
             } catch (Exception e) {
                 System.err.println("========== ERROR: Failed to establish Minio connection. " + e.getMessage());
@@ -213,48 +213,48 @@ public class CAE {
             System.out.println("========== JDBC: connect to CAE_FILE server success! ==========");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("[FAIL]conn database£º" + e.getMessage());
+            System.err.println("[FAIL]conn databaseï¼š" + e.getMessage());
         }
     }
 
     public boolean DeleteRecord(String dbName,String tableName,String id){
-        //É¾³ıÒ»Ìõ¼ÇÂ¼¶ÔÓ¦µÄËùÓĞÎÄ¼ş
+        //åˆ é™¤ä¸€æ¡è®°å½•å¯¹åº”çš„æ‰€æœ‰æ–‡ä»¶
         if(fileDBMap.get(dbName).containsKey(tableName)){
-            // ´Ó fileDBMap »ñÈ¡ÎÄ¼ş×Ö¶Î¼¯ºÏ
+            // ä» fileDBMap è·å–æ–‡ä»¶å­—æ®µé›†åˆ
             Map<String, Set<String>> tableMap = fileDBMap.get(dbName);
             if (tableMap != null) {
                 Set<String> fields = tableMap.get(tableName);
                 if (fields != null) {
-                    // ±éÀú×Ö¶Î£¬Ö´ĞĞÉ¾³ı²Ù×÷
+                    // éå†å­—æ®µï¼Œæ‰§è¡Œåˆ é™¤æ“ä½œ
                     for (String field : fields) {
-                        // Éú³É CAEPath
+                        // ç”Ÿæˆ CAEPath
                         String CAEPath = sql2CAEPath(dbName, tableName, field, id);
                         if(CAEPath == null || CAEPath.equals(" ")  || CAEPath.equals("") || CAEPath.isEmpty()){
-                            System.err.println("ÎÄ¼ş×Ö¶ÎÄÚÈİÎª¿Õ£¡field:"+field);
-                        }else if(CAEPath.equals("false")){ //²»´æÔÚ¶ÔÓ¦µÄ¼ÇÂ¼
+                            System.err.println("æ–‡ä»¶å­—æ®µå†…å®¹ä¸ºç©ºï¼field:"+field);
+                        }else if(CAEPath.equals("false")){ //ä¸å­˜åœ¨å¯¹åº”çš„è®°å½•
                             return false;
                         }else{
-                            // É¾³ıÎÄ¼ş
+                            // åˆ é™¤æ–‡ä»¶
                             delete(CAEPath);
                         }
                     }
-                    //É¾³ı¼ÇÂ¼
+                    //åˆ é™¤è®°å½•
                     deleterecord(dbName, tableName, id);
                     return true;
                 } else {
-                    System.err.println("No fields found for table: " + tableName);//²»ÊÇ¶ÔÓ¦Êı¾İ±íÃû
+                    System.err.println("No fields found for table: " + tableName);//ä¸æ˜¯å¯¹åº”æ•°æ®è¡¨å
                     return false;
                 }
             } else {
-                System.err.println("No data found for dbName: " + dbName);//²»ÊÇ¶ÔÓ¦Êı¾İ¿âÃû
+                System.err.println("No data found for dbName: " + dbName);//ä¸æ˜¯å¯¹åº”æ•°æ®åº“å
                 return false;
             }
         }
-        System.err.println("No FileData for this record!"); //²»ÊÇÎÄ¼ş×Ö¶Î
+        System.err.println("No FileData for this record!"); //ä¸æ˜¯æ–‡ä»¶å­—æ®µ
         return false;
     }
 
-    //ÔÚDMÊı¾İ¿âÖĞÉ¾³ıÒ»Ìõ¼ÇÂ¼
+    //åœ¨DMæ•°æ®åº“ä¸­åˆ é™¤ä¸€æ¡è®°å½•
     private boolean deleterecord(String dbName,String tableName,String id){
         String idField = getIDField(dbName, tableName);
         String delete_sql = String.format("DELETE FROM %s.%s WHERE %s = '%s';",dbName, tableName,idField,id);
@@ -263,7 +263,7 @@ public class CAE {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("DM delete this record success!");
-                // ¹Ø±ÕÓï¾ä
+                // å…³é—­è¯­å¥
                 stmt.close();
                 return true;
             } else {
@@ -277,39 +277,39 @@ public class CAE {
     }
 
     /**
-     * ¸ù¾İÊı¾İ¿âÃû³Æ¡¢±íÃû¡¢×Ö¶ÎÃûºÍ ID É¾³ıµ¥¸öÎÄ¼ş
+     * æ ¹æ®æ•°æ®åº“åç§°ã€è¡¨åã€å­—æ®µåå’Œ ID åˆ é™¤å•ä¸ªæ–‡ä»¶
      *
-     * @param dbName Êı¾İ¿âÃû³Æ
-     * @param tableName ±íÃû³Æ
-     * @param field ×Ö¶ÎÃû³Æ
-     * @param id Ö÷¼ü ID
-     * @return ÊÇ·ñÉ¾³ı³É¹¦
+     * @param dbName æ•°æ®åº“åç§°
+     * @param tableName è¡¨åç§°
+     * @param field å­—æ®µåç§°
+     * @param id ä¸»é”® ID
+     * @return æ˜¯å¦åˆ é™¤æˆåŠŸ
      */
     public boolean DeleteFile(String dbName, String tableName, String field, String id){
         System.out.println("--------------Delete File--------------");
         String CAEPath = null;
         try{
-            //Ã»ÕÒµ½¶ÔÓ¦¼ÇÂ¼
+            //æ²¡æ‰¾åˆ°å¯¹åº”è®°å½•
             if(checkFileField(dbName,tableName,field)){
-                //¶¨ÖÆsqlÓï¾ä£¬½âÎöµÃµ½ĞÂµÄCAEPath
+                //å®šåˆ¶sqlè¯­å¥ï¼Œè§£æå¾—åˆ°æ–°çš„CAEPath
                 CAEPath = sql2CAEPath(dbName,tableName,field,id);
-                //×Ö¶ÎÄÚÈİÎª¿Õ£¬²»ĞèÒªÈ¥minioÖĞ´¦Àí²Ù×÷
+                //å­—æ®µå†…å®¹ä¸ºç©ºï¼Œä¸éœ€è¦å»minioä¸­å¤„ç†æ“ä½œ
                 if(CAEPath == null || CAEPath.equals(" ")  || CAEPath.equals("") || CAEPath.isEmpty()){
-                    System.err.println("ÎÄ¼ş×Ö¶ÎÄÚÈİÎª¿Õ£¡ field:"+field);
+                    System.err.println("æ–‡ä»¶å­—æ®µå†…å®¹ä¸ºç©ºï¼ field:"+field);
                     return false;
                 }else if(CAEPath.equals("false")){
                     return false;
                 }
             }else{
-                System.err.println("²»ÊÇÎÄ¼ş×Ö¶Î£¡");
+                System.err.println("ä¸æ˜¯æ–‡ä»¶å­—æ®µï¼");
                 return false;
             }
         }catch (Exception e){
             e.printStackTrace();
-            System.err.println("¶ÔÓ¦¿âÃû£¬±íÃû£¬ÎÄ¼ş×Ö¶ÎÃûÓĞÎó");
+            System.err.println("å¯¹åº”åº“åï¼Œè¡¨åï¼Œæ–‡ä»¶å­—æ®µåæœ‰è¯¯");
             return false;
         }
-        //É¾³ıÎÄ¼ş ²¢ Çå¿Õ×Ö¶Î
+        //åˆ é™¤æ–‡ä»¶ å¹¶ æ¸…ç©ºå­—æ®µ
         return delete(CAEPath) && updateField(null,dbName,tableName,id,field) ;
     }
 
@@ -317,18 +317,18 @@ public class CAE {
 //        String bucketName = null;
 //        String objectName = null;
 //
-//        //³õÊ¼×Ö¶ÎÄÚÈİÎª¿Õ»òÕß¿Õ´®µÄÇé¿ö£¬³õÊ¼»¯Í°ÃûºÍobjectName
+//        //åˆå§‹å­—æ®µå†…å®¹ä¸ºç©ºæˆ–è€…ç©ºä¸²çš„æƒ…å†µï¼Œåˆå§‹åŒ–æ¡¶åå’ŒobjectName
 //        if(CAEPath == null || CAEPath == " "){
 //            bucketName = dbName.toLowerCase().replace("_", "-");
 //            File file = new File(localPath);
-//            String fileName = file.getName();  // »ñÈ¡ÎÄ¼şÃû£¬°üÀ¨À©Õ¹Ãû£¬Èç "file.jpg"
+//            String fileName = file.getName();  // è·å–æ–‡ä»¶åï¼ŒåŒ…æ‹¬æ‰©å±•åï¼Œå¦‚ "file.jpg"
 //            objectName = tableName + "/" + id + "/" + fileName;
 //        }else{
-//            //»ñÈ¡¶ÔÓ¦ObjectName
+//            //è·å–å¯¹åº”ObjectName
 //            bucketName = trimmedCAEPath(CAEPath)[0];
 //            objectName = trimmedCAEPath(CAEPath)[1];
 //        }
-        //»ñÈ¡¶ÔÓ¦ObjectName
+        //è·å–å¯¹åº”ObjectName
         String bucketName = trimmedCAEPath(CAEPath)[0];
         String objectName = trimmedCAEPath(CAEPath)[1];
 
@@ -348,8 +348,8 @@ public class CAE {
     }
 
     /**
-     * ÉÏ´«µ¥¸öÎÄ¼şµ½ CAE_FILE ²¢Í¬Ê±¸üĞÂÎÄ¼şÂ·¾¶
-     * @param localPath ±¾µØÎÄ¼şÂ·¾¶£¬±íÊ¾ÒªÉÏ´«µÄÎÄ¼ş¡£
+     * ä¸Šä¼ å•ä¸ªæ–‡ä»¶åˆ° CAE_FILE å¹¶åŒæ—¶æ›´æ–°æ–‡ä»¶è·¯å¾„
+     * @param localPath æœ¬åœ°æ–‡ä»¶è·¯å¾„ï¼Œè¡¨ç¤ºè¦ä¸Šä¼ çš„æ–‡ä»¶ã€‚
      */
     public boolean UploadFile(String localPath, String dbName, String tableName, String field, String id){
         System.out.println("--------------UpLoad File--------------");
@@ -357,14 +357,14 @@ public class CAE {
         try{
             if(checkFileField(dbName,tableName,field)){
                 try{
-                    //IDÊÇ·ñ´æÔÚ
+                    //IDæ˜¯å¦å­˜åœ¨
                     if(!sql2CAEPath(dbName,tableName,field,id).equals("false")){
-                        //¸üĞÂÎÄ¼şÂ·¾¶
+                        //æ›´æ–°æ–‡ä»¶è·¯å¾„
                         if(updateField(localPath,dbName,tableName,id,field)){
-                            //¶¨ÖÆsqlÓï¾ä£¬½âÎöµÃµ½ĞÂµÄCAEPath
+                            //å®šåˆ¶sqlè¯­å¥ï¼Œè§£æå¾—åˆ°æ–°çš„CAEPath
                             CAEPath = sql2CAEPath(dbName,tableName,field,id);
-                            //×Ö¶ÎÄÚÈİÎª¿Õ£¬×ÔÖ÷¸üĞÂÍ°Ãû£¬ObjectName
-                            if(CAEPath.equals("false")){//²»´æÔÚ¶ÔÓ¦µÄ¼ÇÂ¼
+                            //å­—æ®µå†…å®¹ä¸ºç©ºï¼Œè‡ªä¸»æ›´æ–°æ¡¶åï¼ŒObjectName
+                            if(CAEPath.equals("false")){//ä¸å­˜åœ¨å¯¹åº”çš„è®°å½•
                                 return false;
                             }
                         }
@@ -373,16 +373,16 @@ public class CAE {
                     }
                 } catch (Exception e){
                     e.printStackTrace();
-                    System.err.println("DM Êı¾İ¿â¸üĞÂÎÄ¼şÂ·¾¶Î´³É¹¦£¡");
+                    System.err.println("DM æ•°æ®åº“æ›´æ–°æ–‡ä»¶è·¯å¾„æœªæˆåŠŸï¼");
                     return false;
                 }
             }else{
-                System.err.println("²»ÊÇÎÄ¼ş×Ö¶Î£¡ field:"+field);
+                System.err.println("ä¸æ˜¯æ–‡ä»¶å­—æ®µï¼ field:"+field);
                 return false;
             }
         }catch (Exception e){
             e.printStackTrace();
-            System.err.println("¶ÔÓ¦¿âÃû£¬±íÃû£¬ÎÄ¼ş×Ö¶ÎÃûÓĞÎó£¡");
+            System.err.println("å¯¹åº”åº“åï¼Œè¡¨åï¼Œæ–‡ä»¶å­—æ®µåæœ‰è¯¯ï¼");
             return false;
         }
         return upload(CAEPath,localPath,dbName,tableName,id);
@@ -391,19 +391,19 @@ public class CAE {
     private boolean upload(String CAEPath,String localPath,String dbName, String tableName, String id){
         String bucketName = null;
         String objectName = null;
-        //³õÊ¼×Ö¶ÎÄÚÈİÎª¿Õ»òÕß¿Õ´®µÄÇé¿ö£¬³õÊ¼»¯Í°ÃûºÍobjectName
+        //åˆå§‹å­—æ®µå†…å®¹ä¸ºç©ºæˆ–è€…ç©ºä¸²çš„æƒ…å†µï¼Œåˆå§‹åŒ–æ¡¶åå’ŒobjectName
         if(CAEPath == null || CAEPath.equals(" ")  || CAEPath.equals("") || CAEPath.isEmpty()){
             bucketName = dbName.toLowerCase().replace("_", "-");
             File file = new File(localPath);
-            String fileName = file.getName();  // »ñÈ¡ÎÄ¼şÃû£¬°üÀ¨À©Õ¹Ãû£¬Èç "file.jpg"
+            String fileName = file.getName();  // è·å–æ–‡ä»¶åï¼ŒåŒ…æ‹¬æ‰©å±•åï¼Œå¦‚ "file.jpg"
             objectName = tableName + "/" + id + "/" + fileName;
         }else{
-            //»ñÈ¡¶ÔÓ¦ObjectName
+            //è·å–å¯¹åº”ObjectName
             bucketName = trimmedCAEPath(CAEPath)[0];
             objectName = trimmedCAEPath(CAEPath)[1];
         }
 
-        // È·±£Í°´æÔÚ
+        // ç¡®ä¿æ¡¶å­˜åœ¨
         try {
             if (!fileClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
                 fileClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
@@ -412,7 +412,7 @@ public class CAE {
             e.printStackTrace();
         }
 
-        // ÉÏ´«ÎÄ¼ş
+        // ä¸Šä¼ æ–‡ä»¶
         try {
             fileClient.uploadObject(
                     UploadObjectArgs.builder()
@@ -421,27 +421,27 @@ public class CAE {
                             .filename(localPath)
                             .build()
             );
-            System.out.println("UPLOAD FILE£º" + localPath + " -> " + CAEPath);
+            System.out.println("UPLOAD FILEï¼š" + localPath + " -> " + CAEPath);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
-            // Èç¹û localPath Îª null£¬²»Ö´ĞĞÎÄ¼ş±£´æ£¬Ö±½Ó·µ»Ø false
+            // å¦‚æœ localPath ä¸º nullï¼Œä¸æ‰§è¡Œæ–‡ä»¶ä¿å­˜ï¼Œç›´æ¥è¿”å› false
             return false;
         }
     }
 
     /**
-     * ½âÎöµÃµ½Òª¸üĞÂ×Ö¶ÎÄÚÈİ£¬²¢ÉÏ´«ÖÁDMÊı¾İ¿â
-     * @return  ³É¹¦£¿Ê§°Ü
+     * è§£æå¾—åˆ°è¦æ›´æ–°å­—æ®µå†…å®¹ï¼Œå¹¶ä¸Šä¼ è‡³DMæ•°æ®åº“
+     * @return  æˆåŠŸï¼Ÿå¤±è´¥
      */
     public boolean updateField(String localPath, String dbName, String tableName, String id,String field) {
         String dbName1 = dbName.toLowerCase().replace("_", "-");
         String resultPath = null;
         if(localPath == null){
-            resultPath = " "; //É¾³ıÎÄ¼şµÄÊ±ºòÄÚÈİÉèÎª¿Õ´®
+            resultPath = " "; //åˆ é™¤æ–‡ä»¶çš„æ—¶å€™å†…å®¹è®¾ä¸ºç©ºä¸²
         }else {
             File file = new File(localPath);
-            String fileName = file.getName();  // »ñÈ¡ÎÄ¼şÃû£¬°üÀ¨À©Õ¹Ãû£¬Èç "file.jpg"
+            String fileName = file.getName();  // è·å–æ–‡ä»¶åï¼ŒåŒ…æ‹¬æ‰©å±•åï¼Œå¦‚ "file.jpg"
             resultPath = "/" + dbName1 + "/" + tableName + "/" + id + "/" + fileName;
         }
 
@@ -450,8 +450,8 @@ public class CAE {
     }
 
     /**
-     * ÔÚDMÊı¾İ¿â¸üĞÂ×Ö¶ÎÄÚÈİ--¼´ resultPath
-     * @param resultPath Òª¸üĞÂµÄÂ·¾¶ÄÚÈİ
+     * åœ¨DMæ•°æ®åº“æ›´æ–°å­—æ®µå†…å®¹--å³ resultPath
+     * @param resultPath è¦æ›´æ–°çš„è·¯å¾„å†…å®¹
      */
     private boolean updatefield(String resultPath,String dbName, String tableName, String id,String field){
         String idField = getIDField(dbName, tableName);
@@ -462,7 +462,7 @@ public class CAE {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("update DM success!");
-                // ¹Ø±ÕÓï¾ä
+                // å…³é—­è¯­å¥
                 stmt.close();
                 return true;
             } else {
@@ -477,35 +477,35 @@ public class CAE {
 
 
     /**
-     * ¸ù¾İÊı¾İ¿âÃû³Æ¡¢±íÃû¡¢×Ö¶ÎÃûºÍ ID ÏÂÔØµ¥¸öÎÄ¼ş
-     * @param localPath ±¾µØ±£´æÂ·¾¶
+     * æ ¹æ®æ•°æ®åº“åç§°ã€è¡¨åã€å­—æ®µåå’Œ ID ä¸‹è½½å•ä¸ªæ–‡ä»¶
+     * @param localPath æœ¬åœ°ä¿å­˜è·¯å¾„
      * ...
-     * @return ÊÇ·ñÏÂÔØ³É¹¦
+     * @return æ˜¯å¦ä¸‹è½½æˆåŠŸ
      */
     public boolean GetFile(String localPath, String dbName, String tableName, String field, String id){
         System.out.println("--------------DownLoad File--------------");
         String CAEPath = null;
         try{
             if(checkFileField(dbName,tableName,field)){
-                //¶¨ÖÆsqlÓï¾ä£¬½âÎöµÃµ½CAEPath
+                //å®šåˆ¶sqlè¯­å¥ï¼Œè§£æå¾—åˆ°CAEPath
                 CAEPath = sql2CAEPath(dbName,tableName,field,id);
-                //×Ö¶ÎÄÚÈİÎª¿Õ£¬²»ĞèÒªÈ¥minioÖĞ´¦Àí²Ù×÷
+                //å­—æ®µå†…å®¹ä¸ºç©ºï¼Œä¸éœ€è¦å»minioä¸­å¤„ç†æ“ä½œ
                 if(CAEPath == null || CAEPath.equals(" ")  || CAEPath.equals("") || CAEPath.isEmpty()){
-                    System.err.println("ÎÄ¼ş×Ö¶ÎÄÚÈİÎª¿Õ£¡ field:"+field);
+                    System.err.println("æ–‡ä»¶å­—æ®µå†…å®¹ä¸ºç©ºï¼ field:"+field);
                     return false;
-                }else if(CAEPath.equals("false")){//²»´æÔÚ¶ÔÓ¦µÄ¼ÇÂ¼
+                }else if(CAEPath.equals("false")){//ä¸å­˜åœ¨å¯¹åº”çš„è®°å½•
                     return false;
                 }
             }else{
-                System.err.println("²»ÊÇÎÄ¼ş×Ö¶Î£¡ field:"+field);
+                System.err.println("ä¸æ˜¯æ–‡ä»¶å­—æ®µï¼ field:"+field);
                 return false;
             }
         }catch (Exception e){
             e.printStackTrace();
-            System.err.println("¶ÔÓ¦¿âÃû£¬±íÃû£¬ÎÄ¼ş×Ö¶ÎÃûÓĞÎó");
+            System.err.println("å¯¹åº”åº“åï¼Œè¡¨åï¼Œæ–‡ä»¶å­—æ®µåæœ‰è¯¯");
             return false;
         }
-        //½âÎöCAEPathÏÂÔØµ½±¾µØÂ·¾¶
+        //è§£æCAEPathä¸‹è½½åˆ°æœ¬åœ°è·¯å¾„
         return getfile(CAEPath, localPath);
     }
 
@@ -513,10 +513,10 @@ public class CAE {
         String bucketName = trimmedCAEPath(CAEPath)[0];
         String objectName = trimmedCAEPath(CAEPath)[1];
 
-        // ÌáÈ¡ÎÄ¼şÃû£¨´Ó objectName ÖĞÈ¥³ıÂ·¾¶£¬Ö»±£ÁôÎÄ¼şÃû£©
+        // æå–æ–‡ä»¶åï¼ˆä» objectName ä¸­å»é™¤è·¯å¾„ï¼Œåªä¿ç•™æ–‡ä»¶åï¼‰
         String fileName = objectName.substring(objectName.lastIndexOf("/") + 1);
 
-        // Æ´½Ó±¾µØÂ·¾¶ºÍÎÄ¼şÃû
+        // æ‹¼æ¥æœ¬åœ°è·¯å¾„å’Œæ–‡ä»¶å
         String localFilePath = localPath + File.separator + fileName;
         //System.out.println(localFilePath);
 
@@ -524,9 +524,9 @@ public class CAE {
             fileClient.downloadObject(DownloadObjectArgs.builder()
                     .bucket(bucketName)
                     .object(objectName)
-                    .filename(localFilePath) // ±ØĞëÖ¸¶¨ÎÄ¼şÃû
+                    .filename(localFilePath) // å¿…é¡»æŒ‡å®šæ–‡ä»¶å
                     .build());
-            System.out.println("GET FILE£º" + CAEPath + " -> " + localFilePath);
+            System.out.println("GET FILEï¼š" + CAEPath + " -> " + localFilePath);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -540,10 +540,10 @@ public class CAE {
 
         InputStream inputStream = null;
         try {
-            // µ÷ÓÃ API »ñÈ¡¶ÔÏóÁ÷
+            // è°ƒç”¨ API è·å–å¯¹è±¡æµ
             *//*inputStream = fileClient.getObject(GetObjectArgs.builder()
                     .bucket(bucketName)
-                    .object(objectName) // ×¢ÒâÕâÀï²»ÒªÔÙ´Î URL ±àÂë
+                    .object(objectName) // æ³¨æ„è¿™é‡Œä¸è¦å†æ¬¡ URL ç¼–ç 
                     .build());*/
     /*
 
@@ -553,23 +553,23 @@ public class CAE {
         }
         //fileClient.getObject(bucketName, objectName, localPath);
 
-        // ÌáÈ¡ÎÄ¼şÃû
+        // æå–æ–‡ä»¶å
         String fileName = objectName.substring(objectName.lastIndexOf("/") + 1);
         //System.out.println("Extracted File Name: " + fileName);
-        // Èç¹û localFolderPath ²»Îª null£¬½«ÎÄ¼ş±£´æµ½±¾µØ
+        // å¦‚æœ localFolderPath ä¸ä¸º nullï¼Œå°†æ–‡ä»¶ä¿å­˜åˆ°æœ¬åœ°
         if (localPath != null) {
             try {
-                // È·±£Ä¿±êÂ·¾¶µÄ¸¸Ä¿Â¼´æÔÚ
+                // ç¡®ä¿ç›®æ ‡è·¯å¾„çš„çˆ¶ç›®å½•å­˜åœ¨
                 File localDir = new File(localPath);
                 if (!localDir.exists()) {
-                    localDir.mkdirs(); // ´´½¨ÎÄ¼ş¼Ğ
+                    localDir.mkdirs(); // åˆ›å»ºæ–‡ä»¶å¤¹
                 }
 
-                // Æ´½ÓÄ¿±êÎÄ¼şÍêÕûÂ·¾¶
+                // æ‹¼æ¥ç›®æ ‡æ–‡ä»¶å®Œæ•´è·¯å¾„
                 File localFile = new File(localDir, fileName);
                 //System.out.println("Saving file to: " + localFile.getAbsolutePath());
 
-                // ±£´æÎÄ¼ş
+                // ä¿å­˜æ–‡ä»¶
                 try (FileOutputStream fos = new FileOutputStream(localFile)) {
                     byte[] buffer = new byte[1024];
                     int bytesRead;
@@ -584,7 +584,7 @@ public class CAE {
                 try {
                     if (inputStream != null) {
                         inputStream.close();
-                        System.out.println("ÎÄ¼şÏÂÔØ³É¹¦£º" + CAEPath + " -> " + localPath);
+                        System.out.println("æ–‡ä»¶ä¸‹è½½æˆåŠŸï¼š" + CAEPath + " -> " + localPath);
                         return true;
                     }
                 } catch (IOException e) {
@@ -592,39 +592,39 @@ public class CAE {
                 }
             }
         }
-        // Èç¹û localPath Îª null£¬²»Ö´ĞĞÎÄ¼ş±£´æ£¬Ö±½Ó·µ»Ø false
+        // å¦‚æœ localPath ä¸º nullï¼Œä¸æ‰§è¡Œæ–‡ä»¶ä¿å­˜ï¼Œç›´æ¥è¿”å› false
         return false;
     }*/
 
     /**
-     * ¸ù¾İÊı¾İ¿âÃû³Æ¡¢±íÃû¡¢×Ö¶ÎÃûºÍ ID ÏÂÔØµ¥¸öÎÄ¼ş×Ö·ûÁ÷
+     * æ ¹æ®æ•°æ®åº“åç§°ã€è¡¨åã€å­—æ®µåå’Œ ID ä¸‹è½½å•ä¸ªæ–‡ä»¶å­—ç¬¦æµ
      * ...
-     * @return ÊÇ·ñÏÂÔØ³É¹¦
+     * @return æ˜¯å¦ä¸‹è½½æˆåŠŸ
      */
     public InputStream GetFile( String dbName, String tableName, String field, String id){
         System.out.println("--------------DownLoad FileStream--------------");
         String CAEPath = null;
         try{
             if(checkFileField(dbName,tableName,field)){
-                //¶¨ÖÆsqlÓï¾ä£¬½âÎöµÃµ½CAEPath
+                //å®šåˆ¶sqlè¯­å¥ï¼Œè§£æå¾—åˆ°CAEPath
                 CAEPath = sql2CAEPath(dbName,tableName,field,id);
-                //×Ö¶ÎÄÚÈİÎª¿Õ£¬²»ĞèÒªÈ¥minioÖĞ´¦Àí²Ù×÷
+                //å­—æ®µå†…å®¹ä¸ºç©ºï¼Œä¸éœ€è¦å»minioä¸­å¤„ç†æ“ä½œ
                 if(CAEPath == null || CAEPath.equals(" ")  || CAEPath.equals("") || CAEPath.isEmpty()){
-                    System.err.println("ÎÄ¼ş×Ö¶ÎÄÚÈİÎª¿Õ£¡ field:"+field);
+                    System.err.println("æ–‡ä»¶å­—æ®µå†…å®¹ä¸ºç©ºï¼ field:"+field);
                     return null;
-                }else if(CAEPath.equals("false")){//²»´æÔÚ¶ÔÓ¦µÄ¼ÇÂ¼
+                }else if(CAEPath.equals("false")){//ä¸å­˜åœ¨å¯¹åº”çš„è®°å½•
                     return null;
                 }
             }else{
-                System.err.println("²»ÊÇÎÄ¼ş×Ö¶Î£¡ field:"+field);
+                System.err.println("ä¸æ˜¯æ–‡ä»¶å­—æ®µï¼ field:"+field);
                 return null;
             }
         }catch (Exception e){
             e.printStackTrace();
-            System.err.println("¶ÔÓ¦¿âÃû£¬±íÃû£¬ÎÄ¼ş×Ö¶ÎÃûÓĞÎó");
+            System.err.println("å¯¹åº”åº“åï¼Œè¡¨åï¼Œæ–‡ä»¶å­—æ®µåæœ‰è¯¯");
             return null;
         }
-        //½âÎöCAEPathÏÂÔØµ½±¾µØÂ·¾¶
+        //è§£æCAEPathä¸‹è½½åˆ°æœ¬åœ°è·¯å¾„
         return getstream(CAEPath);
     }
 
@@ -633,7 +633,7 @@ public class CAE {
         String bucketName = trimmedCAEPath(CAEPath)[0];
         String objectName = trimmedCAEPath(CAEPath)[1];
 
-        // µ÷ÓÃ API »ñÈ¡¶ÔÏóÁ÷
+        // è°ƒç”¨ API è·å–å¯¹è±¡æµ
         InputStream inputStream = null;
         try {
             inputStream = fileClient.getObject(
@@ -649,23 +649,23 @@ public class CAE {
     }
 
     /**
-     * ·â×°µÄÎÄ¼ş×Ö¶Î¼ì²éÂß¼­£¬·µ»Ø true »ò false
+     * å°è£…çš„æ–‡ä»¶å­—æ®µæ£€æŸ¥é€»è¾‘ï¼Œè¿”å› true æˆ– false
      * ...
-     * @return ÎÄ¼ş×Ö¶ÎÊÇ·ñ¶ÔÓ¦³É¹¦
+     * @return æ–‡ä»¶å­—æ®µæ˜¯å¦å¯¹åº”æˆåŠŸ
      */
     private static boolean checkFileField(String dbName, String tableName, String field) {
-        // Ê¹ÓÃ Optional ½øĞĞÁ´Ê½¼ì²é
+        // ä½¿ç”¨ Optional è¿›è¡Œé“¾å¼æ£€æŸ¥
         //boolean check = fileDBMap.get(dbName).get(tableName).contains(field);
         return fileDBMap.get(dbName).get(tableName).contains(field);
     }
 
     /**
-     * ¸ù¾İÊı¾İ¿âÃû³Æ¡¢±íÃû¡¢×Ö¶ÎÃûºÍ ID »ñÈ¡ÎÄ¼ş±íÖĞÎÄ¼ş×Ö¶ÎÄÚÈİ--CAEPath
+     * æ ¹æ®æ•°æ®åº“åç§°ã€è¡¨åã€å­—æ®µåå’Œ ID è·å–æ–‡ä»¶è¡¨ä¸­æ–‡ä»¶å­—æ®µå†…å®¹--CAEPath
      * ...
-     * @return CAEPathÂ·¾¶
+     * @return CAEPathè·¯å¾„
      */
     private String sql2CAEPath(String dbName, String tableName, String field, String id){
-        // »ñÈ¡¶ÔÓ¦µÄ ID ×Ö¶Î
+        // è·å–å¯¹åº”çš„ ID å­—æ®µ
         String idField = getIDField(dbName, tableName);
 
         String CAEPath = null;
@@ -674,23 +674,23 @@ public class CAE {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    CAEPath = rs.getString(1); // »ñÈ¡ÎÄ¼şÂ·¾¶
+                    CAEPath = rs.getString(1); // è·å–æ–‡ä»¶è·¯å¾„
                 } else {
-                    System.err.println("Î´ÕÒµ½¶ÔÓ¦µÄ¼ÇÂ¼£¬ID: " + id);
+                    System.err.println("æœªæ‰¾åˆ°å¯¹åº”çš„è®°å½•ï¼ŒID: " + id);
                     return "false";
                 }
             }
         } catch (Exception e) {
-            System.err.println("²éÑ¯Êı¾İ¿âÊ§°Ü: " + e.getMessage());
+            System.err.println("æŸ¥è¯¢æ•°æ®åº“å¤±è´¥: " + e.getMessage());
             e.printStackTrace();
             return "false";
         }
         return CAEPath;
     }
 
-    // ¸ù¾İ dbName ºÍ tableName »ñÈ¡¶ÔÓ¦µÄ ID ×Ö¶Î
+    // æ ¹æ® dbName å’Œ tableName è·å–å¯¹åº”çš„ ID å­—æ®µ
     public static String getIDField(String dbName, String tableName) {
-        // ´Ó fileIDMap ÖĞ²éÕÒ¶ÔÓ¦µÄ dbName
+        // ä» fileIDMap ä¸­æŸ¥æ‰¾å¯¹åº”çš„ dbName
         Map<String, String> tableMap = fileIDMap.get(dbName);
         if(tableMap != null){
             return tableMap.get(tableName);
@@ -700,18 +700,18 @@ public class CAE {
     }
 
     /**
-     * ´¦Àí×Ö¶ÎÄÚÈİ--ÎÄ¼şÂ·¾¶
-     * @param CAEPath   filesystemÖĞµÄÄ¿±êÂ·¾¶£¬¸ñÊ½ÀàËÆÓÚ "xxx/folderName/fileName"¡£
+     * å¤„ç†å­—æ®µå†…å®¹--æ–‡ä»¶è·¯å¾„
+     * @param CAEPath   filesystemä¸­çš„ç›®æ ‡è·¯å¾„ï¼Œæ ¼å¼ç±»ä¼¼äº "xxx/folderName/fileName"ã€‚
      * return [bucketName,objectName]
      */
     private String[] trimmedCAEPath(String CAEPath){
-        // È¥µôÇ°ÃæµÄ '/'£¬ÒÔ±ãÍ³Ò»´¦Àí
+        // å»æ‰å‰é¢çš„ '/'ï¼Œä»¥ä¾¿ç»Ÿä¸€å¤„ç†
         String trimmedPath = CAEPath.substring(1);
 
-        // ·ÖÎö CAEPath£¬ÌáÈ¡Í°ÃûºÍ¶ÔÏóÃû
+        // åˆ†æ CAEPathï¼Œæå–æ¡¶åå’Œå¯¹è±¡å
         int firstSlashIndex = trimmedPath.indexOf("/");
         if (firstSlashIndex == -1) {
-            throw new IllegalArgumentException("CAEPath ¸ñÊ½²»ÕıÈ·£¬±ØĞë°üº¬Í°ÃûºÍÎÄ¼şÂ·¾¶£¬ÀıÈç£ºxxx/folderName/fileName");
+            throw new IllegalArgumentException("CAEPath æ ¼å¼ä¸æ­£ç¡®ï¼Œå¿…é¡»åŒ…å«æ¡¶åå’Œæ–‡ä»¶è·¯å¾„ï¼Œä¾‹å¦‚ï¼šxxx/folderName/fileName");
         }
 
         String bucketName = trimmedPath.substring(0, firstSlashIndex);
@@ -720,22 +720,22 @@ public class CAE {
         return new String[]{bucketName,objectName};
     }
 
-    //½âÎöµÃµ½¿âÃû & ±íÃû --> [schema,tableName]
+    //è§£æå¾—åˆ°åº“å & è¡¨å --> [schema,tableName]
     private String[] parseSQL(String sql) {
         String schema = null;
         String tableName = null;
         List<String> columns = new ArrayList<>();
         try {
-            // ½âÎöSQLÓï¾ä
+            // è§£æSQLè¯­å¥
             Statement statement = CCJSqlParserUtil.parse(sql);
 
-            // ¼ì²é SQL Óï¾äÀàĞÍ
+            // æ£€æŸ¥ SQL è¯­å¥ç±»å‹
             if (statement instanceof Select) {
-                // ½âÎöSELECTÓï¾ä
+                // è§£æSELECTè¯­å¥
                 Select selectStatement = (Select) CCJSqlParserUtil.parse(sql);
                 PlainSelect plainSelect = (PlainSelect) selectStatement.getSelectBody();
 
-                // »ñÈ¡FROM×Ó¾äÖĞµÄ±í
+                // è·å–FROMå­å¥ä¸­çš„è¡¨
                 FromItem fromItem = plainSelect.getFromItem();
                 if (fromItem instanceof Table) {
                     Table table = (Table) fromItem;
@@ -745,7 +745,7 @@ public class CAE {
                     }
                 }
 
-                // »ñÈ¡SELECT×Ó¾äÖĞµÄ×Ö¶Î
+                // è·å–SELECTå­å¥ä¸­çš„å­—æ®µ
                 List<SelectItem> selectItems = plainSelect.getSelectItems();
                 for (SelectItem selectItem : selectItems) {
                     if (selectItem instanceof SelectExpressionItem) {
@@ -755,7 +755,7 @@ public class CAE {
                     }
                 }
 
-                // »ñÈ¡JOIN×Ó¾äÖĞµÄ±í£¨Èç¹ûÓĞµÄ»°£©
+                // è·å–JOINå­å¥ä¸­çš„è¡¨ï¼ˆå¦‚æœæœ‰çš„è¯ï¼‰
                 List<Join> joins = plainSelect.getJoins();
                 if (joins != null) {
                     for (Join join : joins) {
@@ -780,7 +780,7 @@ public class CAE {
         return new String[]{
                 schema,
                 tableName,
-                String.join(",", columns),  // ½«×Ö¶ÎÃûÓÃ¶ººÅÁ¬½Ó³ÉÒ»¸ö×Ö·û´®
+                String.join(",", columns),  // å°†å­—æ®µåç”¨é€—å·è¿æ¥æˆä¸€ä¸ªå­—ç¬¦ä¸²
         };
     }
 
@@ -795,7 +795,7 @@ public class CAE {
 
         try {
             stmt = conn.prepareStatement(sql);
-            //Ö´ĞĞ²éÑ¯
+            //æ‰§è¡ŒæŸ¥è¯¢
             rsWrapper.setRs(stmt.executeQuery());
             System.out.println("query success!");
             return true;
@@ -819,7 +819,7 @@ public class CAE {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("update success!");
-                // ¹Ø±ÕÓï¾ä
+                // å…³é—­è¯­å¥
                 stmt.close();
                 return true;
             } else {
@@ -845,7 +845,7 @@ public class CAE {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("delete success!");
-                // ¹Ø±ÕÓï¾ä
+                // å…³é—­è¯­å¥
                 stmt.close();
                 return true;
             } else {
@@ -870,7 +870,7 @@ public class CAE {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("insert success!");
-                // ¹Ø±ÕÓï¾ä
+                // å…³é—­è¯­å¥
                 stmt.close();
                 return true;
             } else {
@@ -883,8 +883,8 @@ public class CAE {
         }
     }
 
-    /** ÏÔÊ¾½á¹û¼¯
-     * @param rsWrapper ½á¹û¼¯¶ÔÏó
+    /** æ˜¾ç¤ºç»“æœé›†
+     * @param rsWrapper ç»“æœé›†å¯¹è±¡
      */
     public void Display(ResultSetWrapper rsWrapper) {
         if (rsWrapper.getRs() == null) {
@@ -893,11 +893,11 @@ public class CAE {
         }
         try {
             List<Integer> colTypes = new ArrayList<>();
-            // È¡µÃ½á¹û¼¯ÔªÊı¾İ
+            // å–å¾—ç»“æœé›†å…ƒæ•°æ®
             ResultSetMetaData rsmd = rsWrapper.getRs().getMetaData();
-            // È¡µÃ½á¹û¼¯Ëù°üº¬µÄÁĞÊı
+            // å–å¾—ç»“æœé›†æ‰€åŒ…å«çš„åˆ—æ•°
             int numCols = rsmd.getColumnCount();
-            // »ñÈ¡ÁĞÀàĞÍ   // ÏÔÊ¾ÁĞ±êÍ·
+            // è·å–åˆ—ç±»å‹   // æ˜¾ç¤ºåˆ—æ ‡å¤´
             for (int i = 1; i <= numCols; i++) {
                 int type = rsWrapper.getRs().getMetaData().getColumnType(i);
                 colTypes.add(type);
@@ -906,7 +906,7 @@ public class CAE {
             System.out.println("");
 
 
-            // ´¦ÀíÃ¿Ò»ĞĞ¼ÇÂ¼
+            // å¤„ç†æ¯ä¸€è¡Œè®°å½•
             while (rsWrapper.getRs().next()) {
                 for (int i = 1; i <= numCols; i++) {
                     int type = colTypes.get(i - 1);
@@ -948,7 +948,7 @@ public class CAE {
 //            if (dataConfig == null) {
 //                System.out.println("Open config File: test failed.");
 //            }
-//            // È·±£ dataConfig ÊÇÒ»¸ö Map
+//            // ç¡®ä¿ dataConfig æ˜¯ä¸€ä¸ª Map
 //            if (!(dataConfig instanceof Map)) {
 //                System.out.println("Config file format is incorrect. Expected a Map.");
 //                return;
@@ -956,10 +956,10 @@ public class CAE {
 //
 //            Map<String, Object> configMap = (Map<String, Object>) dataConfig;
 //
-//            // »ñÈ¡Êı¾İ¿âÅäÖÃ
+//            // è·å–æ•°æ®åº“é…ç½®
 //            Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) configMap.get("database"));
 //
-//            // °²È«»ñÈ¡ÅäÖÃĞÅÏ¢
+//            // å®‰å…¨è·å–é…ç½®ä¿¡æ¯
 //            String server = databaseConfig.map(m -> m.get("server")).orElse(null);
 //            String username = databaseConfig.map(m -> m.get("username")).orElse(null);
 //
@@ -975,13 +975,13 @@ public class CAE {
 //        }
 //    }
 
-    // ¹Ø±ÕÓï¾ä¾ä±ú  ¹Ø±ÕÊı¾İ¶ÔÏó
+    // å…³é—­è¯­å¥å¥æŸ„  å…³é—­æ•°æ®å¯¹è±¡
     public void setClose(ResultSetWrapper rsWrapper) {
         if (rsWrapper != null) {
             try {
-                // ¹Ø±ÕÓï¾ä
+                // å…³é—­è¯­å¥
                 stmt.close();
-                //¹Ø±Õ½á¹û¼¯
+                //å…³é—­ç»“æœé›†
                 rsWrapper.getRs().close();
             } catch (SQLException e) {
                 System.err.println("Error closing ResultSet: " + e.getMessage());
@@ -990,7 +990,7 @@ public class CAE {
         }
     }
 
-    //¹Ø±ÕÁ¬½Ó
+    //å…³é—­è¿æ¥
     public void connClose() {
         try {
             if (conn != null && !conn.isClosed()) {
@@ -1003,9 +1003,9 @@ public class CAE {
         }
     }
 
-    // ¹Ø±ÕÎÄ¼şÏµÍ³µÄÁ¬½Ó
+    // å…³é—­æ–‡ä»¶ç³»ç»Ÿçš„è¿æ¥
     public void File_connClose() {
-        // ¹Ø±Õ JDBC Á¬½Ó
+        // å…³é—­ JDBC è¿æ¥
         try {
             if (conn != null && !conn.isClosed()) {
                 conn.close();
@@ -1016,10 +1016,10 @@ public class CAE {
             System.exit(-1);
         }
 
-        // ¹Ø±Õ Minio ¿Í»§¶ËÁ¬½Ó
+        // å…³é—­ Minio å®¢æˆ·ç«¯è¿æ¥
         try {
             if (fileClient != null) {
-                // Minio Ã»ÓĞÖ±½Ó¹Ø±ÕµÄ·½·¨£¬ÉèÖÃÎª null ÒÔ°ïÖúÀ¬»ø»ØÊÕ
+                // Minio æ²¡æœ‰ç›´æ¥å…³é—­çš„æ–¹æ³•ï¼Œè®¾ç½®ä¸º null ä»¥å¸®åŠ©åƒåœ¾å›æ”¶
                 fileClient = null;
                 System.out.println("========== Minio: disconnect from server success! ==========");
             }

@@ -5,48 +5,48 @@ import java.io.InputStream;
 public class main {
     public static void main(String[] args) {
         String filePath = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\src\\main\\resources\\interface-config.yaml";
-        CAE db = new CAE(filePath);
+        //CAE db = new CAE(filePath);
         CAE File = new CAE(filePath,true);
         String localPath= "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test";
-        String uploadFile = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test\\7082001-´¬¿ÇÈıÎ¬Ä£ĞÍÎÄ¼ş.igs";
+        String uploadFile = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test\\7082001-èˆ¹å£³ä¸‰ç»´æ¨¡å‹æ–‡ä»¶.igs";
 
-        //²âÊÔÏÂÔØµ¥¸öÎÄ¼ş¡Ì
-//        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081004")){
-//            System.out.println("ÏÂÔØ³É¹¦£¡");
+        //æµ‹è¯•ä¸‹è½½å•ä¸ªæ–‡ä»¶âˆš
+//        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","TRANSVERSE_AREA_CURVE","SampleShip_JBC0000")){
+//            System.out.println("ä¸‹è½½æˆåŠŸï¼");
 //        }
-//        //²âÊÔÏÂÔØµ¥¸öÎÄ¼ş£¬²»´æÔÚµÄID
+//        //æµ‹è¯•ä¸‹è½½å•ä¸ªæ–‡ä»¶ï¼Œä¸å­˜åœ¨çš„ID
 //        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081001")){
-//            System.out.println("ÏÂÔØ³É¹¦£¡");
+//            System.out.println("ä¸‹è½½æˆåŠŸï¼");
 //        }
-//        //²âÊÔÏÂÔØµ¥¸öÎÄ¼ş£¬ÎÄ¼şÊı¾İÎª¿Õ
+//        //æµ‹è¯•ä¸‹è½½å•ä¸ªæ–‡ä»¶ï¼Œæ–‡ä»¶æ•°æ®ä¸ºç©º
 //        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081004")){
-//            System.out.println("ÏÂÔØ³É¹¦£¡");
+//            System.out.println("ä¸‹è½½æˆåŠŸï¼");
 //        }
-//        //²âÊÔÏÂÔØµ¥¸öÎÄ¼ş£¬²»Éæ¼°ÎÄ¼şÊı¾İ
+//        //æµ‹è¯•ä¸‹è½½å•ä¸ªæ–‡ä»¶ï¼Œä¸æ¶‰åŠæ–‡ä»¶æ•°æ®
 //        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_ID","M7081004")){
-//            System.out.println("ÏÂÔØ³É¹¦£¡");
+//            System.out.println("ä¸‹è½½æˆåŠŸï¼");
 //        }
 
 
-        //²âÊÔÏÂÔØµ¥¸öÎÄ¼ş×Ö·ûÁ÷¡Ì
+        //æµ‹è¯•ä¸‹è½½å•ä¸ªæ–‡ä»¶å­—ç¬¦æµâˆš
 //        InputStream inputStream = File.GetFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081004");
 //        if(inputStream != null){
-//            System.out.println("GET STREAM SUCCESS£¡");
+//            System.out.println("GET STREAM SUCCESSï¼");
 //        }
-//        //²âÊÔÏÂÔØ²»´æÔÚµÄID
+//        //æµ‹è¯•ä¸‹è½½ä¸å­˜åœ¨çš„ID
 //        InputStream inputStream1 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081001");
 //        if(inputStream1 != null){
-//            System.out.println("GET STREAM SUCCESS£¡");
+//            System.out.println("GET STREAM SUCCESSï¼");
 //        }
-//        //²âÊÔÏÂÔØÎÄ¼şÊı¾İÎª¿Õ
+//        //æµ‹è¯•ä¸‹è½½æ–‡ä»¶æ•°æ®ä¸ºç©º
 //        InputStream inputStream2 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081004");
 //        if(inputStream2 != null){
-//            System.out.println("GET STREAM SUCCESS£¡");
+//            System.out.println("GET STREAM SUCCESSï¼");
 //        }
-//        //²âÊÔÏÂÔØ£¬²»Éæ¼°ÎÄ¼şÊı¾İ
+//        //æµ‹è¯•ä¸‹è½½ï¼Œä¸æ¶‰åŠæ–‡ä»¶æ•°æ®
 //        InputStream inputStream3 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_ID","M7081004");
 //        if(inputStream3 != null){
-//            System.out.println("GET STREAM SUCCESS£¡");
+//            System.out.println("GET STREAM SUCCESSï¼");
 //        }
 //        try {
 //            inputStream.close();
@@ -59,70 +59,127 @@ public class main {
 //        }
 
 
-        //²âÊÔÕı³£É¾³ıÒ»Ìõ¼ÇÂ¼¡Ì
+        //æµ‹è¯•æ­£å¸¸åˆ é™¤ä¸€æ¡è®°å½•âˆš
 //        if(File.DeleteRecord("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","M7081004")){
-//            System.out.println("É¾³ı¼ÇÂ¼³É¹¦£¡");
+//            System.out.println("åˆ é™¤è®°å½•æˆåŠŸï¼");
 //        }
-//        //²âÊÔÉ¾³ıÒ»Ìõ²»´æÔÚµÄ¼ÇÂ¼
+//        //æµ‹è¯•åˆ é™¤ä¸€æ¡ä¸å­˜åœ¨çš„è®°å½•
 //        if(File.DeleteRecord("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","M7081003")){
-//            System.out.println("É¾³ı¼ÇÂ¼³É¹¦£¡");
+//            System.out.println("åˆ é™¤è®°å½•æˆåŠŸï¼");
 //        }
-//        //²âÊÔÉ¾³ıÎÄ¼şÊı¾İÎª¿ÕµÄ¼ÇÂ¼
+//        //æµ‹è¯•åˆ é™¤æ–‡ä»¶æ•°æ®ä¸ºç©ºçš„è®°å½•
 //        if(File.DeleteRecord("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","SampleShip_JBC0000")){
-//            System.out.println("É¾³ı¼ÇÂ¼³É¹¦£¡");
+//            System.out.println("åˆ é™¤è®°å½•æˆåŠŸï¼");
 //        }
-//        //¸Ã¼ÇÂ¼Ã»ÓĞÉæ¼°ÎÄ¼şÊı¾İ
+//        //è¯¥è®°å½•æ²¡æœ‰æ¶‰åŠæ–‡ä»¶æ•°æ®
 //        if(File.DeleteRecord("HULL_MODEL_AND_INFORMATION_DB","PERFORMANCE_INFO","M7081004")){
-//            System.out.println("É¾³ı¼ÇÂ¼³É¹¦£¡");
+//            System.out.println("åˆ é™¤è®°å½•æˆåŠŸï¼");
 //        }
 
 
-        //²âÊÔÕı³£É¾³ı¡Ì
+        //æµ‹è¯•æ­£å¸¸åˆ é™¤âˆš
 //        if(File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","SampleShip_KCS0000")){
-//            System.out.println("É¾³ı³É¹¦£¡");
+//            System.out.println("åˆ é™¤æˆåŠŸï¼");
 //        }
-//        //²âÊÔÉ¾³ı£¬²»´æÔÚµÄ¼ÇÂ¼
+//        //æµ‹è¯•åˆ é™¤ï¼Œä¸å­˜åœ¨çš„è®°å½•
 //        if(File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081003")){
-//            System.out.println("É¾³ı³É¹¦£¡");
+//            System.out.println("åˆ é™¤æˆåŠŸï¼");
 //        }
-//        //²âÊÔÉ¾³ı£¬ÎÄ¼ş×Ö¶ÎÄÚÈİÎª¿Õ
+//        //æµ‹è¯•åˆ é™¤ï¼Œæ–‡ä»¶å­—æ®µå†…å®¹ä¸ºç©º
 //        if(File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081004")){
-//            System.out.println("É¾³ı³É¹¦£¡");
+//            System.out.println("åˆ é™¤æˆåŠŸï¼");
 //        }
-//        //²âÊÔÉ¾³ı£¬²»ÊÇÎÄ¼ş×Ö¶Î
+//        //æµ‹è¯•åˆ é™¤ï¼Œä¸æ˜¯æ–‡ä»¶å­—æ®µ
 //        if(File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","AFTER_SHAPE","M7081004")){
-//            System.out.println("É¾³ı³É¹¦£¡");
+//            System.out.println("åˆ é™¤æˆåŠŸï¼");
 //        }
 
 
-        //²âÊÔÉÏ´«¡Ì
-//        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081004")){
-//            System.out.println("ÉÏ´«³É¹¦£¡");
+        //æµ‹è¯•ä¸Šä¼ âˆš
+//        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081015")){
+//            System.out.println("ä¸Šä¼ æˆåŠŸï¼");
 //        }
-//        //²âÊÔÉÏ´«£¬²»´æÔÚµÄ¼ÇÂ¼
+//        //æµ‹è¯•ä¸Šä¼ ï¼Œä¸å­˜åœ¨çš„è®°å½•
 //        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081001")){
-//            System.out.println("ÉÏ´«³É¹¦£¡");
+//            System.out.println("ä¸Šä¼ æˆåŠŸï¼");
 //        }
-//        //²âÊÔÉÏ´«£¬ÎÄ¼ş×Ö¶ÎÄÚÈİÎª¿Õ£¬Ò²¿ÉÒÔ³É¹¦£¡
+//        //æµ‹è¯•ä¸Šä¼ ï¼Œæ–‡ä»¶å­—æ®µå†…å®¹ä¸ºç©ºï¼Œä¹Ÿå¯ä»¥æˆåŠŸï¼
 //        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081004")){
-//            System.out.println("ÉÏ´«³É¹¦£¡");
+//            System.out.println("ä¸Šä¼ æˆåŠŸï¼");
 //        }
-//        //²âÊÔÉÏ´«£¬²»ÊÇÎÄ¼ş×Ö¶Î
+//        //æµ‹è¯•ä¸Šä¼ ï¼Œä¸æ˜¯æ–‡ä»¶å­—æ®µ
 //        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","AFTER_SHAPE","M7081004")){
-//            System.out.println("ÉÏ´«³É¹¦£¡");
+//            System.out.println("ä¸Šä¼ æˆåŠŸï¼");
 //        }
 
-        //²âÊÔ²éÑ¯--¹Ø¼üÉè±¸¿â
+        //æµ‹è¯•æŸ¥è¯¢--åŸºæœ¬èˆ¹å‹åº“
 //        ResultSetWrapper rsWrapper = new ResultSetWrapper();
+//        if (File.Query("select * from BASIC_SHIP_INFORMATION_DB.SHIP_DATA_INFO where ship_type = 'æ²¹èˆ¹';",rsWrapper)) {
+//            File.Display(rsWrapper);
+//            File.setClose(rsWrapper);
+//        };
+//
+//        //æµ‹è¯•æŸ¥è¯¢--å…³é”®è®¾å¤‡åº“
 //        if (File.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWrapper)) {
 //            File.Display(rsWrapper);
 //            File.setClose(rsWrapper);
 //        };
-//       //¹Ø±ÕÎÄ¼şÏµÍ³Á¬½Ó
-//        File.File_connClose();
 
+        /**
+         * è¾¾æ¢¦æ•°æ®åº“æ“ä½œæµ‹è¯• - Fileå¯¹è±¡
+         */
 
-        // ²âÊÔ²åÈë
+        // æµ‹è¯•æ’å…¥
+//        if(File.Insert("INSERT INTO SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF (\n" +
+//                "    EQUIP_ID,\n" +
+//                "    MAJOR,\n" +
+//                "    SYSTEM,\n" +
+//                "    CATEGORY,\n" +
+//                "    SPECIAL_ATTRIBUTE,\n" +
+//                "    REMARK,\n" +
+//                "    RECORD\n" +
+//                ") VALUES (\n" +
+//                "    'LJ-2',\n" +
+//                "    'è½®æœº',\n" +
+//                "    'å†…ç‡ƒæœº',\n" +
+//                "    'ä¸»æœº',\n" +
+//                "    '{\"cylinderNum\":\"ç¼¸æ•°\",\"cylinderDiameter\":\"ç¼¸å¾„(mm)\",\"stroke\":\"å†²ç¨‹(mm)\",\"ratedPower\":\"é¢å®šåŠŸç‡(kW)\",\"ratedSpeed\":\"é¢å®šè½¬é€Ÿ(rpm)\",\"smcrPower\":\"SMCRåŠŸç‡(kW)\",\"smcrSpeed\":\"SMCRè½¬é€Ÿ(rpm)\",\"smcrFuelUsed\":\"SMCRæ²¹è€—(g/kWh)\",\"ncrPower\":\"NCRåŠŸç‡(kW)\",\"ncrSpeed\":\"NCRè½¬é€Ÿ(rpm)\",\"ncrFuelUsed\":\"NCRæ²¹è€—(g/kWh)\",\"greaseFuelUsed\":\"æ»‘æ²¹æ²¹è€—(kg/d)\",\"cylinderFuelUsed\":\"æ±½ç¼¸æ²¹è€—(g/kWh)\",\"oilPump\":\"ä¾›æ²¹æ³µ(m3/h)\",\"oilPumpHead\":\"ä¾›æ²¹æ³µå‹å¤´(bar)\",\"stressPump\":\"å¢å‹æ³µ(m3/h)\",\"stressPumpHead\":\"å¢å‹æ³µå‹å¤´(bar)\",\"greasePump\":\"æ»‘æ²¹æ³µ(m3/h)\",\"greasePumpHead\":\"æ»‘æ²¹æ³µå‹å¤´(bar)\",\"greaseTank\":\"æ»‘æ²¹å¾ªç¯èˆ±(m3)\",\"greasePurifierFlow\":\"æ»‘æ²¹åˆ†æ²¹æœºæµé‡(L/h)\",\"middleHeatExchange\":\"ä¸­å¤®çƒ­äº¤æ¢é‡(kW)\",\"middleWaterFlow\":\"ä¸­å¤®å†·å´æ°´æµé‡(m3/h)\",\"cylinderHeatExchange\":\"ç¼¸å¥—çƒ­äº¤æ¢é‡(kW)\",\"cylinderWaterFlow\":\"ç¼¸å¥—å†·å´æ°´æµé‡(m3/h)\",\"greaseHeatExchange\":\"æ»‘æ²¹çƒ­äº¤æ¢é‡(kW)\",\"greaseWaterFlow\":\"æ»‘æ²¹å†·å´æ°´æµé‡(m3/h)\",\"airPump\":\"ç©ºå‹æœº(Nm3/h)\",\"airBottle\":\"ç©ºæ°”ç“¶(m3)\",\"exhaustDiameter\":\"æ’æ°”ç®¡å¾„(mm)\"}',\n" +
+//                "    NULL, \n" +
+//                "    NULL  \n" +
+//                ");")){
+//            System.out.println("INSERT SUCCESS!");
+//        };
+//
+//        // æµ‹è¯•æ›´æ–°
+//        if(File.Update("UPDATE SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF SET SYSTEM = 'å†…ç‡ƒæœº2' WHERE EQUIP_ID = 'LJ-2';")){
+//            System.out.println("UPDATE SUCCESS!");
+//        };
+//
+//        //jsonå­—æ®µçš„æŸ¥è¯¢ï¼Œä¸­æ–‡keyçš„æƒ…å†µ
+//        ResultSetWrapper rsWrapper = new ResultSetWrapper();
+//        if(File.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.AnchorType') = 'ç±»å‹';", rsWrapper)){
+//            System.out.println("QUERY SUCCESS!");
+//            File.Display(rsWrapper);
+//        };
+//
+//        //æµ‹è¯•æŸ¥è¯¢--å…³é”®è®¾å¤‡åº“
+//        if (File.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWrapper)) {
+//            File.Display(rsWrapper);
+//            File.setClose(rsWrapper);
+//        };
+//
+//        // æµ‹è¯•åˆ é™¤
+//        if(File.Delete("DELETE FROM SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF WHERE EQUIP_ID = 'LJ-2';")){
+//            System.out.println("DELETE SUCCESS!");
+//        };
+
+       //å…³é—­æ–‡ä»¶ç³»ç»Ÿè¿æ¥
+        File.File_connClose();
+
+        /**
+         * è¾¾æ¢¦æ•°æ®åº“æ“ä½œæµ‹è¯• - dbå¯¹è±¡
+         */
+        // æµ‹è¯•æ’å…¥
         /*if(db.Insert("INSERT INTO SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF (\n" +
                 "    EQUIP_ID,\n" +
                 "    MAJOR,\n" +
@@ -133,35 +190,35 @@ public class main {
                 "    RECORD\n" +
                 ") VALUES (\n" +
                 "    'LJ-2',\n" +
-                "    'ÂÖ»ú',\n" +
-                "    'ÄÚÈ¼»ú',\n" +
-                "    'Ö÷»ú',\n" +
-                "    '{\"cylinderNum\":\"¸×Êı\",\"cylinderDiameter\":\"¸×¾¶(mm)\",\"stroke\":\"³å³Ì(mm)\",\"ratedPower\":\"¶î¶¨¹¦ÂÊ(kW)\",\"ratedSpeed\":\"¶î¶¨×ªËÙ(rpm)\",\"smcrPower\":\"SMCR¹¦ÂÊ(kW)\",\"smcrSpeed\":\"SMCR×ªËÙ(rpm)\",\"smcrFuelUsed\":\"SMCRÓÍºÄ(g/kWh)\",\"ncrPower\":\"NCR¹¦ÂÊ(kW)\",\"ncrSpeed\":\"NCR×ªËÙ(rpm)\",\"ncrFuelUsed\":\"NCRÓÍºÄ(g/kWh)\",\"greaseFuelUsed\":\"»¬ÓÍÓÍºÄ(kg/d)\",\"cylinderFuelUsed\":\"Æû¸×ÓÍºÄ(g/kWh)\",\"oilPump\":\"¹©ÓÍ±Ã(m3/h)\",\"oilPumpHead\":\"¹©ÓÍ±ÃÑ¹Í·(bar)\",\"stressPump\":\"ÔöÑ¹±Ã(m3/h)\",\"stressPumpHead\":\"ÔöÑ¹±ÃÑ¹Í·(bar)\",\"greasePump\":\"»¬ÓÍ±Ã(m3/h)\",\"greasePumpHead\":\"»¬ÓÍ±ÃÑ¹Í·(bar)\",\"greaseTank\":\"»¬ÓÍÑ­»·²Õ(m3)\",\"greasePurifierFlow\":\"»¬ÓÍ·ÖÓÍ»úÁ÷Á¿(L/h)\",\"middleHeatExchange\":\"ÖĞÑëÈÈ½»»»Á¿(kW)\",\"middleWaterFlow\":\"ÖĞÑëÀäÈ´Ë®Á÷Á¿(m3/h)\",\"cylinderHeatExchange\":\"¸×Ì×ÈÈ½»»»Á¿(kW)\",\"cylinderWaterFlow\":\"¸×Ì×ÀäÈ´Ë®Á÷Á¿(m3/h)\",\"greaseHeatExchange\":\"»¬ÓÍÈÈ½»»»Á¿(kW)\",\"greaseWaterFlow\":\"»¬ÓÍÀäÈ´Ë®Á÷Á¿(m3/h)\",\"airPump\":\"¿ÕÑ¹»ú(Nm3/h)\",\"airBottle\":\"¿ÕÆøÆ¿(m3)\",\"exhaustDiameter\":\"ÅÅÆø¹Ü¾¶(mm)\"}',\n" +
+                "    'è½®æœº',\n" +
+                "    'å†…ç‡ƒæœº',\n" +
+                "    'ä¸»æœº',\n" +
+                "    '{\"cylinderNum\":\"ç¼¸æ•°\",\"cylinderDiameter\":\"ç¼¸å¾„(mm)\",\"stroke\":\"å†²ç¨‹(mm)\",\"ratedPower\":\"é¢å®šåŠŸç‡(kW)\",\"ratedSpeed\":\"é¢å®šè½¬é€Ÿ(rpm)\",\"smcrPower\":\"SMCRåŠŸç‡(kW)\",\"smcrSpeed\":\"SMCRè½¬é€Ÿ(rpm)\",\"smcrFuelUsed\":\"SMCRæ²¹è€—(g/kWh)\",\"ncrPower\":\"NCRåŠŸç‡(kW)\",\"ncrSpeed\":\"NCRè½¬é€Ÿ(rpm)\",\"ncrFuelUsed\":\"NCRæ²¹è€—(g/kWh)\",\"greaseFuelUsed\":\"æ»‘æ²¹æ²¹è€—(kg/d)\",\"cylinderFuelUsed\":\"æ±½ç¼¸æ²¹è€—(g/kWh)\",\"oilPump\":\"ä¾›æ²¹æ³µ(m3/h)\",\"oilPumpHead\":\"ä¾›æ²¹æ³µå‹å¤´(bar)\",\"stressPump\":\"å¢å‹æ³µ(m3/h)\",\"stressPumpHead\":\"å¢å‹æ³µå‹å¤´(bar)\",\"greasePump\":\"æ»‘æ²¹æ³µ(m3/h)\",\"greasePumpHead\":\"æ»‘æ²¹æ³µå‹å¤´(bar)\",\"greaseTank\":\"æ»‘æ²¹å¾ªç¯èˆ±(m3)\",\"greasePurifierFlow\":\"æ»‘æ²¹åˆ†æ²¹æœºæµé‡(L/h)\",\"middleHeatExchange\":\"ä¸­å¤®çƒ­äº¤æ¢é‡(kW)\",\"middleWaterFlow\":\"ä¸­å¤®å†·å´æ°´æµé‡(m3/h)\",\"cylinderHeatExchange\":\"ç¼¸å¥—çƒ­äº¤æ¢é‡(kW)\",\"cylinderWaterFlow\":\"ç¼¸å¥—å†·å´æ°´æµé‡(m3/h)\",\"greaseHeatExchange\":\"æ»‘æ²¹çƒ­äº¤æ¢é‡(kW)\",\"greaseWaterFlow\":\"æ»‘æ²¹å†·å´æ°´æµé‡(m3/h)\",\"airPump\":\"ç©ºå‹æœº(Nm3/h)\",\"airBottle\":\"ç©ºæ°”ç“¶(m3)\",\"exhaustDiameter\":\"æ’æ°”ç®¡å¾„(mm)\"}',\n" +
                 "    NULL, \n" +
                 "    NULL  \n" +
                 ");")){
             System.out.println("INSERT SUCCESS!");
         };
 
-        // ²âÊÔ¸üĞÂ
-        if(db.Update("UPDATE SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF SET SYSTEM = 'ÄÚÈ¼»ú2' WHERE EQUIP_ID = 'LJ-2';")){
+        // æµ‹è¯•æ›´æ–°
+        if(db.Update("UPDATE SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF SET SYSTEM = 'å†…ç‡ƒæœº2' WHERE EQUIP_ID = 'LJ-2';")){
             System.out.println("UPDATE SUCCESS!");
         };
 
-        //json×Ö¶ÎµÄ²éÑ¯£¬ÖĞÎÄkeyµÄÇé¿ö
+        //jsonå­—æ®µçš„æŸ¥è¯¢ï¼Œä¸­æ–‡keyçš„æƒ…å†µ
         ResultSetWrapper rsWrapper = new ResultSetWrapper();
-        if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.AnchorType') = 'ÀàĞÍ';", rsWrapper)){
+        if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.AnchorType') = 'ç±»å‹';", rsWrapper)){
             System.out.println("QUERY SUCCESS!");
             db.Display(rsWrapper);
         };
 
-        //²âÊÔ²éÑ¯--¹Ø¼üÉè±¸¿â
+        //æµ‹è¯•æŸ¥è¯¢--å…³é”®è®¾å¤‡åº“
         if (db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWrapper)) {
             db.Display(rsWrapper);
             db.setClose(rsWrapper);
         };
 
-        // ²âÊÔÉ¾³ı
+        // æµ‹è¯•åˆ é™¤
         if(db.Delete("DELETE FROM SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF WHERE EQUIP_ID = 'LJ-2';")){
             System.out.println("DELETE SUCCESS!");
         };
