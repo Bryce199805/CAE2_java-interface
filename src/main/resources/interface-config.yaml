@@ -3,7 +3,7 @@ database:
   username: "SYSDBA_TEST"
   passwd: "SYSDBA"
 
-filesystem:
+fileSystem:
   endpoint: "222.27.255.211:19000"
   username: "fileadmin_test"
   passwd: "fileadmin"

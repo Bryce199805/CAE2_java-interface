@@ -11,13 +11,13 @@ public class main {
         String uploadFile = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test\\7082001-船壳三维模型文件.igs";
 
         //测试下载单个文件√
-//        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","TRANSVERSE_AREA_CURVE","SampleShip_JBC0000")){
-//            System.out.println("下载成功！");
-//        }
-//        //测试下载单个文件，不存在的ID
-//        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081001")){
-//            System.out.println("下载成功！");
-//        }
+        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","TRANSVERSE_AREA_CURVE","SampleShip_JBC0000")){
+            System.out.println("下载成功！");
+        }
+        //测试下载单个文件，不存在的ID
+        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081001")){
+            System.out.println("下载成功！");
+        }
 //        //测试下载单个文件，文件数据为空
 //        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081004")){
 //            System.out.println("下载成功！");
