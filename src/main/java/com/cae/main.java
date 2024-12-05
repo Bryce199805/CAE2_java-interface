@@ -1,7 +1,5 @@
 package com.cae;
 
-
-import java.io.IOException;
 import java.io.InputStream;
 
 public class main {
@@ -10,26 +8,119 @@ public class main {
         CAE db = new CAE(filePath);
         CAE File = new CAE(filePath,true);
         String localPath= "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test";
-        String uploadFile = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test\\7082001-横剖面面积曲线.jpg";
+        String uploadFile = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test\\7082001-船壳三维模型文件.igs";
 
-        //测试下载单个文件
-        //File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081001");
+        //测试下载单个文件√
+//        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081004")){
+//            System.out.println("下载成功！");
+//        }
+//        //测试下载单个文件，不存在的ID
+//        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081001")){
+//            System.out.println("下载成功！");
+//        }
+//        //测试下载单个文件，文件数据为空
+//        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081004")){
+//            System.out.println("下载成功！");
+//        }
+//        //测试下载单个文件，不涉及文件数据
+//        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_ID","M7081004")){
+//            System.out.println("下载成功！");
+//        }
 
-        //测试下载单个文件字符流
-        /*InputStream inputStream = File.GetFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081003");
-        try {
-            inputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
 
-        //File.DeleteRecord("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","M7081004");
+        //测试下载单个文件字符流√
+//        InputStream inputStream = File.GetFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081004");
+//        if(inputStream != null){
+//            System.out.println("GET STREAM SUCCESS！");
+//        }
+//        //测试下载不存在的ID
+//        InputStream inputStream1 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081001");
+//        if(inputStream1 != null){
+//            System.out.println("GET STREAM SUCCESS！");
+//        }
+//        //测试下载文件数据为空
+//        InputStream inputStream2 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081004");
+//        if(inputStream2 != null){
+//            System.out.println("GET STREAM SUCCESS！");
+//        }
+//        //测试下载，不涉及文件数据
+//        InputStream inputStream3 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_ID","M7081004");
+//        if(inputStream3 != null){
+//            System.out.println("GET STREAM SUCCESS！");
+//        }
+//        try {
+//            inputStream.close();
+//            inputStream1.close();
+//            inputStream2.close();
+//            inputStream3.close();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
-        //测试删除
-        //File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081003");
 
-        //测试上传
-        File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081003");
+        //测试正常删除一条记录√
+//        if(File.DeleteRecord("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","M7081004")){
+//            System.out.println("删除记录成功！");
+//        }
+//        //测试删除一条不存在的记录
+//        if(File.DeleteRecord("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","M7081003")){
+//            System.out.println("删除记录成功！");
+//        }
+//        //测试删除文件数据为空的记录
+//        if(File.DeleteRecord("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","SampleShip_JBC0000")){
+//            System.out.println("删除记录成功！");
+//        }
+//        //该记录没有涉及文件数据
+//        if(File.DeleteRecord("HULL_MODEL_AND_INFORMATION_DB","PERFORMANCE_INFO","M7081004")){
+//            System.out.println("删除记录成功！");
+//        }
+
+
+        //测试正常删除√
+//        if(File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","SampleShip_KCS0000")){
+//            System.out.println("删除成功！");
+//        }
+//        //测试删除，不存在的记录
+//        if(File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081003")){
+//            System.out.println("删除成功！");
+//        }
+//        //测试删除，文件字段内容为空
+//        if(File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","M7081004")){
+//            System.out.println("删除成功！");
+//        }
+//        //测试删除，不是文件字段
+//        if(File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","AFTER_SHAPE","M7081004")){
+//            System.out.println("删除成功！");
+//        }
+
+
+        //测试上传√
+//        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081004")){
+//            System.out.println("上传成功！");
+//        }
+//        //测试上传，不存在的记录
+//        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081001")){
+//            System.out.println("上传成功！");
+//        }
+//        //测试上传，文件字段内容为空，也可以成功！
+//        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081004")){
+//            System.out.println("上传成功！");
+//        }
+//        //测试上传，不是文件字段
+//        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","AFTER_SHAPE","M7081004")){
+//            System.out.println("上传成功！");
+//        }
+
+        //测试查询--关键设备库
+//        ResultSetWrapper rsWrapper = new ResultSetWrapper();
+//        if (File.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWrapper)) {
+//            File.Display(rsWrapper);
+//            File.setClose(rsWrapper);
+//        };
+//       //关闭文件系统连接
+//        File.File_connClose();
+
 
         // 测试插入
         /*if(db.Insert("INSERT INTO SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF (\n" +
