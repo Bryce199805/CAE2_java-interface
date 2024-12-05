@@ -49,7 +49,8 @@ public class CAE {
 
     public CAE(String filePath) {
         // 读取 YAML 配置文件
-        yaml = new Yaml();
+        // todo 代码规范问题 类成员变量 类成员方法 不应省略this指针
+        this.yaml = new Yaml();
         try (FileReader reader = new FileReader(new File(filePath))) {
             Object dataConfig = yaml.load(reader);
             if (dataConfig == null) {
@@ -155,7 +156,7 @@ public class CAE {
             // 获取数据库配置
             Map<String, String> databaseConfig = (Map<String, String>) configMap.get("database");
             // 获取 filesystem 配置信息
-            Map<String, String> fileConfig = (Map<String, String>) configMap.get("filesystem");
+            Map<String, String> fileConfig = (Map<String, String>) configMap.get("fileSystem");
             if (fileConfig == null) {
                 System.err.println("Missing 'endpoint' configuration in the config file.");
                 System.exit(1);
@@ -219,26 +220,29 @@ public class CAE {
 
     public boolean DeleteRecord(String dbName,String tableName,String id){
         //删除一条记录对应的所有文件
+        // todo 代码可读性差  调整顺序
         if(fileDBMap.get(dbName).containsKey(tableName)){
             // 从 fileDBMap 获取文件字段集合
             Map<String, Set<String>> tableMap = fileDBMap.get(dbName);
             if (tableMap != null) {
                 Set<String> fields = tableMap.get(tableName);
                 if (fields != null) {
+
                     // 遍历字段，执行删除操作
                     for (String field : fields) {
                         // 生成 CAEPath
                         String CAEPath = sql2CAEPath(dbName, tableName, field, id);
+                        // todo 判空逻辑错误
                         if(CAEPath == null || CAEPath.equals(" ")  || CAEPath.equals("") || CAEPath.isEmpty()){
                             System.err.println("文件字段内容为空！field:"+field);
                         }else if(CAEPath.equals("false")){ //不存在对应的记录
                             return false;
                         }else{
-                            // 删除文件
+                            // 删除文件 // todo 代码书写规范 类内方法带上this指针
                             delete(CAEPath);
                         }
                     }
-                    //删除记录
+                    //删除记录  // todo
                     deleterecord(dbName, tableName, id);
                     return true;
                 } else {
@@ -254,10 +258,11 @@ public class CAE {
         return false;
     }
 
-    //在DM数据库中删除一条记录
+    //在DM数据库中删除一条记录  // todo 代码命名规范  驼峰命名法
     private boolean deleterecord(String dbName,String tableName,String id){
         String idField = getIDField(dbName, tableName);
         String delete_sql = String.format("DELETE FROM %s.%s WHERE %s = '%s';",dbName, tableName,idField,id);
+
         try {
             stmt = conn.prepareStatement(delete_sql);
             int rowsAffected = stmt.executeUpdate();
@@ -354,7 +359,7 @@ public class CAE {
     public boolean UploadFile(String localPath, String dbName, String tableName, String field, String id){
         System.out.println("--------------UpLoad File--------------");
         String CAEPath = null;
-        try{
+        try{    // todo 可读性差
             if(checkFileField(dbName,tableName,field)){
                 try{
                     //ID是否存在
@@ -490,6 +495,8 @@ public class CAE {
                 //定制sql语句，解析得到CAEPath
                 CAEPath = sql2CAEPath(dbName,tableName,field,id);
                 //字段内容为空，不需要去minio中处理操作
+
+                // todo 你这套判空逻辑多次用到  是不是应该抽出来成一个类方法
                 if(CAEPath == null || CAEPath.equals(" ")  || CAEPath.equals("") || CAEPath.isEmpty()){
                     System.err.println("文件字段内容为空！ field:"+field);
                     return false;
@@ -501,7 +508,7 @@ public class CAE {
                 return false;
             }
         }catch (Exception e){
-            e.printStackTrace();
+//            e.printStackTrace();
             System.err.println("对应库名，表名，文件字段名有误");
             return false;
         }
@@ -510,6 +517,8 @@ public class CAE {
     }
 
     private boolean getfile(String CAEPath, String localPath) {
+
+        // todo 为什么要执行两遍？
         String bucketName = trimmedCAEPath(CAEPath)[0];
         String objectName = trimmedCAEPath(CAEPath)[1];
 
@@ -710,7 +719,7 @@ public class CAE {
 
         // 分析 CAEPath，提取桶名和对象名
         int firstSlashIndex = trimmedPath.indexOf("/");
-        if (firstSlashIndex == -1) {
+        if (firstSlashIndex == -1) { // todo CAEPath是什么？ 用户并不知道啥是CAEPath
             throw new IllegalArgumentException("CAEPath 格式不正确，必须包含桶名和文件路径，例如：xxx/folderName/fileName");
         }
 
