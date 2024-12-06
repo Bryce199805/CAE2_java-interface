@@ -223,7 +223,7 @@ public class CAE {
         //删除一条记录对应的所有文件
         // todo 代码可读性差  调整顺序
         if(!this.fileDBMap.get(dbName).containsKey(tableName)){
-            System.err.println("No FileData for this record!"); //不是文件字段
+            System.err.println(String.format("No corresponding file data found for the database: [%s], table: [%s], ID: [%s]!！",dbName,tableName,id)); //不是文件字段
             return false;
         }
         // 从 fileDBMap 获取文件字段集合
@@ -242,50 +242,17 @@ public class CAE {
             // 生成 CAEPath
             String CAEPath = this.Sql2CAEPath(dbName, tableName, field, id);
             // todo 判空逻辑错误
-            this.isCAEPathValid(CAEPath,field);
+            // 校验CAEPath
+            if (!this.isCAEPathValid(CAEPath, dbName, tableName, field, id)) {
+                continue; // 跳过当前字段，继续检查其他字段
+                //return false;
+            }
             // 删除文件 // todo 代码书写规范 类内方法带上this指针
             this.delete(CAEPath);
 
         }
         //删除记录  // todo
-        this.DeleteRecordInDM(dbName, tableName, id);
-        return true;
-
-//        if(this.fileDBMap.get(dbName).containsKey(tableName)){
-//            // 从 fileDBMap 获取文件字段集合
-//            Map<String, Set<String>> tableMap = this.fileDBMap.get(dbName);
-//            if (tableMap != null) {
-//                Set<String> fields = tableMap.get(tableName);
-//                if (fields != null) {
-//
-//                    // 遍历字段，执行删除操作
-//                    for (String field : fields) {
-//                        // 生成 CAEPath
-//                        String CAEPath = sql2CAEPath(dbName, tableName, field, id);
-//                        // todo 判空逻辑错误
-//                        if(CAEPath == null || CAEPath.trim().isEmpty()){
-//                            System.err.println("文件字段内容为空！field:"+field);
-//                        }else if(CAEPath.equals("false")){ //不存在对应的记录
-//                            return false;
-//                        }else{
-//                            // 删除文件 // todo 代码书写规范 类内方法带上this指针
-//                            delete(CAEPath);
-//                        }
-//                    }
-//                    //删除记录  // todo
-//                    deleterecord(dbName, tableName, id);
-//                    return true;
-//                } else {
-//                    System.err.println("No fields found for table: " + tableName);//不是对应数据表名
-//                    return false;
-//                }
-//            } else {
-//                System.err.println("No data found for dbName: " + dbName);//不是对应数据库名
-//                return false;
-//            }
-//        }
-//        System.err.println("No FileData for this record!"); //不是文件字段
-//        return false;
+        return this.DeleteRecordInDM(dbName, tableName, id);
     }
 
     //在DM数据库中删除一条记录  // todo 代码命名规范  驼峰命名法
@@ -326,32 +293,20 @@ public class CAE {
         String CAEPath = null;
         try{
             //没找到对应记录
-            if(this.CheckFileField(dbName,tableName,field)){
-                System.err.println("不是文件字段！");
+            if(!this.CheckFileField(dbName,tableName,field)){
+                System.err.println(String.format("The specified field -- %s is not a file field! " , field));
                 return false;
             }
             //定制sql语句，解析得到新的CAEPath
             CAEPath = this.Sql2CAEPath(dbName,tableName,field,id);
             //字段内容为空，不需要去minio中处理操作
-            this.isCAEPathValid(CAEPath,field);
-//            //没找到对应记录
-//            if(this.CheckFileField(dbName,tableName,field)){
-//                //定制sql语句，解析得到新的CAEPath
-//                CAEPath = Sql2CAEPath(dbName,tableName,field,id);
-//                //字段内容为空，不需要去minio中处理操作
-//                if(CAEPath == null || CAEPath.trim().isEmpty()){
-//                    System.err.println("文件字段内容为空！ field:"+field);
-//                    return false;
-//                }else if(CAEPath.equals("false")){
-//                    return false;
-//                }
-//            }else{
-//                System.err.println("不是文件字段！");
-//                return false;
-//            }
+            // 校验CAEPath
+            if (!this.isCAEPathValid(CAEPath, dbName, tableName, field, id)) {
+                return false;
+            }
         }catch (Exception e){
             //e.printStackTrace();
-            System.err.println("对应库名，表名，文件字段名有误: " + e.getMessage());
+            System.err.println(String.format("%s, %s, or %s is incorrect.",dbName,tableName,field) + e.getMessage());
             //System.err.println("对应库名，表名，文件字段名有误");
             return false;
         }
@@ -388,53 +343,26 @@ public class CAE {
         System.out.println("--------------UpLoad File--------------");
         String CAEPath = null;
         try{    // todo 可读性差
-            if(this.CheckFileField(dbName,tableName,field)){
-                System.err.println("不是文件字段！ field:"+field);
+            if(!this.CheckFileField(dbName,tableName,field)){
+                System.err.println(String.format("The specified field [%s] is not a file field.", field));
                 return false;
             }
-                //ID是否存在
-                if(this.Sql2CAEPath(dbName,tableName,field,id).equals("false")){
+            //ID是否存在
+            if(this.Sql2CAEPath(dbName,tableName,field,id).equals("false")){
+                return false;
+            }
+            //更新文件路径
+            if(UpdateField(localPath,dbName,tableName,id,field)){
+                //定制sql语句，解析得到新的CAEPath
+                CAEPath = this.Sql2CAEPath(dbName,tableName,field,id);
+                //字段内容为空，自主更新桶名，ObjectName
+                if(CAEPath.equals("false")){//不存在对应的记录
                     return false;
                 }
-                //更新文件路径
-                if(UpdateField(localPath,dbName,tableName,id,field)){
-                    //定制sql语句，解析得到新的CAEPath
-                    CAEPath = this.Sql2CAEPath(dbName,tableName,field,id);
-                    //字段内容为空，自主更新桶名，ObjectName
-                    if(CAEPath.equals("false")){//不存在对应的记录
-                        return false;
-                    }
-                }
-
-
-//            if(this.CheckFileField(dbName,tableName,field)){
-//                try{
-//                    //ID是否存在
-//                    if(!Sql2CAEPath(dbName,tableName,field,id).equals("false")){
-//                        //更新文件路径
-//                        if(UpdateField(localPath,dbName,tableName,id,field)){
-//                            //定制sql语句，解析得到新的CAEPath
-//                            CAEPath = Sql2CAEPath(dbName,tableName,field,id);
-//                            //字段内容为空，自主更新桶名，ObjectName
-//                            if(CAEPath.equals("false")){//不存在对应的记录
-//                                return false;
-//                            }
-//                        }
-//                    }else {
-//                        return false;
-//                    }
-//                } catch (Exception e){
-//                    e.printStackTrace();
-//                    System.err.println("DM 数据库更新文件路径未成功！");
-//                    return false;
-//                }
-//            }else{
-//                System.err.println("不是文件字段！ field:"+field);
-//                return false;
-//            }
+            }
         }catch (Exception e){
             //e.printStackTrace();
-            System.err.println("对应库名，表名，文件字段名有误: " + e.getMessage());
+            System.err.println(String.format("%s, %s, or %s is incorrect.",dbName,tableName,field) + e.getMessage());
             //System.err.println("对应库名，表名，文件字段名有误！");
             return false;
         }
@@ -545,36 +473,20 @@ public class CAE {
         String CAEPath = null;
         try{
             if(!this.CheckFileField(dbName,tableName,field)){
-                System.err.println("不是文件字段！ field:"+field);
+                System.err.println(String.format("The specified field [%s] is not a file field.", field));
                 return false;
             }
             //定制sql语句，解析得到CAEPath
             CAEPath = this.Sql2CAEPath(dbName,tableName,field,id);
 
-            //字段内容为空，不需要去minio中处理操作
             // todo 你这套判空逻辑多次用到  是不是应该抽出来成一个类方法
-            this.isCAEPathValid(CAEPath,field);
-
-//            if(this.CheckFileField(dbName,tableName,field)){
-//                //定制sql语句，解析得到CAEPath
-//                CAEPath = Sql2CAEPath(dbName,tableName,field,id);
-//                //字段内容为空，不需要去minio中处理操作
-//
-//                // todo 你这套判空逻辑多次用到  是不是应该抽出来成一个类方法
-//                if(CAEPath == null || CAEPath.trim().isEmpty()){
-//                    System.err.println("文件字段内容为空！ field:"+field);
-//                    return false;
-//                }else if(CAEPath.equals("false")){//不存在对应的记录
-//                    return false;
-//                }
-//            }else{
-//                System.err.println("不是文件字段！ field:"+field);
-//                return false;
-//            }
+            // 校验CAEPath
+            if (!this.isCAEPathValid(CAEPath, dbName, tableName, field, id)) {
+                return false;
+            }
         }catch (Exception e){
 //            e.printStackTrace();
-            System.err.println("对应库名，表名，文件字段名有误: " + e.getMessage());
-            //System.err.println("对应库名，表名，文件字段名有误");
+            System.err.println(String.format("%s, %s, or %s is incorrect.",dbName,tableName,field)+ e.getMessage());
             return false;
         }
         //解析CAEPath下载到本地路径
@@ -582,12 +494,10 @@ public class CAE {
     }
 
     private boolean DownloadObject(String CAEPath, String localPath) {
-
         // todo 为什么要执行两遍？
         String[] pathParts = this.TrimmedCAEPath(CAEPath);
         String bucketName = pathParts[0];
         String objectName = pathParts[1];
-
 
         // 提取文件名（从 objectName 中去除路径，只保留文件名）
         String fileName = objectName.substring(objectName.lastIndexOf("/") + 1);
@@ -621,35 +531,21 @@ public class CAE {
         System.out.println("--------------DownLoad FileStream--------------");
         String CAEPath = null;
         try{
-            if(this.CheckFileField(dbName,tableName,field)){
-                System.err.println("不是文件字段！ field:"+field);
+            if(!this.CheckFileField(dbName,tableName,field)){
+                System.err.println(String.format("The specified field [%s] is not a file field.", field));
                 return null;
             }
             //定制sql语句，解析得到CAEPath
             CAEPath = this.Sql2CAEPath(dbName,tableName,field,id);
             if(CAEPath == null || CAEPath.trim().isEmpty()){
-                System.err.println("文件字段内容为空！ field:"+field);
+                System.err.println(String.format("The file field content is empty for the database: [%s], table: [%s], field: [%s], ID: [%s]!！",dbName,tableName, field,id));
                 return null;
             }else if(CAEPath.equals("false")) {//不存在对应的记录
                 return null;
             }
-//            if(CheckFileField(dbName,tableName,field)){
-//                //定制sql语句，解析得到CAEPath
-//                CAEPath = Sql2CAEPath(dbName,tableName,field,id);
-//                //字段内容为空，不需要去minio中处理操作
-//                if(CAEPath == null || CAEPath.trim().isEmpty()){
-//                    System.err.println("文件字段内容为空！ field:"+field);
-//                    return null;
-//                }else if(CAEPath.equals("false")){//不存在对应的记录
-//                    return null;
-//                }
-//            }else{
-//                System.err.println("不是文件字段！ field:"+field);
-//                return null;
-//            }
         }catch (Exception e){
             //e.printStackTrace();
-            System.err.println("对应库名，表名，文件字段名有误: " + e.getMessage());
+            System.err.println(String.format("%s, %s, or %s is incorrect.",dbName,tableName,field)+ e.getMessage());
             //System.err.println("对应库名，表名，文件字段名有误");
             return null;
         }
@@ -680,15 +576,17 @@ public class CAE {
         return inputStream;
     }
 
-    private boolean isCAEPathValid(String CAEPath, String field) {
+    private boolean isCAEPathValid(String CAEPath, String dbName, String tableName, String field, String id) {
         if (CAEPath == null || CAEPath.trim().isEmpty()) {
-            System.err.println("文件字段内容为空！ field:" + field);
+            System.err.println(String.format("The file field content is empty for the database: [%s], table: [%s], field: [%s], ID: [%s]!！",dbName,tableName, field,id));
             return false;
         } else if (CAEPath.equals("false")) {
-            System.err.println("不存在对应的记录！");
+            //System.err.println("不存在对应的记录！");
             return false;
+        }else {
+            return true;
         }
-        return true;
+
     }
 
 
@@ -720,12 +618,12 @@ public class CAE {
                 if (rs.next()) {
                     CAEPath = rs.getString(1); // 获取文件路径
                 } else {
-                    System.err.println("未找到对应的记录，ID: " + id);
+                    System.err.println(String.format("No corresponding field found for the database: [%s], table: [%s], ID: [%s]! " , dbName , tableName , id));
                     return "false";
                 }
             }
         } catch (Exception e) {
-            System.err.println("查询数据库失败: " + e.getMessage());
+            System.err.println(String.format("Failed to query the database: %s.", dbName) + e.getMessage());
             //e.printStackTrace();
             return "false";
         }
@@ -755,7 +653,8 @@ public class CAE {
         // 分析 CAEPath，提取桶名和对象名
         int firstSlashIndex = trimmedPath.indexOf("/");
         if (firstSlashIndex == -1) { // todo CAEPath是什么？ 用户并不知道啥是CAEPath
-            throw new IllegalArgumentException("路径格式不正确，必须包含桶名和文件路径，例如：xxx/folderName/fileName");
+            System.err.println("路径格式不正确，必须包含桶名和文件路径，例如：xxx/folderName/fileName");
+            //throw new IllegalArgumentException("路径格式不正确，必须包含桶名和文件路径，例如：xxx/folderName/fileName");
         }
 
         String bucketName = trimmedPath.substring(0, firstSlashIndex);
@@ -766,7 +665,7 @@ public class CAE {
 
     public boolean Query(String sql,ResultSetWrapper rsWrapper) {
 
-        System.out.println("-------------- Query --------------");
+        System.out.println("---------- Query In DM ---------");
 
         if (!isValidSQLCommand(sql, "select")) {
             System.err.println("illegal statement.");
@@ -787,7 +686,7 @@ public class CAE {
     }
 
     public boolean Update(String sql) {
-        System.out.println("-------------- Update --------------");
+        System.out.println("--------- Update In DM ---------");
 
         if (!isValidSQLCommand(sql, "update")) {
             System.err.println("illegal statement.");
@@ -814,7 +713,7 @@ public class CAE {
     }
 
     public boolean Delete(String sql) {
-        System.out.println("-------------- Delete --------------");
+        System.out.println("---------- Delete In DM ----------");
 
         if (!isValidSQLCommand(sql, "delete")) {
             System.err.println("illegal statement.");
@@ -841,7 +740,7 @@ public class CAE {
     }
 
     public boolean Insert(String sql) {
-        System.out.println("-------------- Insert --------------");
+        System.out.println("--------- Insert In DM ---------");
         if (!isValidSQLCommand(sql, "insert")) {
             System.err.println("illegal statement.");
             return false;
