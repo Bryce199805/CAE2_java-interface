@@ -134,6 +134,18 @@ public class main {
          */
 
         // 测试插入
+//        if(File.Insert("INSERT INTO \"HULL_MODEL_AND_INFORMATION_DB\".\"HULL_PARAMETER_INFO\" \n" +
+//                "(\"PARAMETER_ID\", \"HULL_ID\", \"PARALLEL_MIDDLE_LENGTH\", \"TRANSVERSE_AREA_CURVE\", \n" +
+//                "\"FORE_AFTER_TRANSVERSE_SHAPE\", \"BULB_PROTRUSION_LENGTH\", \"BULB_SHIP_BREADTH_RATIO\", \n" +
+//                "\"FORE_SHAPE\", \"AFTER_SHAPE\", \"HULL_3D_MODEL\", \"OFFSETS_TABLE\") \n" +
+//                "VALUES \n" +
+//                "(1, 'SampleShip_KCS0000', 0.0, \n" +
+//                "'/hull-model-and-information-db/HULL_PARAMETER_INFO/SampleShip_KCS0000/SampleShip_KCS0000.png', \n" +
+//                "'V形', 7.49, 0.1467, 'U形', 'U形', \n" +
+//                "'/hull-model-and-information-db/HULL_PARAMETER_INFO/SampleShip_KCS0000/SampleShip_KCS0000.igs', \n" +
+//                "'/hull-model-and-information-db/HULL_PARAMETER_INFO/SampleShip_KCS0000/SampleShip_KCS0000_Offset.shf');\n")){
+//            System.out.println("INSERT SUCCESS!");
+//        };
 //        if(File.Insert("INSERT INTO SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF (\n" +
 //                "    EQUIP_ID,\n" +
 //                "    MAJOR,\n" +

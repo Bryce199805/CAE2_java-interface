@@ -77,7 +77,7 @@ public class CAE {
             String username = databaseConfig.map(m -> m.get("username")).orElse(null);
             String password = databaseConfig.map(m -> m.get("passwd")).orElse(null);
 
-            System.out.println(hmacSHA256(password));
+            System.out.println(encryption(password));
 
             if (server == null || username == null || password == null) {
                 System.err.println("Missing required configuration in the config file.");
@@ -86,7 +86,7 @@ public class CAE {
 
             // 建立达梦的连接
             String url = "jdbc:dm://" + server;
-            this.conn = DriverManager.getConnection(url, username, hmacSHA256(password));
+            this.conn = DriverManager.getConnection(url, username, encryption(password));
             this.conn.setAutoCommit(true);
             System.out.println("========== JDBC: connect to DM server success! ==========");
         } catch (Exception e) {
@@ -106,7 +106,7 @@ public class CAE {
      * @param plainString 明文密码
      * @return cipherString 密文
      */
-    private static String hmacSHA256(String plainString) {
+    private static String encryption(String plainString) {
         String cipherString = null;
         try {
             // 指定算法
@@ -175,7 +175,7 @@ public class CAE {
 
             // 建立达梦的连接
             String url = "jdbc:dm://" + server;
-            this.conn = DriverManager.getConnection(url, username, hmacSHA256(password));
+            this.conn = DriverManager.getConnection(url, username, encryption(password));
             this.conn.setAutoCommit(true);
             System.out.println("========== JDBC: connect to DM server success! ==========");
 
@@ -193,12 +193,12 @@ public class CAE {
                 endpoint = "http://" + endpoint; // 默认为 http，如果需要 https，请更改为 https://
             }
 
-            System.out.println(hmacSHA256(file_password));
+            System.out.println(encryption(file_password));
             // 在建立 Minio 连接时，捕获网络连接异常
             try {
                 this.fileClient = MinioClient.builder()
                         .endpoint(endpoint)
-                        .credentials(file_username, hmacSHA256(file_password))
+                        .credentials(file_username, encryption(file_password))
                         .build();
 
                 // 尝试连接 Minio 以确保能够连接成功
