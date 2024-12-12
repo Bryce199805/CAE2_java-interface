@@ -26,7 +26,9 @@ public class LogRecorder {
     private Connection conn;
     private Yaml yaml;
     private String m_username;
-    private String d_username;
+    private String dm_username;
+    private String log_username;
+    private String log_passwd;
     private String ip;
     private String server;
     private String CIDR;
@@ -39,14 +41,14 @@ public class LogRecorder {
         this.enable = readEnable();
         if(this.enable){
             this.readServer();
-            this.readCIDR();
-            this.d_username = this.readUserName("database");
+            this.readLog();
+            this.dm_username = this.readUserName("database");
             this.m_username = this.readUserName("fileSystem");
             this.ip =  this.getIP(CIDR);
 
             String url = "jdbc:dm://"+this.server;
             try {
-                this.conn = DriverManager.getConnection(url, "loguser", "SYSDBA1234");
+                this.conn = DriverManager.getConnection(url, this.log_username, this.log_passwd);
                 this.conn.setAutoCommit(true);
                 System.out.println("成功连接");
             } catch (Exception e) {
@@ -74,15 +76,24 @@ public class LogRecorder {
 //    }
 
     private boolean readEnable() {
-        Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) this.configMap.get("log"));
-        String enableStr = databaseConfig.map(m -> m.get("enable")).orElse(null);
+        Optional<Map<String, Object>> databaseConfig = Optional.ofNullable((Map<String, Object>) this.configMap.get("log"));
 
-        if (enableStr == null) {
+        // 提取 "enable" 配置
+        Object enableObj = databaseConfig.map(m -> m.get("enable")).orElse(null);
+
+        // 检查 enableObj 的类型
+        if (enableObj == null) {
             System.err.println("Missing 'enable' configuration in the config file. Defaulting to false.");
             return false; // 如果没有配置 enable，则返回 false
         }
 
-        return Boolean.parseBoolean(enableStr.trim().toLowerCase());
+        if (enableObj instanceof Boolean) {
+            return (Boolean) enableObj; // 直接返回布尔值
+        }else {
+            System.err.println("不是布尔类型，默认enable 为 false");
+            return false;
+        }
+
     }
 
     private void readYaml(String filePath){
@@ -108,11 +119,13 @@ public class LogRecorder {
         }
     }
 
-    private void readCIDR(){
+    private void readLog(){
         Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) this.configMap.get("log"));
         this.CIDR = databaseConfig.map(m -> m.get("CIDR")).orElse(null);
-        if (this.CIDR == null) {
-            System.err.println("Missing required configuration in the config file.");
+        this.log_username = databaseConfig.map(m -> m.get("username")).orElse(null);
+        this.log_passwd = databaseConfig.map(m -> m.get("passwd")).orElse(null);
+        if (this.CIDR == null || this.log_username == null || this.log_passwd == null) {
+            System.err.println("Missing required configuration in the log config file.");
         }
     }
 
@@ -170,7 +183,7 @@ public class LogRecorder {
             String insert_sql = String.format(
                     "insert into \"LOGS\".\"LOG\" ( \"USER_NAME\", \"IP_ADDR\", \"SOURCE\", \"OPERATION\", \"TIME\", \"SCHEMAS\", \"TABLES\", \"RESULT\") " +
                             "values ( '%s', '%s', 'java接口', '%s', SYSTIMESTAMP, LOGS.TABLES%s, LOGS.TABLES%s, %d);",
-                    this.d_username, this.ip, encodedOperation, schemas, tables, result
+                    this.dm_username, this.ip, encodedOperation, schemas, tables, result
             );
             System.out.println(insert_sql);
 

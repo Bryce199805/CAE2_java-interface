@@ -38,10 +38,10 @@ public class main {
 //            System.out.println("GET STREAM SUCCESS！");
 //        }
 //        //测试下载不存在的ID
-        InputStream inputStream1 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "HULL_3D_MODEL", "M7081001");
-        if (inputStream1 != null) {
-            System.out.println("GET STREAM SUCCESS！");
-        }
+//        InputStream inputStream1 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "HULL_3D_MODEL", "M7081001");
+//        if (inputStream1 != null) {
+//            System.out.println("GET STREAM SUCCESS！");
+//        }
 //        //测试下载文件数据为空
 //        InputStream inputStream2 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "HULL_3D_MODEL", "SampleShip_VLCC0000");
 //        if (inputStream2 != null) {
