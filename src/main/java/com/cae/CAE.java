@@ -23,7 +23,7 @@ public class CAE {
     private static final Map<String, Map<String, String>> fileIDMap = new HashMap<>();
     private LogRecorder logger;
     //private static final Log_Recorder logger = new Log_Recorder();
-    private String filePath = "src/main/resources/interface-config.yaml";
+    //private String filePath = "src/main/resources/interface-config.yaml";
 
     static {
         // fileIDMap 初始化
@@ -37,13 +37,13 @@ public class CAE {
                 ));
     }
 
-    public CAE() {
+    public CAE(String filePath) {
         // 读取 YAML 配置文件
         this.yaml = new Yaml();
-        try (FileReader reader = new FileReader(new File(this.filePath))) {
+        try (FileReader reader = new FileReader(new File(filePath))) {
             Object dataConfig = this.yaml.load(reader);
             if (dataConfig == null) {
-                System.err.println("Open config file: " + this.filePath + " failed.");
+                System.err.println("Open config file: " + filePath + " failed.");
                 //System.exit(1);
             }
 
@@ -66,7 +66,7 @@ public class CAE {
             String username = databaseConfig.map(m -> m.get("username")).orElse(null);
             String password = databaseConfig.map(m -> m.get("passwd")).orElse(null);
 
-            System.out.println(encryption(password));
+            //System.out.println(encryption(password));
 
             if (server == null || username == null || password == null) {
                 System.err.println("Missing required configuration in the config file.");
@@ -80,11 +80,11 @@ public class CAE {
             System.out.println("========== JDBC: connect to DM server success! ==========");
 
             // 通过静态方法获取 Logger 实例
-            this.logger = LogRecorder.getLogger();
+            this.logger = LogRecorder.getLogger(filePath);
 
         } catch (Exception e) {
             //e.printStackTrace();
-            System.err.println("[FAIL]conn database：" + e.getMessage());
+            System.err.println("[FAIL]conn database:" + e.getMessage());
         }
     }
 
@@ -125,13 +125,13 @@ public class CAE {
         return cipherString;
     }
 
-    public CAE(boolean xxx) {
+    public CAE(String filePath,boolean xxx) {
         // 读取 YAML 配置文件
         this.yaml = new Yaml();
-        try (FileReader reader = new FileReader(new File(this.filePath))) {
+        try (FileReader reader = new FileReader(new File(filePath))) {
             Object dataConfig = this.yaml.load(reader);
             if (dataConfig == null) {
-                System.err.println("Open config file: " + this.filePath + " failed.");
+                System.err.println("Open config file: " + filePath + " failed.");
                 //System.exit(1);
             }
 
@@ -185,7 +185,7 @@ public class CAE {
                 endpoint = "http://" + endpoint; // 默认为 http，如果需要 https，请更改为 https://
             }
 
-            System.out.println(encryption(file_password));
+            //System.out.println(encryption(file_password));
             // 在建立 Minio 连接时，捕获网络连接异常
             try {
                 this.fileClient = MinioClient.builder()
@@ -201,15 +201,14 @@ public class CAE {
                 System.exit(1);
             }
 
-            System.out.println(this.fileDBMap);
-            System.out.println(this.fileIDMap);
-
+            //System.out.println(this.fileDBMap);
+            //System.out.println(this.fileIDMap);
             System.out.println("========== JDBC: connect to CAE_FILE server success! ==========");
 
-            this.logger = LogRecorder.getLogger();
+            this.logger = LogRecorder.getLogger(filePath);
         } catch (Exception e) {
             //e.printStackTrace();
-            System.err.println("[FAIL]conn database：" + e.getMessage());
+            System.err.println("[FAIL]conn database:" + e.getMessage());
         }
     }
 
@@ -227,16 +226,20 @@ public class CAE {
             // 处理 result 为 true 的情况
             logResult = 1;
         }
-        String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
-        this.logger.insertRecord(this.filePath, encodedOperation, dbName, tableName, logResult);
+        if(this.logger != null){
+            String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+            this.logger.insertRecord(encodedOperation, dbName, tableName, logResult);
+        }
 
         return result;
     }
 
     // 提取公共方法来记录日志并返回结果  达梦日志
     private boolean logAndReturn(boolean result,String sql, String operation) {
-        String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
-        this.logger.insertRecord(sql,this.filePath, encodedOperation, result ? 1 : 0);
+        if(this.logger != null){
+            String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+            this.logger.insertRecord(sql, encodedOperation, result ? 1 : 0);
+        }
         return result;
     }
 

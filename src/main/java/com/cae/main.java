@@ -6,9 +6,9 @@ public class main {
     public static void main(String[] args) {
         //String filePath = "C:\\Users\\Bryce\\.cae\\interface-config.yaml";
         // [note!!!] 这里的yaml文件路径我改成固定的相对路径了
-        //String filePath = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\src\\main\\resources\\interface-config.yaml";
-        //CAE db = new CAE();
-        CAE File = new CAE(true);
+        String filePath = "src/main/resources/interface-config.yaml";
+        //CAE db = new CAE(filePath);
+        CAE File = new CAE(filePath,true);
         String localPath= "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test";
         String uploadFile = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test\\7082001-船壳三维模型文件.igs";
 
@@ -38,10 +38,10 @@ public class main {
 //            System.out.println("GET STREAM SUCCESS！");
 //        }
 //        //测试下载不存在的ID
-//        InputStream inputStream1 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "HULL_3D_MODEL", "M7081001");
-//        if (inputStream1 != null) {
-//            System.out.println("GET STREAM SUCCESS！");
-//        }
+        InputStream inputStream1 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "HULL_3D_MODEL", "M7081001");
+        if (inputStream1 != null) {
+            System.out.println("GET STREAM SUCCESS！");
+        }
 //        //测试下载文件数据为空
 //        InputStream inputStream2 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "HULL_3D_MODEL", "SampleShip_VLCC0000");
 //        if (inputStream2 != null) {
@@ -124,11 +124,11 @@ public class main {
 
 
         //测试查询--基本船型库
-//        ResultSetWrapper rsWrapper = new ResultSetWrapper();
-//        if (File.Query("select * from BASIC_SHIP_INFORMATION_DB.SHIP_DATA_INFO where ship_type = '油船';",rsWrapper)) {
-//            File.Display(rsWrapper);
-//            File.setClose(rsWrapper);
-//        };
+        ResultSetWrapper rsWrapper = new ResultSetWrapper();
+        if (File.Query("select * from BASIC_SHIP_INFORMATION_DB.SHIP_DATA_INFO where ship_type = '油船';",rsWrapper)) {
+            File.Display(rsWrapper);
+            File.setClose(rsWrapper);
+        };
 //
 //        //测试查询--关键设备库
 //        if (File.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWrapper)) {
