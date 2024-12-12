@@ -1,50 +1,32 @@
 package com.cae;
 
 
-import io.minio.BucketExistsArgs;
-        import io.minio.MakeBucketArgs;
-        import io.minio.MinioClient;
-        import io.minio.UploadObjectArgs;
-        import io.minio.errors.MinioException;
-        import java.io.IOException;
-        import java.security.InvalidKeyException;
-        import java.security.NoSuchAlgorithmException;
 
 public class test {
-    public static void main(String[] args)
-            throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        try {
-            // Create a minioClient with the MinIO server playground, its access key and secret key.
-            MinioClient minioClient =
-                    MinioClient.builder()
-                            .endpoint("https://222.27.255.211:19000")
-                            .credentials("fileadmin_test", "fileadmin")
-                            .build();
+    public static void main(String[] args) {
+        String sql= "SELECT \n" +
+                        "    db1.employees.name AS employee_name,\n" +
+                        "    db1.employees.salary AS employee_salary,\n" +
+                        "    db2.departments.name AS department_name,\n" +
+                        "    db3.projects.project_name AS project_name\n" +
+                        "FROM \n" +
+                        "    db1.employees\n" +
+                        "JOIN \n" +
+                        "    db2.departments \n" +
+                        "    ON db1.employees.department_id = db2.departments.department_id\n" +
+                        "LEFT JOIN \n" +
+                        "    db3.projects \n" +
+                        "    ON db1.employees.project_id = db3.projects.project_id\n" +
+                        "WHERE \n" +
+                        "    db1.employees.salary > (\n" +
+                        "        SELECT AVG(salary) \n" +
+                        "        FROM db1.employees \n" +
+                        "        WHERE department_id = db1.employees.department_id\n" +
+                        "    )\n" +
+                        "ORDER BY \n" +
+                        "    db1.employees.name; ";
 
-            // Make 'asiatrip' bucket if not exist.
-            boolean found =
-                    minioClient.bucketExists(BucketExistsArgs.builder().bucket("HULL-MODEL-AND-INFORMATION-DB").build());
-            if (!found) {
-                // Make a new bucket called 'asiatrip'.
-                minioClient.makeBucket(MakeBucketArgs.builder().bucket("HULL-MODEL-AND-INFORMATION-DB").build());
-            } else {
-                System.out.println("Bucket 'asiatrip' already exists.");
-            }
-
-            // Upload '/home/user/Photos/asiaphotos.zip' as object name 'asiaphotos-2015.zip' to bucket
-            // 'asiatrip'.
-            /*minioClient.uploadObject(
-                    UploadObjectArgs.builder()
-                            .bucket("asiatrip")
-                            .object("asiaphotos-2015.zip")
-                            .filename("/home/user/Photos/asiaphotos.zip")
-                            .build());
-            System.out.println(
-                    "'/home/user/Photos/asiaphotos.zip' is successfully uploaded as "
-                            + "object 'asiaphotos-2015.zip' to bucket 'asiatrip'.");*/
-        } catch (MinioException e) {
-            System.out.println("Error occurred: " + e);
-            System.out.println("HTTP trace: " + e.httpTrace());
-        }
+        //Log_Recorder logger = new Log_Recorder();
+        //logger.insertRecord(sql,"src/main/resources/interface-config.yaml"  , "查询",  1);
     }
 }

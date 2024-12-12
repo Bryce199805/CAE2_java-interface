@@ -7,7 +7,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,12 +20,12 @@ import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.statement.select.Select;
 
-public class Log_Recorder {
+public class LogRecorder {
     private static final String JDBC_DRIVER = "dm.jdbc.driver.DmDriver";
     private Connection conn;
     private Yaml yaml;
 
-    private Log_Recorder(){
+    private LogRecorder(){
         // 建立达梦新用户的连接
         String url = "jdbc:dm://222.27.255.211:15236";
 
@@ -40,13 +39,13 @@ public class Log_Recorder {
     }
 
     // 静态方法，CAE 类可以通过此方法访问 Logger 对象
-    public static Log_Recorder getLogger() {
+    public static LogRecorder getLogger() {
         return LoggerHolder.INSTANCE;
     }
 
     // 使用静态内部类单例模式
     private static class LoggerHolder {
-        private static final Log_Recorder INSTANCE = new Log_Recorder();
+        private static final LogRecorder INSTANCE = new LogRecorder();
     }
 
     private Map<String, Object> readYaml(String filePath){
@@ -139,13 +138,13 @@ public class Log_Recorder {
         String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
         String insert_sql = String.format(
                 "insert into \"LOGS\".\"LOG\" ( \"USER_NAME\", \"IP_ADDR\", \"SOURCE\", \"OPERATION\", \"TIME\", \"SCHEMAS\", \"TABLES\", \"RESULT\") " +
-                        "values ( '%s', '%s', 'java接口', '%s', SYSTIMESTAMP, LOGS.TABLES%s, LOGS.TABLES%s, 1);",
+                        "values ( '%s', '%s', 'java接口', '%s', SYSTIMESTAMP, LOGS.TABLES%s, LOGS.TABLES%s, %d);",
                 userName, ip, encodedOperation, schemas, tables, result
         );
         System.out.println(insert_sql);
 
         if(!this.insert_(insert_sql)){
-            System.out.println("日志更新失败！!");
+            System.err.println("日志更新失败！!");
             return false;
         };
         System.out.println("日志更新成功！");
@@ -159,7 +158,7 @@ public class Log_Recorder {
      * @param filePath
      * @return
      */
-    boolean insertRecord(String filePath, String opreation, String SchameName, String tableName, int result){
+    boolean insertRecord(String filePath, String operation, String SchameName, String tableName, int result){
         System.out.println("======================日志更新=======================");
         //getUserName
         String userName = this.readUserName(filePath,"fileSystem");
@@ -171,15 +170,16 @@ public class Log_Recorder {
             //return false; // 或其他处理逻辑
         }
 
+        String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
         String insert_sql = String.format(
-                "INSERT INTO LOGS.LOG (user_name, ip_addr, source, operation, schemas, tables, time, result) " +
-                        "VALUES ('%s', '%s', 'java接口', '%s', %s, %s, SYSTIMESTAMP, %d);",
-                userName, ip,  opreation, SchameName, tableName, result
+                "insert into \"LOGS\".\"LOG\" ( \"USER_NAME\", \"IP_ADDR\", \"SOURCE\", \"OPERATION\", \"TIME\", \"SCHEMAS\", \"TABLES\", \"RESULT\") " +
+                        "values ( '%s', '%s', 'java接口', '%s', SYSTIMESTAMP, LOGS.TABLES('%s'), LOGS.TABLES('%s'), %d);",
+                userName, ip, encodedOperation, SchameName, SchameName, result
         );
         System.out.println(insert_sql);
 
         if(!this.insert_(insert_sql)){
-            System.out.println("日志更新失败！!");
+            System.err.println("日志更新失败！!");
             return false;
         };
         System.out.println("日志更新成功！");

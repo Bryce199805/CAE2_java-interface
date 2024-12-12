@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="GB18030"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -14,23 +14,23 @@
         <plugins>
             <plugin>
                 <!--
-                    1. ¼ÓÃÜºó,·½·¨Ìå±»Çå¿Õ,±£Áô·½·¨²ÎÊý¡¢×¢½âµÈÐÅÏ¢.Ö÷Òª¼æÈÝswaggerÎÄµµ×¢½âÉ¨Ãè
-                    2. ·½·¨Ìå±»Çå¿Õºó,·´±àÒëÖ»ÄÜ¿´µ½·½·¨ÃûºÍ×¢½â,¿´²»µ½·½·¨ÌåµÄ¾ßÌåÄÚÈÝ
-                    3. ¼ÓÃÜºóµÄÏîÄ¿ÐèÒªÉèÖÃjavaagentÀ´Æô¶¯,Æô¶¯¹ý³ÌÖÐ½âÃÜclass,ÍêÈ«ÄÚ´æ½âÃÜ,²»ÁôÏÂÈÎºÎ½âÃÜºóµÄÎÄ¼þ
-                    4. Æô¶¯¼ÓÃÜºóµÄjar,Éú³Éxxx-encrypted.jar,Õâ¸ö¾ÍÊÇ¼ÓÃÜºóµÄjarÎÄ¼þ,¼ÓÃÜºó²»¿ÉÖ±½ÓÖ´ÐÐ
-                    5. ÎÞÃÜÂëÆô¶¯·½Ê½,java -javaagent:xxx-encrypted.jar -jar xxx-encrypted.jar
-                    6. ÓÐÃÜÂëÆô¶¯·½Ê½,java -javaagent:xxx-encrypted.jar='-pwd= ÃÜÂë' -jar xxx-encrypted.jar
+                    1. åŠ å¯†åŽ,æ–¹æ³•ä½“è¢«æ¸…ç©º,ä¿ç•™æ–¹æ³•å‚æ•°ã€æ³¨è§£ç­‰ä¿¡æ¯.ä¸»è¦å…¼å®¹swaggeræ–‡æ¡£æ³¨è§£æ‰«æ
+                    2. æ–¹æ³•ä½“è¢«æ¸…ç©ºåŽ,åç¼–è¯‘åªèƒ½çœ‹åˆ°æ–¹æ³•åå’Œæ³¨è§£,çœ‹ä¸åˆ°æ–¹æ³•ä½“çš„å…·ä½“å†…å®¹
+                    3. åŠ å¯†åŽçš„é¡¹ç›®éœ€è¦è®¾ç½®javaagentæ¥å¯åŠ¨,å¯åŠ¨è¿‡ç¨‹ä¸­è§£å¯†class,å®Œå…¨å†…å­˜è§£å¯†,ä¸ç•™ä¸‹ä»»ä½•è§£å¯†åŽçš„æ–‡ä»¶
+                    4. å¯åŠ¨åŠ å¯†åŽçš„jar,ç”Ÿæˆxxx-encrypted.jar,è¿™ä¸ªå°±æ˜¯åŠ å¯†åŽçš„jaræ–‡ä»¶,åŠ å¯†åŽä¸å¯ç›´æŽ¥æ‰§è¡Œ
+                    5. æ— å¯†ç å¯åŠ¨æ–¹å¼,java -javaagent:xxx-encrypted.jar -jar xxx-encrypted.jar
+                    6. æœ‰å¯†ç å¯åŠ¨æ–¹å¼,java -javaagent:xxx-encrypted.jar='-pwd= å¯†ç ' -jar xxx-encrypted.jar
                 -->
                 <groupId>net.roseboy</groupId>
                 <artifactId>classfinal-maven-plugin</artifactId>
                 <version>1.2.1</version>
                 <configuration>
-                    <password>#</password><!-- #±íÊ¾Æô¶¯Ê±²»ÐèÒªÃÜÂë,ÊÂÊµÉÏ¶ÔÓÚ´úÂë»ìÏýÀ´Ëµ,Õâ¸öÃÜÂëÃ»Ê²Ã´ÓÃ,ËüÖ»ÊÇÒ»¸öÆô¶¯ÃÜÂë -->
+                    <password>#</password><!-- #è¡¨ç¤ºå¯åŠ¨æ—¶ä¸éœ€è¦å¯†ç ,äº‹å®žä¸Šå¯¹äºŽä»£ç æ··æ·†æ¥è¯´,è¿™ä¸ªå¯†ç æ²¡ä»€ä¹ˆç”¨,å®ƒåªæ˜¯ä¸€ä¸ªå¯åŠ¨å¯†ç  -->
                     <!--<excludes>org.spring</excludes>-->
-                    <packages>com.cae</packages><!-- ¼ÓÃÜµÄ°üÃû,¶à¸ö°üÓÃ¶ººÅ·Ö¿ª -->
-                    <cfgfiles></cfgfiles><!-- ¼ÓÃÜµÄÅäÖÃÎÄ¼þ,¶à¸ö°üÓÃ¶ººÅ·Ö¿ª -->
-                    <libjars></libjars> <!-- jar°ülibÏÂÃæÒª¼ÓÃÜµÄjarÒÀÀµÎÄ¼þ,¶à¸ö°üÓÃ¶ººÅ·Ö¿ª -->
-                    <!--                    <code>xxxx</code> &lt;!&ndash; Ö¸¶¨»úÆ÷Æô¶¯,»úÆ÷Âë &ndash;&gt;-->
+                    <packages>com.cae</packages><!-- åŠ å¯†çš„åŒ…å,å¤šä¸ªåŒ…ç”¨é€—å·åˆ†å¼€ -->
+                    <cfgfiles></cfgfiles><!-- åŠ å¯†çš„é…ç½®æ–‡ä»¶,å¤šä¸ªåŒ…ç”¨é€—å·åˆ†å¼€ -->
+                    <libjars></libjars> <!-- jaråŒ…libä¸‹é¢è¦åŠ å¯†çš„jarä¾èµ–æ–‡ä»¶,å¤šä¸ªåŒ…ç”¨é€—å·åˆ†å¼€ -->
+                    <!--                    <code>xxxx</code> &lt;!&ndash; æŒ‡å®šæœºå™¨å¯åŠ¨,æœºå™¨ç  &ndash;&gt;-->
                 </configuration>
                 <executions>
                     <execution>
@@ -75,7 +75,7 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <project.build.sourceEncoding>GB18030</project.build.sourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
 
@@ -104,6 +104,12 @@
             <groupId>com.github.jsqlparser</groupId>
             <artifactId>jsqlparser</artifactId>
             <version>4.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>3.8.0</version>
         </dependency>
     </dependencies>
 

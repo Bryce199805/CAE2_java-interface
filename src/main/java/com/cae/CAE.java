@@ -1,5 +1,6 @@
 package com.cae;
 
+
 import io.minio.*;
 import org.yaml.snakeyaml.Yaml;
 
@@ -11,17 +12,18 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
-import java.util.logging.Logger;
 
 public class CAE {
     private static final String JDBC_DRIVER = "dm.jdbc.driver.DmDriver";
     private Connection conn;
     private Yaml yaml;
     private PreparedStatement stmt;
-    private static final Logger logger = Logger.getLogger(CAE.class.getName());  //日志记录器
     private MinioClient fileClient;
     private static final Map<String, Map<String, Set<String>>> fileDBMap = new HashMap<>();
     private static final Map<String, Map<String, String>> fileIDMap = new HashMap<>();
+    private LogRecorder logger;
+    //private static final Log_Recorder logger = new Log_Recorder();
+    private String filePath = "src/main/resources/interface-config.yaml";
 
     static {
         // fileIDMap 初始化
@@ -35,14 +37,14 @@ public class CAE {
                 ));
     }
 
-    public CAE(String filePath) {
+    public CAE() {
         // 读取 YAML 配置文件
         this.yaml = new Yaml();
-        try (FileReader reader = new FileReader(new File(filePath))) {
+        try (FileReader reader = new FileReader(new File(this.filePath))) {
             Object dataConfig = this.yaml.load(reader);
             if (dataConfig == null) {
-                System.err.println("Open config file: " + filePath + " failed.");
-                System.exit(1);
+                System.err.println("Open config file: " + this.filePath + " failed.");
+                //System.exit(1);
             }
 
             // 加载 JDBC 驱动
@@ -51,7 +53,7 @@ public class CAE {
             // 确保 dataConfig 是一个 Map
             if (!(dataConfig instanceof Map)) {
                 System.err.println("Config file format is incorrect. Expected a Map.");
-                System.exit(1);
+                //System.exit(1);
             }
 
             Map<String, Object> configMap = (Map<String, Object>) dataConfig;
@@ -68,7 +70,7 @@ public class CAE {
 
             if (server == null || username == null || password == null) {
                 System.err.println("Missing required configuration in the config file.");
-                System.exit(1);
+                //System.exit(1);
             }
 
             // 建立达梦的连接
@@ -76,6 +78,10 @@ public class CAE {
             this.conn = DriverManager.getConnection(url, username, encryption(password));
             this.conn.setAutoCommit(true);
             System.out.println("========== JDBC: connect to DM server success! ==========");
+
+            // 通过静态方法获取 Logger 实例
+            this.logger = LogRecorder.getLogger();
+
         } catch (Exception e) {
             //e.printStackTrace();
             System.err.println("[FAIL]conn database：" + e.getMessage());
@@ -119,15 +125,14 @@ public class CAE {
         return cipherString;
     }
 
-
-    public CAE(String FilePath, boolean xxx) {
+    public CAE(boolean xxx) {
         // 读取 YAML 配置文件
         this.yaml = new Yaml();
-        try (FileReader reader = new FileReader(new File(FilePath))) {
+        try (FileReader reader = new FileReader(new File(this.filePath))) {
             Object dataConfig = this.yaml.load(reader);
             if (dataConfig == null) {
-                System.err.println("Open config file: " + FilePath + " failed.");
-                System.exit(1);
+                System.err.println("Open config file: " + this.filePath + " failed.");
+                //System.exit(1);
             }
 
             // 加载 JDBC 驱动
@@ -136,7 +141,7 @@ public class CAE {
             // 确保 dataConfig 是一个 Map
             if (!(dataConfig instanceof Map)) {
                 System.err.println("Config file format is incorrect. Expected a Map.");
-                System.exit(1);
+                //System.exit(1);
             }
 
             Map<String, Object> configMap = (Map<String, Object>) dataConfig;
@@ -147,7 +152,7 @@ public class CAE {
             Map<String, String> fileConfig = (Map<String, String>) configMap.get("fileSystem");
             if (fileConfig == null) {
                 System.err.println("Missing 'endpoint' configuration in the config file.");
-                System.exit(1);
+                //System.exit(1);
             }
 
             // 安全获取配置信息
@@ -157,7 +162,7 @@ public class CAE {
 
             if (server == null || username == null || password == null) {
                 System.err.println("Missing required configuration in the config file.");
-                System.exit(1);
+                //System.exit(1);
             }
 
             // 建立达梦的连接
@@ -173,7 +178,7 @@ public class CAE {
 
             if (endpoint == null || file_username == null || file_password == null) {
                 System.err.println("Missing required configuration in the config file.");
-                System.exit(1);
+                //System.exit(1);
             }
             // 检查并补全 endpoint 的协议前缀
             if (!endpoint.startsWith("http://") && !endpoint.startsWith("https://")) {
@@ -200,10 +205,39 @@ public class CAE {
             System.out.println(this.fileIDMap);
 
             System.out.println("========== JDBC: connect to CAE_FILE server success! ==========");
+
+            this.logger = LogRecorder.getLogger();
         } catch (Exception e) {
             //e.printStackTrace();
             System.err.println("[FAIL]conn database：" + e.getMessage());
         }
+    }
+
+    // 提取公共方法来记录日志并返回结果  MiniO日志
+    private <T> T logAndReturn(T result, String operation, String dbName, String tableName) {
+        int logResult = 0;
+        // 检查 result 是否为 Boolean 类型，并根据其值来记录日志
+        if (result instanceof Boolean) {
+            logResult = ((Boolean) result) ? 1 : 0;
+
+        } else if (result == null) {
+            // 处理 result 为 null 的情况
+            logResult = 0;
+        } else {
+            // 处理 result 为 true 的情况
+            logResult = 1;
+        }
+        String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+        this.logger.insertRecord(this.filePath, encodedOperation, dbName, tableName, logResult);
+
+        return result;
+    }
+
+    // 提取公共方法来记录日志并返回结果  达梦日志
+    private boolean logAndReturn(boolean result,String sql, String operation) {
+        String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+        this.logger.insertRecord(sql,this.filePath, encodedOperation, result ? 1 : 0);
+        return result;
     }
 
     public boolean DeleteRecord(String dbName, String tableName, String id) {
@@ -211,19 +245,19 @@ public class CAE {
         //删除一条记录对应的所有文件
         if (!this.fileDBMap.containsKey(dbName)) {
             System.err.println(String.format("Database [%s] does not exist!", dbName));
-            return false;
+            return logAndReturn(false,"删除文件",dbName,tableName);
         }
 
         Map<String, Set<String>> tableMap = this.fileDBMap.get(dbName);
         if (tableMap == null || !tableMap.containsKey(tableName)) {
             System.err.println(String.format("No table [%s] found for the database: [%s]!", dbName, tableName, id));
-            return false;
+            return logAndReturn(false,"删除文件",dbName,tableName);
         }
 
         Set<String> fields = tableMap.get(tableName);
         if (fields == null) {
             System.err.println("No fields found for table: " + tableName);//不是对应数据表名
-            return false;
+            return logAndReturn(false,"删除文件",dbName,tableName);
         }
 
         // 遍历字段，执行删除操作
@@ -242,9 +276,12 @@ public class CAE {
         // 检查标志位，如果没有有效的 CAEPath，则输出提示信息
         if (!hasValidCAEPath) {
             System.err.println(String.format("No corresponding file data found for the database: [%s], table: [%s], ID: [%s]!", dbName, tableName, id));
+            return logAndReturn(false,"删除文件",dbName,tableName);
         }
         //删除记录
-        return this.DeleteRecordInDM(dbName, tableName, id);
+        boolean result = this.DeleteRecordInDM(dbName, tableName, id);
+        //记录日志
+        return logAndReturn(result,"删除文件",dbName,tableName);
     }
 
     //在DM数据库中删除一条记录
@@ -270,23 +307,25 @@ public class CAE {
             //没找到对应记录
             if (!this.CheckFileField(dbName, tableName, field)) {
                 System.err.println(String.format("The specified field -- %s is not a file field! ", field));
-                return false;
+                return logAndReturn(false,"删除文件",dbName,tableName);
             }
             //定制sql语句，解析得到新的CAEPath
             CAEPath = this.Sql2CAEPath(dbName, tableName, field, id);
             //字段内容为空，不需要去minio中处理操作
             // 校验CAEPath
             if (!this.isCAEPathValid(CAEPath, dbName, tableName, field, id)) {
-                return false;
+                return logAndReturn(false,"删除文件",dbName,tableName);
             }
         } catch (Exception e) {
             //e.printStackTrace();
             System.err.println(String.format("dbName [%s], tableName [%s], or field [%s] is incorrect.", dbName, tableName, field) + e.getMessage());
             //System.err.println("对应库名，表名，文件字段名有误");
-            return false;
+            return logAndReturn(false,"删除文件",dbName,tableName);
         }
         //删除文件 并 清空字段
-        return this.delete(CAEPath) && this.UpdateField(null, dbName, tableName, id, field);
+        boolean result = this.delete(CAEPath) && this.UpdateField(null, dbName, tableName, id, field);
+        //记录日志
+        return logAndReturn(result,"删除文件",dbName,tableName);
     }
 
     private boolean delete(String CAEPath) {
@@ -317,31 +356,38 @@ public class CAE {
     public boolean UploadFile(String localPath, String dbName, String tableName, String field, String id) {
         System.out.println("--------------UpLoad File--------------");
         String CAEPath = null;
+        boolean result = false;
+        File file = new File(localPath);
+        if(!file.exists() || !file.isFile()){  //文件路径不存在或者不是文件
+            System.err.println(String.format("Exception occurred: [%s] not a regular file", localPath));
+            return false;
+        }
         try {
             if (!this.CheckFileField(dbName, tableName, field)) {
                 System.err.println(String.format("The specified field [%s] is not a file field.", field));
-                return false;
+                return logAndReturn(false,"上传文件",dbName,tableName);
             }
             //ID是否存在
             if (this.Sql2CAEPath(dbName, tableName, field, id).equals("false")) { //不存在对应的记录
                 System.err.println(String.format("No corresponding field found for the database: [%s], table: [%s], field：[%s], ID: [%s]! ", dbName, tableName, field,id));
-                return false;
+                return logAndReturn(false,"上传文件",dbName,tableName);
             }
             //更新文件路径 & 在达梦中更新
             if (!UpdateField(localPath, dbName, tableName, id, field)) {
-                return false;
+                return logAndReturn(false,"上传文件",dbName,tableName);
             }
             //定制sql语句，解析得到新的CAEPath
             CAEPath = this.Sql2CAEPath(dbName, tableName, field, id);
             //字段内容为空，自主更新桶名，ObjectName
-            return this.upload(CAEPath, localPath, dbName, tableName, id);
+            result = this.upload(CAEPath, localPath, dbName, tableName, id);
         } catch (Exception e) {
             //e.printStackTrace();
             System.err.println(String.format("dbName [%s], tableName [%s], or field [%s] is incorrect. ", dbName, tableName, field) + e.getMessage());
             //System.err.println("对应库名，表名，文件字段名有误！");
-            return false;
+            return logAndReturn(false,"上传文件",dbName,tableName);
         }
 
+        return logAndReturn(result,"上传文件",dbName,tableName);
     }
 
     private boolean upload(String CAEPath, String localPath, String dbName, String tableName, String id) {
@@ -394,17 +440,14 @@ public class CAE {
      * 解析得到要更新字段内容，并上传至DM数据库
      * @return 成功？失败
      */
-    public boolean UpdateField(String localPath, String dbName, String tableName, String id, String field) {
+    private boolean UpdateField(String localPath, String dbName, String tableName, String id, String field) {
         String dbName1 = dbName.toLowerCase().replace("_", "-");
         String resultPath = null;
-        File file = new File(localPath);
-        if(!file.exists() || !file.isFile()){  //文件路径不存在或者不是文件
-            System.err.println(String.format("Exception occurred: [%s] not a regular file", localPath));
-            return false;
-        }
+
         if (localPath == null) {
             resultPath = " "; //删除文件的时候内容设为空串
         } else {
+            File file = new File(localPath);
             String fileName = file.getName();  // 获取文件名，包括扩展名，如 "file.jpg"
             resultPath = "/" + dbName1 + "/" + tableName + "/" + id + "/" + fileName;
         }
@@ -435,30 +478,33 @@ public class CAE {
     public boolean GetFile(String localPath, String dbName, String tableName, String field, String id) {
         System.out.println("--------------DownLoad File--------------");
         String CAEPath = null;
+        boolean result = false;
         // 校验 localPath 合法性
         if (!isLocalPathValid(localPath)) {
             //System.err.println(String.format("The specified local path [%s] is invalid.", localPath));
-            return false;
+            return logAndReturn(false,"下载文件",dbName,tableName);
         }
         try {
             if (!this.CheckFileField(dbName, tableName, field)) {
                 System.err.println(String.format("The specified field [%s] is not a file field.", field));
-                return false;
+                return logAndReturn(false,"下载文件",dbName,tableName);
             }
             //定制sql语句，解析得到CAEPath
             CAEPath = this.Sql2CAEPath(dbName, tableName, field, id);
 
             // 校验CAEPath
             if (!this.isCAEPathValid(CAEPath, dbName, tableName, field, id)) {
-                return false;
+                return logAndReturn(false,"下载文件",dbName,tableName);
             }
         } catch (Exception e) {
 //            e.printStackTrace();
             System.err.println(String.format("dbName [%s], tableName [%s], or field [%s] is incorrect.", dbName, tableName, field) + e.getMessage());
-            return false;
+            return logAndReturn(false,"下载文件",dbName,tableName);
         }
         //解析CAEPath下载到本地路径
-        return this.DownloadObject(CAEPath, localPath);
+        result = this.DownloadObject(CAEPath, localPath);
+
+        return logAndReturn(result,"下载文件",dbName,tableName);
     }
 
     private boolean DownloadObject(String CAEPath, String localPath) {
@@ -489,7 +535,6 @@ public class CAE {
         }
     }
 
-
     /**
      * 根据数据库名称、表名、字段名和 ID 下载单个文件字符流
      * ...
@@ -502,25 +547,25 @@ public class CAE {
         try {
             if (!this.CheckFileField(dbName, tableName, field)) {
                 System.err.println(String.format("The specified field [%s] is not a file field.", field));
-                return null;
+                return logAndReturn(null,"下载文件",dbName,tableName);
             }
             //定制sql语句，解析得到CAEPath
             CAEPath = this.Sql2CAEPath(dbName, tableName, field, id);
             if (CAEPath == null || CAEPath.trim().isEmpty()) {
                 System.err.println(String.format("The file field content is empty for the database: [%s], table: [%s], field: [%s], ID: [%s]!！", dbName, tableName, field, id));
-                return null;
+                return logAndReturn(null,"下载文件",dbName,tableName);
             } else if (CAEPath.equals("false")) {//不存在对应的记录
                 System.err.println(String.format("No corresponding field found for the database: [%s], table: [%s], field：[%s], ID: [%s]! ", dbName, tableName, field,id));
-                return null;
+                return logAndReturn(null,"下载文件",dbName,tableName);
             }
         } catch (Exception e) {
             //e.printStackTrace();
             System.err.println(String.format("dbName [%s], tableName [%s], or field [%s] is incorrect.", dbName, tableName, field) + e.getMessage());
             //System.err.println("对应库名，表名，文件字段名有误");
-            return null;
+            return logAndReturn(null,"下载文件",dbName,tableName);
         }
         //解析CAEPath下载到本地路径
-        return this.GetStream(CAEPath);
+        return logAndReturn(this.GetStream(CAEPath),"下载文件",dbName,tableName);
     }
 
     private InputStream GetStream(String CAEPath) {
@@ -621,7 +666,7 @@ public class CAE {
     }
 
     // 根据 dbName 和 tableName 获取对应的 ID 字段
-    public String GetIDField(String dbName, String tableName) {
+    private String GetIDField(String dbName, String tableName) {
         // 从 fileIDMap 中查找对应的 dbName
         Map<String, String> tableMap = this.fileIDMap.get(dbName);
         if (tableMap != null) {
@@ -660,7 +705,7 @@ public class CAE {
 
         if (!isValidSQLCommand(sql, "select")) {
             System.err.println("illegal statement.");
-            return false;
+            return logAndReturn(false, sql,"查询");
         }
 
         try {
@@ -668,11 +713,11 @@ public class CAE {
             //执行查询
             rsWrapper.setRs(this.stmt.executeQuery());
             System.out.println("DM query success!");
-            return true;
+            return logAndReturn(true, sql,"查询");
         } catch (SQLException e) {
             System.err.println("Error executing query: " + e.getMessage());
             //e.printStackTrace();
-            return false;
+            return logAndReturn(false, sql,"查询");
         }
     }
 
@@ -681,7 +726,7 @@ public class CAE {
 
         if (!isValidSQLCommand(sql, "update")) {
             System.err.println("illegal statement.");
-            return false;
+            return logAndReturn(false, sql,"修改");
         }
 
         try {
@@ -691,15 +736,15 @@ public class CAE {
                 System.out.println("DM update success!");
                 // 关闭语句
                 this.stmt.close();
-                return true;
+                return logAndReturn(true, sql,"修改");
             } else {
                 System.out.println("no rows affected.");
-                return false;
+                return logAndReturn(false, sql,"修改");
             }
         } catch (SQLException e) {
             //e.printStackTrace();
             System.err.println("Exception occurred: " + e.getMessage());
-            return false;
+            return logAndReturn(false, sql,"修改");
         }
     }
 
@@ -708,7 +753,7 @@ public class CAE {
 
         if (!isValidSQLCommand(sql, "delete")) {
             System.err.println("illegal statement.");
-            return false;
+            return logAndReturn(false, sql,"删除");
         }
 
         try {
@@ -718,15 +763,15 @@ public class CAE {
                 System.out.println("DM delete success!");
                 // 关闭语句
                 this.stmt.close();
-                return true;
+                return logAndReturn(true, sql,"删除");
             } else {
                 System.out.println("no rows affected.");
-                return false;
+                return logAndReturn(false, sql,"删除");
             }
         } catch (SQLException e) {
             //e.printStackTrace();
             System.err.println("Exception occurred: " + e.getMessage());
-            return false;
+            return logAndReturn(false, sql,"删除");
         }
     }
 
@@ -734,7 +779,7 @@ public class CAE {
         System.out.println("--------- Insert In DM ---------");
         if (!isValidSQLCommand(sql, "insert")) {
             System.err.println("illegal statement.");
-            return false;
+            return logAndReturn(false, sql,"插入");
         }
 
         try {
@@ -744,15 +789,15 @@ public class CAE {
                 System.out.println("DM insert success!");
                 // 关闭语句
                 this.stmt.close();
-                return true;
+                return logAndReturn(true, sql,"插入");
             } else {
                 System.out.println("no rows affected.");
-                return false;
+                return logAndReturn(false, sql,"插入");
             }
         } catch (SQLException e) {
             //e.printStackTrace();
             System.err.println("Exception occurred: " + e.getMessage());
-            return false;
+            return logAndReturn(false, sql,"插入");
         }
     }
 
@@ -870,7 +915,6 @@ public class CAE {
             System.err.println("========== ERROR: Failed to disconnect from Minio server. " + e.getMessage());
         }
     }
-
 
 }
 
