@@ -123,6 +123,7 @@ public class LogRecorder {
         Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) this.configMap.get("log"));
         this.CIDR = databaseConfig.map(m -> m.get("CIDR")).orElse(null);
         this.log_username = databaseConfig.map(m -> m.get("username")).orElse(null);
+        // todo log_passwd 需要加密
         this.log_passwd = databaseConfig.map(m -> m.get("passwd")).orElse(null);
         if (this.CIDR == null || this.log_username == null || this.log_passwd == null) {
             System.err.println("Missing required configuration in the log config file.");
@@ -275,14 +276,16 @@ public class LogRecorder {
                     InetAddress inetAddress = inetAddresses.nextElement();
                     if (inetAddress.getHostAddress().contains(".")) {
                         ip = inetAddress.getHostAddress();
-                        //System.out.println("IP 地址: " + ip);
+                        System.out.println("IP 地址: " + ip);
 
                         // 使用 SubnetUtils 检查是否是局域网
                         SubnetUtils subnetUtils = new SubnetUtils(CIDR);
                         if (subnetUtils.getInfo().isInRange(ip)) {
-                            //System.out.println("局域网 IP: " + ip);
+                            System.out.println("局域网 IP: " + ip);
                             return ip;
                         }
+
+                        // todo cidr匹配不上需要报错卡断程序  你这里默认会取最后一个IP
                     }
                 }
             }
