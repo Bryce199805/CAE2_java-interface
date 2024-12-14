@@ -4,17 +4,17 @@ import java.io.InputStream;
 
 public class main {
     public static void main(String[] args) {
-        //String filePath = "C:\\Users\\Bryce\\.cae\\interface-config.yaml";
+        String filePath = "C:\\Users\\Bryce\\.cae\\interface-config.yaml";
         // [note!!!] 这里的yaml文件路径我改成固定的相对路径了
-        String filePath = "src/main/resources/interface-config.yaml";
+
+//        String filePath = "src/main/resources/interface-config.yaml";
         //CAE db = new CAE(filePath);
         CAE File = new CAE(filePath,true);
         String localPath= "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test";
-        String uploadFile = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test\\7082001-船壳三维模型文件.igs";
+//        String uploadFile = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test\\7082001-船壳三维模型文件.igs";
 
-        //测试下载单个文件√  todo  Exception occurred: .\download\SampleShip_KCS0000.png.fba3eca0acc6b968334425a888738079.part.minio
-        // todo  本地路径非法时 错误输出不明确 [localPath 是否存在，是否是个目录]
-//        if (File.GetFile(" ", "HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "TRANSVERSE_AREA_CURVE", "SampleShip_KCS0000")) {
+        // todo  文件系统用户名也记录达梦的
+//        if (File.GetFile(".", "HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "TRANSVERSE_AREA_CURVE", "SampleShip_KCS0000")) {
 //            System.out.println("下载成功！");
 //        }
 //
@@ -23,7 +23,7 @@ public class main {
 //            System.out.println("下载成功！");
 //        }
 //        //测试下载单个文件，文件数据为空
-//        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","SampleShip_VLCC0000")){
+//        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","TRANSVERSE_AREA_CURVE","SampleShip_VLCC0000")){
 //            System.out.println("下载成功！");
 //        }
         //测试下载单个文件，不涉及文件数据
@@ -62,12 +62,12 @@ public class main {
 //            System.err.println("Exception occurred: " + e.getMessage());
 //        }
 
-        //测试上传  todo localPath不正确时  数据库中路径会更新  更新数据库中路径这件事应当在minio文件上传成功后进行  [ 检查localPath,有误，不更新数据库，也不进一步更新minio文件 ]
-//        if (File.UploadFile(uploadFile, "HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "TRANSVERSE_AREA_CURVE", "a")) {
+        //测试上传
+//        if (File.UploadFile("./SampleShip_KCS0000.png", "HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "TRANSVERSE_AREA_CURVE", "SampleShip_VLCC0000")) {
 //            System.out.println("上传成功！");
 //        }
 //        //测试上传，不存在的记录
-//        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081001")){
+//        if(File.UploadFile("./SampleShip_KCS0000.png","HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081001")){
 //            System.out.println("上传成功！");
 //        }
 //        //测试上传，文件字段内容为空，也可以成功！
@@ -83,8 +83,7 @@ public class main {
 //            System.out.println("删除成功！");
 //        }
 
-        //测试正常删除一条记录√  todo 库名非法 空指针错误  ID非法时 会打印三条错误信息
-        // todo 合法记录中文件对应字段为空时，不应当打印报错信息
+        //测试正常删除一条记录√
 //        if (File.DeleteRecord("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "SampleShip_JBC0000")) {
 //            System.out.println("删除记录成功！");
 //        }
@@ -124,13 +123,19 @@ public class main {
 
 
         //测试查询--基本船型库
+        // todo 测试非法sql时，日志模块的sql解析不应该给用户抛出错误信息，仅记录即可
         ResultSetWrapper rsWrapper = new ResultSetWrapper();
-        if (File.Query("select * from BASIC_SHIP_INFORMATION_DB.SHIP_DATA_INFO where ship_type = '油船';",rsWrapper)) {
-            File.Display(rsWrapper);
-            File.setClose(rsWrapper);
-        };
+//        if (File.Query("select * from BASIC_SHIP_INFORMATION_DB.SHIP_DATA_INFO where ship_type = '油船';",rsWrapper)) {
+//            File.Display(rsWrapper);
+//            File.setClose(rsWrapper);
+//        };
+
+//        if (File.Query("select * from BASIC_SHIP_INFORMATION_DB.SHIP_DATA_INFO as t1, HULL_MODEL_AND_INFORMATION_DB.SHIP_INFO as t2 where t1.SHIP_DATA_ID = t2.SHIP_DATA_ID;",rsWrapper)) {
+//            File.Display(rsWrapper);
+//            File.setClose(rsWrapper);
+//        };
 //
-//        //测试查询--关键设备库
+        //测试查询--关键设备库
 //        if (File.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF;",rsWrapper)) {
 //            File.Display(rsWrapper);
 //            File.setClose(rsWrapper);
@@ -180,7 +185,7 @@ public class main {
 //
 //        //json字段的查询，中文key的情况
 //        ResultSetWrapper rsWrapper = new ResultSetWrapper();
-//        if(File.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.AnchorType') = '类型';", rsWrapper)){
+//        if(File.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.power_type_enum') = '动力类型';", rsWrapper)){
 //            System.out.println("QUERY SUCCESS!");
 //            File.Display(rsWrapper);
 //        };

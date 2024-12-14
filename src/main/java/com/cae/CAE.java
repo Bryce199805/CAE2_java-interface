@@ -218,7 +218,6 @@ public class CAE {
         // 检查 result 是否为 Boolean 类型，并根据其值来记录日志
         if (result instanceof Boolean) {
             logResult = ((Boolean) result) ? 1 : 0;
-
         } else if (result == null) {
             // 处理 result 为 null 的情况
             logResult = 0;
@@ -230,7 +229,6 @@ public class CAE {
             String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
             this.logger.insertRecord(encodedOperation, dbName, tableName, logResult);
         }
-
         return result;
     }
 
