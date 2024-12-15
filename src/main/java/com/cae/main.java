@@ -4,19 +4,19 @@ import java.io.InputStream;
 
 public class main {
     public static void main(String[] args) {
-        String filePath = "C:\\Users\\Bryce\\.cae\\interface-config.yaml";
+        //String filePath = "C:\\Users\\Bryce\\.cae\\interface-config.yaml";
         // [note!!!] 这里的yaml文件路径我改成固定的相对路径了
 
-//        String filePath = "src/main/resources/interface-config.yaml";
+        String filePath = "src/main/resources/interface-config.yaml";
         //CAE db = new CAE(filePath);
         CAE File = new CAE(filePath,true);
         String localPath= "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test";
 //        String uploadFile = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test\\7082001-船壳三维模型文件.igs";
 
         // todo  文件系统用户名也记录达梦的
-//        if (File.GetFile(".", "HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "TRANSVERSE_AREA_CURVE", "SampleShip_KCS0000")) {
-//            System.out.println("下载成功！");
-//        }
+        if (File.GetFile(".", "HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "TRANSVERSE_AREA_CURVE", "SampleShip_KCS0000")) {
+            System.out.println("下载成功！");
+        }
 //
 //        //测试下载单个文件，不存在的ID
 //        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081001")){

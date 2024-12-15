@@ -9,7 +9,7 @@ fileSystem:
   passwd: "fileadmin"
 
 log:
-  username: "loguser"
+  username: "logusers"
   passwd: "SYSDBA1234"
-  CIDR: "192.168.0.0/16"
+  CIDR: "192.168.0.0/30"
   enable: true

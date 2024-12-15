@@ -44,7 +44,7 @@ public class CAE {
             Object dataConfig = this.yaml.load(reader);
             if (dataConfig == null) {
                 System.err.println("Open config file: " + filePath + " failed.");
-                //System.exit(1);
+                System.exit(1);
             }
 
             // 加载 JDBC 驱动
@@ -53,7 +53,7 @@ public class CAE {
             // 确保 dataConfig 是一个 Map
             if (!(dataConfig instanceof Map)) {
                 System.err.println("Config file format is incorrect. Expected a Map.");
-                //System.exit(1);
+                System.exit(1);
             }
 
             Map<String, Object> configMap = (Map<String, Object>) dataConfig;
@@ -70,7 +70,7 @@ public class CAE {
 
             if (server == null || username == null || password == null) {
                 System.err.println("Missing required configuration in the config file.");
-                //System.exit(1);
+                System.exit(1);
             }
 
             // 建立达梦的连接
@@ -132,7 +132,7 @@ public class CAE {
             Object dataConfig = this.yaml.load(reader);
             if (dataConfig == null) {
                 System.err.println("Open config file: " + filePath + " failed.");
-                //System.exit(1);
+                System.exit(1);
             }
 
             // 加载 JDBC 驱动
@@ -141,7 +141,7 @@ public class CAE {
             // 确保 dataConfig 是一个 Map
             if (!(dataConfig instanceof Map)) {
                 System.err.println("Config file format is incorrect. Expected a Map.");
-                //System.exit(1);
+                System.exit(1);
             }
 
             Map<String, Object> configMap = (Map<String, Object>) dataConfig;
@@ -152,7 +152,7 @@ public class CAE {
             Map<String, String> fileConfig = (Map<String, String>) configMap.get("fileSystem");
             if (fileConfig == null) {
                 System.err.println("Missing 'endpoint' configuration in the config file.");
-                //System.exit(1);
+                System.exit(1);
             }
 
             // 安全获取配置信息
@@ -162,7 +162,7 @@ public class CAE {
 
             if (server == null || username == null || password == null) {
                 System.err.println("Missing required configuration in the config file.");
-                //System.exit(1);
+                System.exit(1);
             }
 
             // 建立达梦的连接
@@ -178,7 +178,7 @@ public class CAE {
 
             if (endpoint == null || file_username == null || file_password == null) {
                 System.err.println("Missing required configuration in the config file.");
-                //System.exit(1);
+                System.exit(1);
             }
             // 检查并补全 endpoint 的协议前缀
             if (!endpoint.startsWith("http://") && !endpoint.startsWith("https://")) {

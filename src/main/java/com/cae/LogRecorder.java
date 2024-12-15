@@ -20,12 +20,15 @@ import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.statement.select.Select;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 
 public class LogRecorder {
     private static final String JDBC_DRIVER = "dm.jdbc.driver.DmDriver";
     private Connection conn;
     private Yaml yaml;
-    private String m_username;
+    //private String m_username;
     private String dm_username;
     private String log_username;
     private String log_passwd;
@@ -43,18 +46,47 @@ public class LogRecorder {
             this.readServer();
             this.readLog();
             this.dm_username = this.readUserName("database");
-            this.m_username = this.readUserName("fileSystem");
-            this.ip =  this.getIP(CIDR);
+            //this.m_username = this.readUserName("fileSystem");
+            this.getIP(CIDR);
 
             String url = "jdbc:dm://"+this.server;
+            //System.out.println(encryption(this.log_passwd));
             try {
-                this.conn = DriverManager.getConnection(url, this.log_username, this.log_passwd);
+                this.conn = DriverManager.getConnection(url, this.log_username, encryption(this.log_passwd));
                 this.conn.setAutoCommit(true);
-                System.out.println("成功连接");
+                System.out.println("日志用户成功连接");
             } catch (Exception e) {
                 System.err.println("[No Need / Fail] conn database for logUser:" + e.getMessage());
+                System.exit(1);
             }
         }
+    }
+
+    //加密
+    private static String encryption(String plainString) {
+        String cipherString = null;
+        try {
+            // 指定算法
+            String algorithm = "HmacSHA256";
+            // 创建密钥规范
+            SecretKeySpec secretKeySpec = new SecretKeySpec("3G@ln$UOd8Ptf@XU".getBytes(StandardCharsets.UTF_8), algorithm);
+            // 获取Mac对象实例
+            Mac mac = Mac.getInstance(algorithm);
+            // 初始化mac
+            mac.init(secretKeySpec);
+            // 计算mac
+            byte[] macBytes = mac.doFinal(plainString.getBytes(StandardCharsets.UTF_8));
+            // 输出为16进制字符串
+            StringBuilder sb = new StringBuilder();
+            for (byte b : macBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            cipherString = sb.toString().substring(0, 32);
+        } catch (Exception e) {
+            System.err.println("Exception occurred: " + e.getMessage());
+            //e.printStackTrace();
+        }
+        return cipherString;
     }
 
     // 静态方法，CAE 类可以通过此方法访问 Logger 对象
@@ -127,6 +159,7 @@ public class LogRecorder {
         this.log_passwd = databaseConfig.map(m -> m.get("passwd")).orElse(null);
         if (this.CIDR == null || this.log_username == null || this.log_passwd == null) {
             System.err.println("Missing required configuration in the log config file.");
+            System.exit(1);
         }
     }
 
@@ -147,6 +180,7 @@ public class LogRecorder {
         this.server = databaseConfig.map(m -> m.get("server")).orElse(null);
         if (this.server == null) {
             System.err.println("Missing required configuration in the config file.");
+            System.exit(1);
         }
     }
 
@@ -213,16 +247,12 @@ public class LogRecorder {
 
             //getIP
             //String ip = this.getIP(this.readCIDR(filePath));
-            if (this.ip == null) {
-                System.err.println("No valid IP found in the specified CIDR range.");
-                //return false; // 或其他处理逻辑
-            }
 
             String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
             String insert_sql = String.format(
                     "insert into \"LOGS\".\"LOG\" ( \"USER_NAME\", \"IP_ADDR\", \"SOURCE\", \"OPERATION\", \"TIME\", \"SCHEMAS\", \"TABLES\", \"RESULT\") " +
                             "values ( '%s', '%s', 'java接口', '%s', SYSTIMESTAMP, LOGS.TABLES('%s'), LOGS.TABLES('%s'), %d);",
-                    this.m_username, this.ip, encodedOperation, SchameName, tableName, result
+                    this.dm_username, this.ip, encodedOperation, SchameName, tableName, result
             );
             System.out.println(insert_sql);
 
@@ -260,8 +290,8 @@ public class LogRecorder {
         }
     }
 
-    private String getIP(String CIDR){
-        String ip = null;
+    private void getIP(String CIDR){
+        //String ip = null;
         try {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
             while (networkInterfaces.hasMoreElements()) {
@@ -275,25 +305,34 @@ public class LogRecorder {
                 while (inetAddresses.hasMoreElements()) {
                     InetAddress inetAddress = inetAddresses.nextElement();
                     if (inetAddress.getHostAddress().contains(".")) {
-                        ip = inetAddress.getHostAddress();
-                        System.out.println("IP 地址: " + ip);
-
+                        String cur_ip = inetAddress.getHostAddress();
+                        //System.out.println("IP 地址: " + cur_ip);
                         // 使用 SubnetUtils 检查是否是局域网
-                        SubnetUtils subnetUtils = new SubnetUtils(CIDR);
-                        if (subnetUtils.getInfo().isInRange(ip)) {
-                            System.out.println("局域网 IP: " + ip);
-                            return ip;
+                        try {
+                            SubnetUtils subnetUtils = new SubnetUtils(CIDR);
+                            if (subnetUtils.getInfo().isInRange(cur_ip)) {
+                                System.out.println("局域网 IP: " + cur_ip);
+                                this.ip = cur_ip;
+                            }
+                        } catch (IllegalArgumentException e) {
+                            // 如果 CIDR 格式无效，立即抛出异常
+                            throw new IllegalStateException("Invalid CIDR format: " + CIDR, e);
                         }
-
-                        // todo cidr匹配不上需要报错卡断程序  你这里默认会取最后一个IP
+                        // todo cidr匹配不上需要报错卡断程序  你这里默认会取最后一个IP ---> 在下面进行了判断this.ip是否为空
                     }
                 }
             }
+            // 遍历完所有网络接口，没有找到符合条件的 IP
+            throw new IllegalStateException("No valid IP found in the specified CIDR range: " + CIDR);
         } catch (Exception e) {
             //e.printStackTrace();
         }
-        return ip;
+        if (this.ip == null) {
+            System.err.println("No valid IP found in the specified CIDR range.");
+        }
+
     }
+
 
     private List<String[]> parseSQL(String sql) {
         List<String[]> schemaTableList = new ArrayList<>();
