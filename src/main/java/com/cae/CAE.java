@@ -214,6 +214,7 @@ public class CAE {
 
     // 提取公共方法来记录日志并返回结果  MiniO日志
     private <T> T logAndReturn(T result, String operation, String dbName, String tableName) {
+        String encodedOperation = null;
         int logResult = 0;
         // 检查 result 是否为 Boolean 类型，并根据其值来记录日志
         if (result instanceof Boolean) {
@@ -226,7 +227,7 @@ public class CAE {
             logResult = 1;
         }
         if(this.logger != null){
-            String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+            encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
             this.logger.insertRecord(encodedOperation, dbName, tableName, logResult);
         }
         return result;
