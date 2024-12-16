@@ -195,9 +195,9 @@ public class CAE {
 
                 // 尝试连接 Minio 以确保能够连接成功
                 this.fileClient.listBuckets();  // 尝试列出桶，测试连接是否成功
-                System.out.println("========== Minio: connect to CAE_FILE server success! ==========");
+                System.out.println("========== CAE_FILE: connect to CAE_FILE server success! ==========");
             } catch (Exception e) {
-                System.err.println("========== ERROR: Failed to establish Minio connection. " + e.getMessage());
+                System.err.println("========== ERROR: Failed to establish CAE_FILE server connection. " + e.getMessage());
                 System.exit(1);
             }
 
@@ -215,6 +215,7 @@ public class CAE {
     // 提取公共方法来记录日志并返回结果  MiniO日志
     private <T> T logAndReturn(T result, String operation, String dbName, String tableName) {
         String encodedOperation = null;
+        encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
         int logResult = 0;
         // 检查 result 是否为 Boolean 类型，并根据其值来记录日志
         if (result instanceof Boolean) {
@@ -227,7 +228,6 @@ public class CAE {
             logResult = 1;
         }
         if(this.logger != null){
-            encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
             this.logger.insertRecord(encodedOperation, dbName, tableName, logResult);
         }
         return result;
@@ -247,19 +247,19 @@ public class CAE {
         //删除一条记录对应的所有文件
         if (!this.fileDBMap.containsKey(dbName)) {
             System.err.println(String.format("Database [%s] does not exist!", dbName));
-            return logAndReturn(false,"删除文件",dbName,tableName);
+            return logAndReturn(false,"删除",dbName,tableName);
         }
 
         Map<String, Set<String>> tableMap = this.fileDBMap.get(dbName);
         if (tableMap == null || !tableMap.containsKey(tableName)) {
             System.err.println(String.format("No table [%s] found for the database: [%s]!", dbName, tableName, id));
-            return logAndReturn(false,"删除文件",dbName,tableName);
+            return logAndReturn(false,"删除",dbName,tableName);
         }
 
         Set<String> fields = tableMap.get(tableName);
         if (fields == null) {
             System.err.println("No fields found for table: " + tableName);//不是对应数据表名
-            return logAndReturn(false,"删除文件",dbName,tableName);
+            return logAndReturn(false,"删除",dbName,tableName);
         }
 
         // 遍历字段，执行删除操作
@@ -278,12 +278,12 @@ public class CAE {
         // 检查标志位，如果没有有效的 CAEPath，则输出提示信息
         if (!hasValidCAEPath) {
             System.err.println(String.format("No corresponding file data found for the database: [%s], table: [%s], ID: [%s]!", dbName, tableName, id));
-            return logAndReturn(false,"删除文件",dbName,tableName);
+            return logAndReturn(false,"删除",dbName,tableName);
         }
         //删除记录
         boolean result = this.DeleteRecordInDM(dbName, tableName, id);
         //记录日志
-        return logAndReturn(result,"删除文件",dbName,tableName);
+        return logAndReturn(result,"删除",dbName,tableName);
     }
 
     //在DM数据库中删除一条记录
@@ -291,7 +291,25 @@ public class CAE {
         String idField = this.GetIDField(dbName, tableName);
         String delete_sql = String.format("DELETE FROM %s.%s WHERE %s = '%s';", dbName, tableName, idField, id);
 
-        return Delete(delete_sql);
+        try {
+            this.stmt = this.conn.prepareStatement(delete_sql);
+            int rowsAffected = this.stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("DM delete success!");
+                // 关闭语句
+                this.stmt.close();
+                return true;
+            } else {
+                System.out.println("no rows affected.");
+                return false;
+            }
+        } catch (SQLException e) {
+            //e.printStackTrace();
+            System.err.println("Exception occurred: " + e.getMessage());
+            return false;
+        }
+
+        //return Delete(delete_sql);
     }
 
     /**
@@ -467,7 +485,25 @@ public class CAE {
         String idField = this.GetIDField(dbName, tableName);
         String update_sql = String.format(
                 "UPDATE %s.%s SET %s = '%s' WHERE %s = '%s';", dbName, tableName, field, resultPath, idField, id);
-        return Update(update_sql);
+
+        try {
+            this.stmt = this.conn.prepareStatement(update_sql);
+            int rowsAffected = this.stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("DM update success!");
+                // 关闭语句
+                this.stmt.close();
+                return true;
+            } else {
+                System.out.println("no rows affected.");
+                return false;
+            }
+        } catch (SQLException e) {
+            //e.printStackTrace();
+            System.err.println("Exception occurred: " + e.getMessage());
+            return false;
+        }
+        //return Update(update_sql);
     }
 
 
@@ -911,10 +947,10 @@ public class CAE {
             if (this.fileClient != null) {
                 // Minio 没有直接关闭的方法，设置为 null 以帮助垃圾回收
                 this.fileClient = null;
-                System.out.println("========== Minio: disconnect from server success! ==========");
+                System.out.println("========== CAE_FILE: disconnect from server success! ==========");
             }
         } catch (Exception e) {
-            System.err.println("========== ERROR: Failed to disconnect from Minio server. " + e.getMessage());
+            System.err.println("========== ERROR: Failed to disconnect from CAE_FILE server. " + e.getMessage());
         }
     }
 

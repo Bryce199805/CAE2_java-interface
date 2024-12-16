@@ -56,7 +56,7 @@ public class LogRecorder {
                 this.conn.setAutoCommit(true);
                 System.out.println("日志用户成功连接");
             } catch (Exception e) {
-                System.err.println("[No Need / Fail] conn database for logUser:" + e.getMessage());
+                System.err.println("[Fail] conn database for logUser:" + e.getMessage());
                 System.exit(1);
             }
         }
@@ -89,7 +89,7 @@ public class LogRecorder {
         return cipherString;
     }
 
-    // 静态方法，CAE 类可以通过此方法访问 Logger 对象
+    // 静态方法，单例模式，CAE 类可以通过此方法访问 Logger 对象
     public static synchronized LogRecorder getLogger(String filePath) {
         if (instance == null) {
             instance = new LogRecorder(filePath);
@@ -155,7 +155,7 @@ public class LogRecorder {
         Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) this.configMap.get("log"));
         this.CIDR = databaseConfig.map(m -> m.get("CIDR")).orElse(null);
         this.log_username = databaseConfig.map(m -> m.get("username")).orElse(null);
-        // todo log_passwd 需要加密
+        // todo log_passwd 需要加密  √
         this.log_passwd = databaseConfig.map(m -> m.get("passwd")).orElse(null);
         if (this.CIDR == null || this.log_username == null || this.log_passwd == null) {
             System.err.println("Missing required configuration in the log config file.");
@@ -216,8 +216,8 @@ public class LogRecorder {
 
             String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
             String insert_sql = String.format(
-                    "insert into \"LOGS\".\"LOG\" ( \"USER_NAME\", \"IP_ADDR\", \"SOURCE\", \"OPERATION\", \"TIME\", \"SCHEMAS\", \"TABLES\", \"RESULT\") " +
-                            "values ( '%s', '%s', 'java接口', '%s', SYSTIMESTAMP, LOGS.TABLES%s, LOGS.TABLES%s, %d);",
+                    "insert into \"USER_MANAGEMENT_DB\".\"LOG\" ( \"USER_NAME\", \"IP_ADDR\", \"SOURCE\", \"OPERATION\", \"TIME\", \"SCHEMAS\", \"TABLES\", \"RESULT\") " +
+                            "values ( '%s', '%s', 'Java数据接口', '%s', SYSTIMESTAMP, TABLES%s, TABLES%s, %d);",
                     this.dm_username, this.ip, encodedOperation, schemas, tables, result
             );
             System.out.println(insert_sql);
@@ -250,8 +250,8 @@ public class LogRecorder {
 
             String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
             String insert_sql = String.format(
-                    "insert into \"LOGS\".\"LOG\" ( \"USER_NAME\", \"IP_ADDR\", \"SOURCE\", \"OPERATION\", \"TIME\", \"SCHEMAS\", \"TABLES\", \"RESULT\") " +
-                            "values ( '%s', '%s', 'java接口', '%s', SYSTIMESTAMP, LOGS.TABLES('%s'), LOGS.TABLES('%s'), %d);",
+                    "insert into \"USER_MANAGEMENT_DB\".\"LOG\" ( \"USER_NAME\", \"IP_ADDR\", \"SOURCE\", \"OPERATION\", \"TIME\", \"SCHEMAS\", \"TABLES\", \"RESULT\") " +
+                            "values ( '%s', '%s', 'Java数据接口', '%s', SYSTIMESTAMP, TABLES('%s'), TABLES('%s'), %d);",
                     this.dm_username, this.ip, encodedOperation, SchameName, tableName, result
             );
             System.out.println(insert_sql);
@@ -311,14 +311,14 @@ public class LogRecorder {
                         try {
                             SubnetUtils subnetUtils = new SubnetUtils(CIDR);
                             if (subnetUtils.getInfo().isInRange(cur_ip)) {
-                                System.out.println("局域网 IP: " + cur_ip);
+                                //System.out.println("局域网 IP: " + cur_ip);
                                 this.ip = cur_ip;
                             }
                         } catch (IllegalArgumentException e) {
                             // 如果 CIDR 格式无效，立即抛出异常
                             throw new IllegalStateException("Invalid CIDR format: " + CIDR, e);
                         }
-                        // todo cidr匹配不上需要报错卡断程序  你这里默认会取最后一个IP ---> 在下面进行了判断this.ip是否为空
+                        // todo cidr匹配不上需要报错卡断程序  你这里默认会取最后一个IP ---> 在下面进行了判断this.ip是否为空  √
                     }
                 }
             }
@@ -387,7 +387,7 @@ public class LogRecorder {
             }
         } catch (Exception e) {
             //e.printStackTrace();
-            System.err.println("[FAIL] ParseSQL ERROR：" + e.getMessage());
+            //System.err.println("[FAIL] ParseSQL ERROR：" + e.getMessage());
         }
         return schemaTableList;
     }

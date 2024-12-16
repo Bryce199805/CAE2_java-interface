@@ -11,10 +11,10 @@ public class main {
         //CAE db = new CAE(filePath);
         CAE File = new CAE(filePath,true);
         String localPath= "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test";
-//        String uploadFile = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test\\7082001-船壳三维模型文件.igs";
+        String uploadFile = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test\\7082001-船壳三维模型文件.igs";
 
-        // todo  文件系统用户名也记录达梦的
-        if (File.GetFile(".", "HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "TRANSVERSE_AREA_CURVE", "SampleShip_KCS0000")) {
+        // todo  文件系统用户名也记录达梦的  √
+        if (File.GetFile(" ", "HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "TRANSVERSE_AREA_CURVE", "SampleShip_KCS0001")) {
             System.out.println("下载成功！");
         }
 //
@@ -23,7 +23,7 @@ public class main {
 //            System.out.println("下载成功！");
 //        }
 //        //测试下载单个文件，文件数据为空
-//        if(File.GetFile(localPath,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","TRANSVERSE_AREA_CURVE","SampleShip_VLCC0000")){
+//        if (File.GetFile(localPath, "HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "TRANSVERSE_AREA_CURVE", "SampleShip_KCS0000")) {
 //            System.out.println("下载成功！");
 //        }
         //测试下载单个文件，不涉及文件数据
@@ -33,7 +33,7 @@ public class main {
 
 
         //测试下载单个文件字符流√
-//        InputStream inputStream = File.GetFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "OFFSETS_TABLE", "SampleShip_KCS0000");
+//        InputStream inputStream = File.GetFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "OFFSETS_TABLE", "SampleShip_KCS0001");
 //        if (inputStream != null) {
 //            System.out.println("GET STREAM SUCCESS！");
 //        }
@@ -43,7 +43,7 @@ public class main {
 //            System.out.println("GET STREAM SUCCESS！");
 //        }
 //        //测试下载文件数据为空
-//        InputStream inputStream2 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "HULL_3D_MODEL", "SampleShip_VLCC0000");
+//        InputStream inputStream2 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "HULL_3D_MODEL", "SampleShip_KCS0000");
 //        if (inputStream2 != null) {
 //            System.out.println("GET STREAM SUCCESS！");
 //        }
@@ -52,26 +52,18 @@ public class main {
 //        if (inputStream3 != null) {
 //            System.out.println("GET STREAM SUCCESS！");
 //        }
-//        try {
-//            inputStream.close();
-//            inputStream1.close();
-//            inputStream2.close();
-//            inputStream3.close();
-//        } catch (Exception e) {
-////            e.printStackTrace();
-//            System.err.println("Exception occurred: " + e.getMessage());
-//        }
+
 
         //测试上传
-//        if (File.UploadFile("./SampleShip_KCS0000.png", "HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "TRANSVERSE_AREA_CURVE", "SampleShip_VLCC0000")) {
+//        if (File.UploadFile(uploadFile, "HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "TRANSVERSE_AREA_CURVE", "SampleShip_KCS0000")) {
 //            System.out.println("上传成功！");
 //        }
 //        //测试上传，不存在的记录
-//        if(File.UploadFile("./SampleShip_KCS0000.png","HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081001")){
+//        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081001")){
 //            System.out.println("上传成功！");
 //        }
 //        //测试上传，文件字段内容为空，也可以成功！
-//        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","SampleShip_VLCC0000")){
+//        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","SampleShip_KCS0000")){
 //            System.out.println("上传成功！");
 //        }
 //        //测试上传，不是文件字段
@@ -79,9 +71,6 @@ public class main {
 //            System.out.println("上传成功！");
 //        }
 
-//        if (File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "OFFSETS_TABLE", "SampleShip_JBC0002")) {
-//            System.out.println("删除成功！");
-//        }
 
         //测试正常删除一条记录√
 //        if (File.DeleteRecord("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "SampleShip_JBC0000")) {
@@ -102,10 +91,7 @@ public class main {
 
 
         //测试正常删除√
-//        if (File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "OFFSETS_TABLE", "SampleShip_JBC0001")) {
-//            System.out.println("删除成功！");
-//        }
-//        if(File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","TRANSVERSE_AREA_CURVE","SampleShip_VLCC0000")){
+//        if (File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "HULL_3D_MODEL", "SampleShip_JBC0000")) {
 //            System.out.println("删除成功！");
 //        }
 //        //测试删除，不存在的记录
@@ -113,7 +99,7 @@ public class main {
 //            System.out.println("删除成功！");
 //        }
 //        //测试删除，文件字段内容为空
-//        if(File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","SampleShip_VLCC0000")){
+//        if(File.DeleteFile("HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","HULL_3D_MODEL","SampleShip_JBC0000")){
 //            System.out.println("删除成功！");
 //        }
 //        //测试删除，不是文件字段
@@ -123,7 +109,7 @@ public class main {
 
 
         //测试查询--基本船型库
-        // todo 测试非法sql时，日志模块的sql解析不应该给用户抛出错误信息，仅记录即可
+        // todo 测试非法sql时，日志模块的sql解析不应该给用户抛出错误信息，仅记录即可  √
         ResultSetWrapper rsWrapper = new ResultSetWrapper();
 //        if (File.Query("select * from BASIC_SHIP_INFORMATION_DB.SHIP_DATA_INFO where ship_type = '油船';",rsWrapper)) {
 //            File.Display(rsWrapper);
@@ -234,7 +220,7 @@ public class main {
         };
 
         //json字段的查询，中文key的情况
-        ResultSetWrapper rsWrapper = new ResultSetWrapper();
+       // ResultSetWrapper rsWrapper = new ResultSetWrapper();
         if(db.Query("select * from SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF where JSON_VALUE(SPECIAL_ATTRIBUTE, '$.AnchorType') = '类型';", rsWrapper)){
             System.out.println("QUERY SUCCESS!");
             db.Display(rsWrapper);
@@ -250,7 +236,7 @@ public class main {
         if(db.Delete("DELETE FROM SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF WHERE EQUIP_ID = 'LJ-2';")){
             System.out.println("DELETE SUCCESS!");
         };
-        
+
         db.connClose();*/
     }
 }

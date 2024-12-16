@@ -9,18 +9,41 @@
     <version>v0.1</version>
     <packaging>jar</packaging>
 
+    <!-- 设置 jitpack.io 插件仓库 -->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </pluginRepository>
+    </pluginRepositories>
+
 
     <build>
         <plugins>
+<!--            <plugin>-->
+<!--                <groupId>com.github.core-lib</groupId>-->
+<!--                <artifactId>xjar-maven-plugin</artifactId>-->
+<!--                <version>2.0.6</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>build</goal>-->
+<!--                        </goals>-->
+<!--                        <phase>package</phase>-->
+<!--                        <configuration>-->
+<!--                            <password>#</password>-->
+<!--                            <includes>-->
+<!--                                <include>com/cae/**</include>-->
+<!--                            </includes>-->
+<!--                            <sourceDir>${project.build.directory}/classes</sourceDir> &lt;!&ndash; 这里指定编译后的类文件路径 &ndash;&gt;-->
+<!--                            <sourceJar>${project.build.directory}/${project.artifactId}-${project.version}.jar</sourceJar> &lt;!&ndash; 这里指定JAR文件的路径 &ndash;&gt;-->
+<!--                            <targetDir>${project.build.directory}</targetDir> &lt;!&ndash; 加密后的JAR文件输出路径 &ndash;&gt;-->
+<!--                            <targetJar>${project.build.directory}/${project.artifactId}-${project.version}-encrypted.jar</targetJar> &lt;!&ndash; 加密后的JAR文件名称 &ndash;&gt;-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
             <plugin>
-                <!--
-                    1. 加密后,方法体被清空,保留方法参数、注解等信息.主要兼容swagger文档注解扫描
-                    2. 方法体被清空后,反编译只能看到方法名和注解,看不到方法体的具体内容
-                    3. 加密后的项目需要设置javaagent来启动,启动过程中解密class,完全内存解密,不留下任何解密后的文件
-                    4. 启动加密后的jar,生成xxx-encrypted.jar,这个就是加密后的jar文件,加密后不可直接执行
-                    5. 无密码启动方式,java -javaagent:xxx-encrypted.jar -jar xxx-encrypted.jar
-                    6. 有密码启动方式,java -javaagent:xxx-encrypted.jar='-pwd= 密码' -jar xxx-encrypted.jar
-                -->
                 <groupId>net.roseboy</groupId>
                 <artifactId>classfinal-maven-plugin</artifactId>
                 <version>1.2.1</version>
@@ -42,7 +65,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.1</version>
@@ -67,7 +90,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 
@@ -114,5 +137,4 @@
     </dependencies>
 
 </project>
-
 
