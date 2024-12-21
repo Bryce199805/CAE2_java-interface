@@ -1,0 +1,11 @@
+server:
+  username: "708_USER"
+  password: "708_user"
+  database-server: "222.27.255.211:15236"
+  file-system-server: "222.27.255.211:19000"
+
+log:
+  username: "Admin_LOG"
+  password: "logmanager"
+  cidr: "192.168.0.0/16"
+  enable: true

@@ -34,10 +34,13 @@ public class LogRecorder {
     private String log_passwd;
     private String ip;
     private String server;
-    private String CIDR;
+    private String cidr;
     private Map<String, Object> configMap;
     private static LogRecorder instance;
     private boolean enable;
+    private static final String SYSTEM_MSG = "\033[33m\033[1m[Logger Message]: \033[0m";  // 黄色加粗
+    private static final String ERROR_MSG = "\033[31m\033[1m[Logger Error]: \033[0m";   // 红色加粗
+    private static final String SUCCESS_MSG = "\033[32m\033[1m[Logger Success]: \033[0m";   // 绿色加粗
 
     private LogRecorder(String filePath){
         this.readYaml(filePath);
@@ -45,18 +48,18 @@ public class LogRecorder {
         if(this.enable){
             this.readServer();
             this.readLog();
-            this.dm_username = this.readUserName("database");
+            this.dm_username = this.readUserName("server");
             //this.m_username = this.readUserName("fileSystem");
-            this.getIP(CIDR);
+            this.getIP(cidr);
 
             String url = "jdbc:dm://"+this.server;
             //System.out.println(encryption(this.log_passwd));
             try {
                 this.conn = DriverManager.getConnection(url, this.log_username, encryption(this.log_passwd));
                 this.conn.setAutoCommit(true);
-                System.out.println("日志用户成功连接");
+                System.out.println(SYSTEM_MSG + " Connect to server success!");
             } catch (Exception e) {
-                System.err.println("[Fail] conn database for logUser:" + e.getMessage());
+                System.out.println(ERROR_MSG + "Conn database for logUser:" + e.getMessage());
                 System.exit(1);
             }
         }
@@ -83,7 +86,7 @@ public class LogRecorder {
             }
             cipherString = sb.toString().substring(0, 32);
         } catch (Exception e) {
-            System.err.println("Exception occurred: " + e.getMessage());
+            System.out.println(ERROR_MSG + "Exception occurred: " + e.getMessage());
             //e.printStackTrace();
         }
         return cipherString;
@@ -115,14 +118,14 @@ public class LogRecorder {
 
         // 检查 enableObj 的类型
         if (enableObj == null) {
-            System.err.println("Missing 'enable' configuration in the config file. Defaulting to false.");
+            System.out.println(ERROR_MSG + "Missing 'enable' configuration in the config file. Defaulting to false.");
             return false; // 如果没有配置 enable，则返回 false
         }
 
         if (enableObj instanceof Boolean) {
             return (Boolean) enableObj; // 直接返回布尔值
         }else {
-            System.err.println("不是布尔类型，默认enable 为 false");
+            System.out.println(ERROR_MSG + "不是布尔类型，默认enable 为 false");
             return false;
         }
 
@@ -134,7 +137,7 @@ public class LogRecorder {
         try (FileReader reader = new FileReader(new File(filePath))) {
             Object dataConfig = this.yaml.load(reader);
             if (dataConfig == null) {
-                System.err.println("Open config file: " + filePath + " failed.");
+                System.out.println(ERROR_MSG + "Open config file: " + filePath + " failed.");
             }
 
             // 加载 JDBC 驱动
@@ -142,23 +145,23 @@ public class LogRecorder {
 
             // 确保 dataConfig 是一个 Map
             if (!(dataConfig instanceof Map)) {
-                System.err.println("Config file format is incorrect. Expected a Map.");
+                System.out.println(ERROR_MSG + "Config file format is incorrect. Expected a Map.");
             }
             this.configMap = (Map<String, Object>) dataConfig;
 
         }catch(Exception e){
-            System.err.println("[No Need / Fail] configMap:" + e.getMessage());
+            System.out.println(ERROR_MSG + "[No Need / Fail] configMap," + e.getMessage());
         }
     }
 
     private void readLog(){
         Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) this.configMap.get("log"));
-        this.CIDR = databaseConfig.map(m -> m.get("CIDR")).orElse(null);
+        this.cidr = databaseConfig.map(m -> m.get("cidr")).orElse(null);
         this.log_username = databaseConfig.map(m -> m.get("username")).orElse(null);
         // todo log_passwd 需要加密  √
-        this.log_passwd = databaseConfig.map(m -> m.get("passwd")).orElse(null);
-        if (this.CIDR == null || this.log_username == null || this.log_passwd == null) {
-            System.err.println("Missing required configuration in the log config file.");
+        this.log_passwd = databaseConfig.map(m -> m.get("password")).orElse(null);
+        if (this.cidr == null || this.log_username == null || this.log_passwd == null) {
+            System.out.println(ERROR_MSG + "Missing required configuration in the log config file.");
             System.exit(1);
         }
     }
@@ -170,16 +173,16 @@ public class LogRecorder {
         // 安全获取配置信息
         username = databaseConfig.map(m -> m.get("username")).orElse(null);
         if (username == null) {
-            System.err.println("Missing required configuration in the config file.");
+            System.out.println(ERROR_MSG + "Missing required configuration in the config file.");
         }
         return username;
     }
 
     private void readServer(){
-        Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) this.configMap.get("database"));
-        this.server = databaseConfig.map(m -> m.get("server")).orElse(null);
+        Optional<Map<String, String>> databaseConfig = Optional.ofNullable((Map<String, String>) this.configMap.get("server"));
+        this.server = databaseConfig.map(m -> m.get("database-server")).orElse(null);
         if (this.server == null) {
-            System.err.println("Missing required configuration in the config file.");
+            System.out.println(ERROR_MSG + "Missing required configuration in the config file.");
             System.exit(1);
         }
     }
@@ -191,11 +194,7 @@ public class LogRecorder {
      */
     boolean insertRecord(String sql, String operation, int result){
         if(this.enable){
-            System.out.println("======================日志更新======================");
-            if (this.ip == null) {
-                System.err.println("No valid IP found in the specified CIDR range.");
-                //return false; // 或其他处理逻辑
-            }
+            //System.out.println("======================日志更新======================");
 
             // Parse SQL
             List<String[]> names = this.parseSQL(sql);
@@ -217,19 +216,19 @@ public class LogRecorder {
             String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
             String insert_sql = String.format(
                     "insert into \"USER_MANAGEMENT_DB\".\"LOG\" ( \"USER_NAME\", \"IP_ADDR\", \"SOURCE\", \"OPERATION\", \"TIME\", \"SCHEMAS\", \"TABLES\", \"RESULT\") " +
-                            "values ( '%s', '%s', 'Java数据接口', '%s', SYSTIMESTAMP, TABLES%s, TABLES%s, %d);",
+                            "values ( '%s', '%s', 'Java数据接口', '%s', SYSTIMESTAMP, USER_MANAGEMENT_DB.TABLES%s, USER_MANAGEMENT_DB.TABLES%s, %d);",
                     this.dm_username, this.ip, encodedOperation, schemas, tables, result
             );
-            System.out.println(insert_sql);
+            //System.out.println(insert_sql);
 
             if(!this.insert_(insert_sql)){
-                System.err.println("日志更新失败！!");
+                System.out.println(ERROR_MSG + "Log record fail！!");
                 return false;
             };
-            System.out.println("日志更新成功！");
+            //System.out.println(SUCCESS_MSG + "日志更新成功！");
             return true;
         }else {
-            System.out.println("不更新日志！");
+            //System.out.println(SYSTEM_MSG + "不更新日志！");
             return false;
         }
 
@@ -241,51 +240,44 @@ public class LogRecorder {
      */
     boolean insertRecord( String operation, String SchameName, String tableName, int result){
         if(this.enable){
-            System.out.println("======================日志更新=======================");
-            //getUserName
-            //String userName = this.readUserName(filePath,"fileSystem");
-
-            //getIP
-            //String ip = this.getIP(this.readCIDR(filePath));
-
             String encodedOperation = new String(operation.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
             String insert_sql = String.format(
                     "insert into \"USER_MANAGEMENT_DB\".\"LOG\" ( \"USER_NAME\", \"IP_ADDR\", \"SOURCE\", \"OPERATION\", \"TIME\", \"SCHEMAS\", \"TABLES\", \"RESULT\") " +
-                            "values ( '%s', '%s', 'Java数据接口', '%s', SYSTIMESTAMP, TABLES('%s'), TABLES('%s'), %d);",
+                            "values ( '%s', '%s', 'Java数据接口', '%s', SYSTIMESTAMP, USER_MANAGEMENT_DB.TABLES('%s'), USER_MANAGEMENT_DB.TABLES('%s'), %d);",
                     this.dm_username, this.ip, encodedOperation, SchameName, tableName, result
             );
-            System.out.println(insert_sql);
+            //System.out.println(insert_sql);
 
             if(!this.insert_(insert_sql)){
-                System.err.println("日志更新失败！!");
+                System.out.println(ERROR_MSG + "Log record fail！!");
                 return false;
             };
-            System.out.println("日志更新成功！");
+            //System.out.println(SUCCESS_MSG + "日志更新成功！");
             return true;
         }else{
-            System.out.println("不更新日志！");
+            //System.out.println(SYSTEM_MSG + "不更新日志！");
             return false;
         }
     }
 
     //往日志表中插入相关数据
     private boolean insert_(String insert_sql){
-        System.out.println("--------- Insert In DM ---------");
+        //System.out.println("--------- Insert In DM ---------");
         try {
             PreparedStatement stmt = this.conn.prepareStatement(insert_sql);
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("DM insert success!");
+                //System.out.println(SUCCESS_MSG + "DM insert success!");
                 // 关闭语句
                 stmt.close();
                 return true;
             } else {
-                System.out.println("no rows affected.");
+                System.out.println(ERROR_MSG + "No rows affected.");
                 return false;
             }
         } catch (SQLException e) {
             //e.printStackTrace();
-            System.err.println("Exception occurred: " + e.getMessage());
+            System.out.println(ERROR_MSG + "Exception occurred: " + e.getMessage());
             return false;
         }
     }
@@ -311,24 +303,26 @@ public class LogRecorder {
                         try {
                             SubnetUtils subnetUtils = new SubnetUtils(CIDR);
                             if (subnetUtils.getInfo().isInRange(cur_ip)) {
-                                //System.out.println("局域网 IP: " + cur_ip);
+//                                System.out.println("局域网 IP: " + cur_ip);
                                 this.ip = cur_ip;
                             }
                         } catch (IllegalArgumentException e) {
                             // 如果 CIDR 格式无效，立即抛出异常
-                            throw new IllegalStateException("Invalid CIDR format: " + CIDR, e);
+                            System.out.println(ERROR_MSG + "Invalid CIDR format: " + CIDR);
+                            //throw new IllegalStateException("Invalid CIDR format: " + CIDR, e);
                         }
                         // todo cidr匹配不上需要报错卡断程序  你这里默认会取最后一个IP ---> 在下面进行了判断this.ip是否为空  √
                     }
                 }
             }
             // 遍历完所有网络接口，没有找到符合条件的 IP
-            throw new IllegalStateException("No valid IP found in the specified CIDR range: " + CIDR);
+            //System.out.println(ERROR_MSG + "No valid IP found in the specified CIDR range: " + CIDR);
+            //throw new IllegalStateException("No valid IP found in the specified CIDR range: " + CIDR);
         } catch (Exception e) {
             //e.printStackTrace();
         }
         if (this.ip == null) {
-            System.err.println("No valid IP found in the specified CIDR range.");
+            System.out.println(ERROR_MSG + "No valid IP found in the specified CIDR range." + CIDR);
         }
 
     }
@@ -383,11 +377,11 @@ public class LogRecorder {
                 this.addTableInfoToList(table,schemaTableList);
             }
             else {
-                System.err.println("Unsupported SQL type");
+                System.out.println(ERROR_MSG + "Unsupported SQL type");
             }
         } catch (Exception e) {
             //e.printStackTrace();
-            //System.err.println("[FAIL] ParseSQL ERROR：" + e.getMessage());
+            //System.out.println("[FAIL] ParseSQL ERROR：" + e.getMessage());
         }
         return schemaTableList;
     }
@@ -399,6 +393,19 @@ public class LogRecorder {
             //System.out.println("schema = " + schema);
             //System.out.println("tableName = " + tableName);
             list.add(new String[]{schema, tableName});
+        }
+    }
+
+    //关闭连接
+    public void connClose() {
+        try {
+            if (this.conn != null && !this.conn.isClosed()) {
+                this.conn.close();
+                System.out.println(SYSTEM_MSG + "Disconnect from server success!");
+            }
+        } catch (SQLException e) {
+            System.out.println(ERROR_MSG + "Exception occurred: " + e.getMessage());
+            //e.printStackTrace();
         }
     }
 }
