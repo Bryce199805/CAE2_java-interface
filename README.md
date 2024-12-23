@@ -1,6 +1,6 @@
 # JAVA Interface
 
 ## 编码标准
- GB18030
+ utf-8
 
-## JDK11开发
+## JDK8开发
