@@ -252,19 +252,19 @@ public class CAE {
         //删除一条记录对应的所有文件
         if (!this.fileDBMap.containsKey(dbName)) {
             System.out.println(ERROR_MSG + String.format("Database [%s] does not exist!", dbName));
-            return logAndReturn(false,"删除",dbName,tableName);
+            return false;
         }
 
         Map<String, Set<String>> tableMap = this.fileDBMap.get(dbName);
         if (tableMap == null || !tableMap.containsKey(tableName)) {
             System.out.println(ERROR_MSG + String.format( "No table [%s] found for the database: [%s]!", dbName, tableName, id));
-            return logAndReturn(false,"删除",dbName,tableName);
+            return false;
         }
 
         Set<String> fields = tableMap.get(tableName);
         if (fields == null) {
             System.out.println(ERROR_MSG + "No fields found for table: " + tableName);//不是对应数据表名
-            return logAndReturn(false,"删除",dbName,tableName);
+            return false;
         }
 
         // 遍历字段，执行删除操作
@@ -283,7 +283,7 @@ public class CAE {
         // 检查标志位，如果没有有效的 CAEPath，则输出提示信息
         if (!hasValidCAEPath) {
             System.out.println(ERROR_MSG + String.format("No corresponding file data found for the database: [%s], table: [%s], ID: [%s]!", dbName, tableName, id));
-            return logAndReturn(false,"删除",dbName,tableName);
+            return false;
         }
         //删除记录
         boolean result = this.DeleteRecordInDM(dbName, tableName, id);
@@ -334,20 +334,20 @@ public class CAE {
             //没找到对应记录
             if (!this.CheckFileField(dbName, tableName, field)) {
                 System.out.println(ERROR_MSG + String.format("The specified field -- %s is not a file field! ", field));
-                return logAndReturn(false,"删除文件",dbName,tableName);
+                return false;
             }
             //定制sql语句，解析得到新的CAEPath
             CAEPath = this.Sql2CAEPath(dbName, tableName, field, id);
             //字段内容为空，不需要去minio中处理操作
             // 校验CAEPath
             if (!this.isCAEPathValid(CAEPath, dbName, tableName, field, id)) {
-                return logAndReturn(false,"删除文件",dbName,tableName);
+                return false;
             }
         } catch (Exception e) {
             //e.printStackTrace();
             System.out.println(ERROR_MSG + String.format("dbName [%s], tableName [%s], or field [%s] is incorrect.", dbName, tableName, field) + e.getMessage());
             //System.out.println("对应库名，表名，文件字段名有误");
-            return logAndReturn(false,"删除文件",dbName,tableName);
+            return false;
         }
         //删除文件 并 清空字段
         boolean result = this.delete(CAEPath) && this.UpdateField(null, dbName, tableName, id, field);
@@ -394,16 +394,16 @@ public class CAE {
         try {
             if (!this.CheckFileField(dbName, tableName, field)) {
                 System.out.println(ERROR_MSG + String.format("The specified field [%s] is not a file field.", field));
-                return logAndReturn(false,"上传文件",dbName,tableName);
+                return false;
             }
             //ID是否存在
             if (this.Sql2CAEPath(dbName, tableName, field, id).equals("false")) { //不存在对应的记录
                 System.out.println(ERROR_MSG + String.format("No corresponding field found for the database: [%s], table: [%s], field：[%s], ID: [%s]! ", dbName, tableName, field,id));
-                return logAndReturn(false,"上传文件",dbName,tableName);
+                return false;
             }
             //更新文件路径 & 在达梦中更新
             if (!UpdateField(localPath, dbName, tableName, id, field)) {
-                return logAndReturn(false,"上传文件",dbName,tableName);
+                return false;
             }
             //定制sql语句，解析得到新的CAEPath
             CAEPath = this.Sql2CAEPath(dbName, tableName, field, id);
@@ -413,7 +413,7 @@ public class CAE {
             //e.printStackTrace();
             System.out.println(ERROR_MSG + String.format("DbName [%s], tableName [%s], or field [%s] is incorrect. ", dbName, tableName, field) + e.getMessage());
             //System.out.println("对应库名，表名，文件字段名有误！");
-            return logAndReturn(false,"上传文件",dbName,tableName);
+            return false;
         }
         if(result){
             System.out.println(SUCCESS_MSG + "File is successfully uploaded.");
@@ -531,24 +531,24 @@ public class CAE {
         // 校验 localPath 合法性
         if (!isLocalPathValid(localPath)) {
             //System.out.println(String.format("The specified local path [%s] is invalid.", localPath));
-            return logAndReturn(false,"下载文件",dbName,tableName);
+            return false;
         }
         try {
             if (!this.CheckFileField(dbName, tableName, field)) {
                 System.out.println(ERROR_MSG + String.format("The specified field [%s] is not a file field.", field));
-                return logAndReturn(false,"下载文件",dbName,tableName);
+                return false;
             }
             //定制sql语句，解析得到CAEPath
             CAEPath = this.Sql2CAEPath(dbName, tableName, field, id);
 
             // 校验CAEPath
             if (!this.isCAEPathValid(CAEPath, dbName, tableName, field, id)) {
-                return logAndReturn(false,"下载文件",dbName,tableName);
+                return false;
             }
         } catch (Exception e) {
 //            e.printStackTrace();
             System.out.println(ERROR_MSG + String.format("DbName [%s], tableName [%s], or field [%s] is incorrect.", dbName, tableName, field) + e.getMessage());
-            return logAndReturn(false,"下载文件",dbName,tableName);
+            return false;
         }
         //解析CAEPath下载到本地路径
         result = this.DownloadObject(CAEPath, localPath);
@@ -597,7 +597,7 @@ public class CAE {
         try {
             if (!this.CheckFileField(dbName, tableName, field)) {
                 System.out.println(ERROR_MSG + String.format("The specified field [%s] is not a file field.", field));
-                return logAndReturn(null,"下载文件",dbName,tableName);
+                return null;
             }
             //定制sql语句，解析得到CAEPath
             CAEPath = this.Sql2CAEPath(dbName, tableName, field, id);
@@ -606,13 +606,13 @@ public class CAE {
                 return logAndReturn(null,"下载文件",dbName,tableName);
             } else if (CAEPath.equals("false")) {//不存在对应的记录
                 System.out.println(ERROR_MSG + String.format("No corresponding field found for the database: [%s], table: [%s], field：[%s], ID: [%s]! ", dbName, tableName, field,id));
-                return logAndReturn(null,"下载文件",dbName,tableName);
+                return null;
             }
         } catch (Exception e) {
             //e.printStackTrace();
             System.out.println(ERROR_MSG + String.format("DbName [%s], tableName [%s], or field [%s] is incorrect.", dbName, tableName, field) + e.getMessage());
             //System.out.println("对应库名，表名，文件字段名有误");
-            return logAndReturn(null,"下载文件",dbName,tableName);
+            return null;
         }
         //解析CAEPath下载到本地路径
         if (this.GetStream(CAEPath) != null) {
@@ -759,7 +759,7 @@ public class CAE {
 
         if (!isValidSQLCommand(sql, "select")) {
             System.out.println(ERROR_MSG + "illegal statement.");
-            return logAndReturn(false, sql,"查询");
+            return false;
         }
 
         try {
@@ -780,7 +780,7 @@ public class CAE {
 
         if (!isValidSQLCommand(sql, "update")) {
             System.out.println(ERROR_MSG + "Illegal statement.");
-            return logAndReturn(false, sql,"修改");
+            return false;
         }
 
         try {
@@ -807,7 +807,7 @@ public class CAE {
 
         if (!isValidSQLCommand(sql, "delete")) {
             System.out.println(ERROR_MSG + "Illegal statement.");
-            return logAndReturn(false, sql,"删除");
+            return false;
         }
 
         try {
@@ -833,7 +833,7 @@ public class CAE {
         //System.out.println("--------- Insert In DM ---------");
         if (!isValidSQLCommand(sql, "insert")) {
             System.out.println(ERROR_MSG + "Illegal statement.");
-            return logAndReturn(false, sql,"插入");
+            return false;
         }
 
         try {

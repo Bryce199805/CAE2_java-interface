@@ -219,13 +219,13 @@ public class LogRecorder {
                             "values ( '%s', '%s', 'Java数据接口', '%s', SYSTIMESTAMP, USER_MANAGEMENT_DB.TABLES%s, USER_MANAGEMENT_DB.TABLES%s, %d);",
                     this.dm_username, this.ip, encodedOperation, schemas, tables, result
             );
-            //System.out.println(insert_sql);
+            System.out.println(insert_sql);
 
             if(!this.insert_(insert_sql)){
                 System.out.println(ERROR_MSG + "Log record fail！!");
                 return false;
             };
-            //System.out.println(SUCCESS_MSG + "日志更新成功！");
+            System.out.println(SUCCESS_MSG + "日志更新成功！");
             return true;
         }else {
             //System.out.println(SYSTEM_MSG + "不更新日志！");
@@ -252,7 +252,7 @@ public class LogRecorder {
                 System.out.println(ERROR_MSG + "Log record fail！!");
                 return false;
             };
-            //System.out.println(SUCCESS_MSG + "日志更新成功！");
+            System.out.println(SUCCESS_MSG + "日志更新成功！");
             return true;
         }else{
             //System.out.println(SYSTEM_MSG + "不更新日志！");
