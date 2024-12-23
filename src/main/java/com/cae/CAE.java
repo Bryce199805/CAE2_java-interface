@@ -576,7 +576,7 @@ public class CAE {
                     .filename(localFilePath) // 必须指定文件名
                     .build());
             //System.out.println(CAEPath + "->" + localFilePath);
-            System.out.println(SUCCESS_MSG + "File successfully downloaded to "+ localFilePath);
+            System.out.println(SUCCESS_MSG + "File is successfully downloaded to "+ localFilePath);
             return true;
         } catch (Exception e) {
             //e.printStackTrace();
