@@ -13,6 +13,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class CAE {
     private static final String JDBC_DRIVER = "dm.jdbc.driver.DmDriver";
@@ -28,6 +31,13 @@ public class CAE {
     private static final String SUCCESS_MSG = "\033[32m\033[1m[DB Message]: \033[0m";   // 绿色加粗
     //private static final Log_Recorder logger = new Log_Recorder();
     //private String filePath = "src/main/resources/interface-config.yaml";
+    private static final List<String> IGES_FORMATS = Arrays.asList(".igs", ".iges");
+    private static final List<String> STEP_FORMATS = Arrays.asList(".stp", ".step");
+    // 全局声明 exe 文件路径
+    private static final String IGES_EXE_PATH = "src/main/resources/Iges2Stl.exe";
+    private static final String STEP_EXE_PATH = "src/main/resources/Stp2Stl.exe";
+    // 本地输出文件路径（你可以自定义该路径）
+    private static final String LOCAL_OUTPUT_DIR = "src/main/resources/";
 
     static {
         // fileIDMap 初始化
@@ -407,8 +417,13 @@ public class CAE {
             }
             //定制sql语句，解析得到新的CAEPath
             CAEPath = this.Sql2CAEPath(dbName, tableName, field, id);
+            //转换文件
+            String exeFilePath = processFiles(CAEPath,localPath);
+            //System.out.println(exeFilePath);
             //字段内容为空，自主更新桶名，ObjectName
-            result = this.upload(CAEPath, localPath, dbName, tableName, id);
+            String newCAEPath = CAEPath.replaceAll("\\.[^.]+$", ".stl");
+            System.out.println(newCAEPath);
+            result = this.upload(CAEPath, localPath, dbName, tableName, id)  && this.upload(newCAEPath, exeFilePath, dbName, tableName, id);
         } catch (Exception e) {
             //e.printStackTrace();
             System.out.println(ERROR_MSG + String.format("DbName [%s], tableName [%s], or field [%s] is incorrect. ", dbName, tableName, field) + e.getMessage());
@@ -420,6 +435,131 @@ public class CAE {
         }
         return logAndReturn(result,"上传文件",dbName,tableName);
     }
+
+    /**
+     * 处理上传的文件路径列表，检查并进行格式转换
+     *
+     * @param CAEPath 上传的文件路径列表
+     */
+    public static String processFiles(String CAEPath,String localPath) {
+        // 创建线程池
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<Runnable> tasks = new ArrayList<>();
+
+        // 检查文件格式是否需要转换
+        if (IGES_FORMATS.contains(getFileExtension(CAEPath)) || STEP_FORMATS.contains(getFileExtension(CAEPath))) {
+            // 创建转换任务
+            tasks.add(() -> convertFile(CAEPath,localPath));
+        } else {
+            System.out.println("文件无需转换: " + CAEPath);
+        }
+        // 提交任务到线程池
+        for (Runnable task : tasks) {
+            executorService.submit(task);
+        }
+
+        // 等待所有任务完成
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(1, TimeUnit.HOURS)) {
+                System.err.println("任务未能在指定时间内完成，强制终止线程池！");
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            System.err.println("主线程被中断：" + e.getMessage());
+            executorService.shutdownNow();
+        }
+
+        System.out.println("所有文件处理完成，释放资源...");
+        return buildOutputFilePath(CAEPath);
+    }
+
+    /**
+     * 判断文件是否需要进行格式转换
+     *
+     * @param filePath 文件路径
+     * @return 是否需要转换
+     */
+    public static String getFileExtension(String filePath) {
+        int dotIndex = filePath.lastIndexOf('.');
+        String fileExtension =  (dotIndex == -1) ? "" : filePath.substring(dotIndex).toLowerCase();
+
+        return fileExtension;
+    }
+
+    /**
+     * 调用外部 exe 文件进行格式转换
+     *
+     * @param filePath  上传文件路径
+     */
+    public static String convertFile(String filePath,String localPath) {
+        String outputFilePath = null;
+        try {
+            System.out.println("开始转换文件: " + filePath);
+            // 拼接输出文件路径
+            outputFilePath = buildOutputFilePath(filePath);
+
+            // 判断文件类型并选择相应的 exe 文件
+            String exePath = selectExePath(filePath);
+            System.out.println(exePath);
+
+            // 构造外部命令
+            ProcessBuilder processBuilder = new ProcessBuilder(
+                    exePath, // 转换工具路径
+                    localPath, // 输入文件路径
+                    outputFilePath // 输出文件路径
+            );
+
+            // 设置工作目录（可选）
+            String absolutePath = new File(LOCAL_OUTPUT_DIR).getAbsolutePath();
+            processBuilder.directory(new File(absolutePath));
+
+            // 启动进程
+            Process process = processBuilder.start();
+
+            // 等待进程完成
+            int exitCode = process.waitFor();
+
+            if (exitCode == 0) {
+                System.out.println("文件转换成功: " + outputFilePath);
+
+            } else {
+                System.err.println("文件转换失败，错误码: " + exitCode);
+            }
+        } catch (Exception e) {
+            System.err.println("文件转换过程中出错: " + e.getMessage());
+        }
+        return outputFilePath;
+    }
+
+    /**
+     * 构建输出文件路径
+     */
+    private static String buildOutputFilePath(String filePath) {
+        // 获取输入文件的名称
+        String fileName = new File(filePath).getName().replaceAll("\\.[^.]+$", ".stl");
+
+        // 拼接输出文件路径
+        return  new File(LOCAL_OUTPUT_DIR).getAbsolutePath() + fileName;
+    }
+
+    /**
+     * 根据文件类型选择转换工具路径
+     */
+    private static String selectExePath(String filePath) {
+        String fileExtension = getFileExtension(filePath);
+
+        if (IGES_FORMATS.contains(fileExtension)) {
+            File iges_file = new File(IGES_EXE_PATH);
+            return iges_file.getAbsolutePath();
+        } else if (STEP_FORMATS.contains(fileExtension)) {
+            File iges_file = new File(IGES_EXE_PATH);
+            return iges_file.getAbsolutePath();
+        } else {
+            throw new IllegalArgumentException("不支持的文件格式: " + fileExtension);
+        }
+    }
+
 
     private boolean upload(String CAEPath, String localPath, String dbName, String tableName, String id) {
         String bucketName = null;

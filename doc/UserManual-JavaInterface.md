@@ -347,24 +347,17 @@ public boolean Insert(String sql)
 
 ```java
 CAE db = new CAE(filePath);
-//测试插入，并打印插入成功信息
-if(db.Insert("INSERT INTO SHIP_EQUIPMENT_INFO_DB.EQUI_CLASSIFY_PARADEF (\n" +
-     "    EQUIP_ID,\n" +
-     "    MAJOR,\n" +
-     "    SYSTEM,\n" +
-     "    CATEGORY,\n" +
-     "    SPECIAL_ATTRIBUTE,\n" +
-     "    REMARK,\n" +
-     "    RECORD\n" +
-     ") VALUES (\n" +
-     "    'LJ-2',\n" +
-     "    '轮机',\n" +
-     "    '内燃机',\n" +
-     "    '主机',\n" +
-     "    '{\"cylinderNum\":\"缸数\",\"cylinderDiameter\":\"缸径(mm)\",\"stroke\":\"冲程(mm)\",\"ratedPower\":\"额定功率(kW)\",\"ratedSpeed\":\"额定转速(rpm)\",\"smcrPower\":\"SMCR功率(kW)\",\"smcrSpeed\":\"SMCR转速(rpm)\",\"smcrFuelUsed\":\"SMCR油耗(g/kWh)\",\"ncrPower\":\"NCR功率(kW)\",\"ncrSpeed\":\"NCR转速(rpm)\",\"ncrFuelUsed\":\"NCR油耗(g/kWh)\",\"greaseFuelUsed\":\"滑油油耗(kg/d)\",\"cylinderFuelUsed\":\"汽缸油耗(g/kWh)\",\"oilPump\":\"供油泵(m3/h)\",\"oilPumpHead\":\"供油泵压头(bar)\",\"stressPump\":\"增压泵(m3/h)\",\"stressPumpHead\":\"增压泵压头(bar)\",\"greasePump\":\"滑油泵(m3/h)\",\"greasePumpHead\":\"滑油泵压头(bar)\",\"greaseTank\":\"滑油循环舱(m3)\",\"greasePurifierFlow\":\"滑油分油机流量(L/h)\",\"middleHeatExchange\":\"中央热交换量(kW)\",\"middleWaterFlow\":\"中央冷却水流量(m3/h)\",\"cylinderHeatExchange\":\"缸套热交换量(kW)\",\"cylinderWaterFlow\":\"缸套冷却水流量(m3/h)\",\"greaseHeatExchange\":\"滑油热交换量(kW)\",\"greaseWaterFlow\":\"滑油冷却水流量(m3/h)\",\"airPump\":\"空压机(Nm3/h)\",\"airBottle\":\"空气瓶(m3)\",\"exhaustDiameter\":\"排气管径(mm)\"}',\n" +
-    "    NULL, \n" +
-    "    NULL  \n" +
-    ");"));
+//测试插入
+ if(File.Insert("INSERT INTO \"HULL_MODEL_AND_INFORMATION_DB\".\"HULL_PARAMETER_INFO\" \n" +
+                "(\"PARAMETER_ID\", \"HULL_ID\", \"PARALLEL_MIDDLE_LENGTH\", \"TRANSVERSE_AREA_CURVE\", \n" +
+                "\"FORE_AFTER_TRANSVERSE_SHAPE\", \"BULB_PROTRUSION_LENGTH\", \"BULB_SHIP_BREADTH_RATIO\", \n" +
+                "\"FORE_SHAPE\", \"AFTER_SHAPE\", \"HULL_3D_MODEL\", \"OFFSETS_TABLE\") \n" +
+                "VALUES \n" +
+                "(1, 'SampleShip_KCS0000', 0.0, \n" +
+                "'/hull-model-and-information-db/HULL_PARAMETER_INFO/SampleShip_KCS0000/SampleShip_KCS0000.png', \n" +
+                "'V形', 7.49, 0.1467, 'U形', 'U形', \n" +
+                "'/hull-model-and-information-db/HULL_PARAMETER_INFO/SampleShip_KCS0000/SampleShip_KCS0000.igs', \n" +
+                "'/hull-model-and-information-db/HULL_PARAMETER_INFO/SampleShip_KCS0000/SampleShip_KCS0000_Offset.shf');\n"));
 ```
 
 
