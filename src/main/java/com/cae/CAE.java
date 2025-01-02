@@ -396,6 +396,7 @@ public class CAE {
     public boolean UploadFile(String localPath, String dbName, String tableName, String field, String id) {
         String CAEPath = null;
         boolean result = false;
+        boolean result1 = false;
         File file = new File(localPath);
         if(!file.exists() || !file.isFile()){  //文件路径不存在或者不是文件
             System.out.println(ERROR_MSG + String.format("Exception occurred, [%s] not a regular file", localPath));
@@ -411,29 +412,63 @@ public class CAE {
                 System.out.println(ERROR_MSG + String.format("No corresponding field found for the database: [%s], table: [%s], field：[%s], ID: [%s]! ", dbName, tableName, field,id));
                 return false;
             }
+
+            //todo 后缀是否合法——只有其中一个文件字段可以进行格式转换，同时检查另外两个文件字段是否对应正确
+            if(!checkExtension(localPath,field)){
+                System.out.println(ERROR_MSG + String.format("field: [%s] File Extension is incorrect!",field));
+            }
+
             //更新文件路径 & 在达梦中更新
             if (!UpdateField(localPath, dbName, tableName, id, field)) {
                 return false;
             }
             //定制sql语句，解析得到新的CAEPath
             CAEPath = this.Sql2CAEPath(dbName, tableName, field, id);
-            //转换文件
-            String exeFilePath = processFiles(CAEPath,localPath);
-            //System.out.println(exeFilePath);
+            //todo 针对 HULL_3D_MODEL 转换文件
+            if ("HULL_3D_MODEL".equals(field)) {
+                String exeFilePath = processFiles(CAEPath, localPath);
+                //System.out.println(exeFilePath);
+                String newCAEPath = CAEPath.replaceAll("\\.[^.]+$", ".stl");
+                System.out.println(newCAEPath);
+                result1 = this.upload(newCAEPath, exeFilePath, dbName, tableName, id);
+            }
+
             //字段内容为空，自主更新桶名，ObjectName
-            String newCAEPath = CAEPath.replaceAll("\\.[^.]+$", ".stl");
-            System.out.println(newCAEPath);
-            result = this.upload(CAEPath, localPath, dbName, tableName, id)  && this.upload(newCAEPath, exeFilePath, dbName, tableName, id);
+            result = this.upload(CAEPath, localPath, dbName, tableName, id);
         } catch (Exception e) {
             //e.printStackTrace();
             System.out.println(ERROR_MSG + String.format("DbName [%s], tableName [%s], or field [%s] is incorrect. ", dbName, tableName, field) + e.getMessage());
             //System.out.println("对应库名，表名，文件字段名有误！");
             return false;
         }
+
+        if("HULL_3D_MODEL".equals(field)){
+            if(result && result1){
+                System.out.println(SUCCESS_MSG + "File is successfully uploaded.");
+                return logAndReturn(result && result1,"上传文件",dbName,tableName);
+            }
+        }
         if(result){
             System.out.println(SUCCESS_MSG + "File is successfully uploaded.");
         }
+
         return logAndReturn(result,"上传文件",dbName,tableName);
+    }
+
+    private static boolean checkExtension(String localPath,String field){
+        String fileExtension = getFileExtension(localPath);
+        if ("TRANSVERSE_AREA_CURVE".equals(field)) {
+            if (!fileExtension.matches("(?i)\\.png|\\.jpg|\\.jpeg$")) {
+                System.out.println("对应文件格式不正确！(TRANSVERSE_AREA_CURVE 仅支持 png, jpg, jpeg)");
+                return false;
+            }
+        } else if ("HULL_3D_MODEL".equals(field)) {
+            if (!fileExtension.matches("(?i)\\.stp|\\.stl|\\.igs|\\.step|\\.iges$")) {
+                System.out.println("对应文件格式不正确！(HULL_3D_MODEL 仅支持 stp, stl, igs, step, iges)");
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -446,13 +481,9 @@ public class CAE {
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         List<Runnable> tasks = new ArrayList<>();
 
-        // 检查文件格式是否需要转换
-        if (IGES_FORMATS.contains(getFileExtension(CAEPath)) || STEP_FORMATS.contains(getFileExtension(CAEPath))) {
-            // 创建转换任务
-            tasks.add(() -> convertFile(CAEPath,localPath));
-        } else {
-            System.out.println("文件无需转换: " + CAEPath);
-        }
+        // 创建转换任务
+        tasks.add(() -> convertFile(CAEPath,localPath));
+
         // 提交任务到线程池
         for (Runnable task : tasks) {
             executorService.submit(task);
@@ -500,15 +531,33 @@ public class CAE {
             outputFilePath = buildOutputFilePath(filePath);
 
             // 判断文件类型并选择相应的 exe 文件
-            String exePath = selectExePath(filePath);
-            System.out.println(exePath);
+            String fileExtension = getFileExtension(filePath);
+            ProcessBuilder processBuilder;
 
-            // 构造外部命令
-            ProcessBuilder processBuilder = new ProcessBuilder(
-                    exePath, // 转换工具路径
-                    localPath, // 输入文件路径
-                    outputFilePath // 输出文件路径
-            );
+            if (IGES_FORMATS.contains(fileExtension)) {
+                processBuilder = new ProcessBuilder(
+                        "Iges2Stl.exe", // 调用已经配置好环境变量的 Iges2Stl.exe
+                        localPath,
+                        outputFilePath
+                );
+            } else if (STEP_FORMATS.contains(fileExtension)) {
+                processBuilder = new ProcessBuilder(
+                        "Stp2Stl.exe", // 调用已经配置好环境变量的 Stp2Stl.exe
+                        localPath,
+                        outputFilePath
+                );
+            } else {
+                throw new IllegalArgumentException("不支持的文件格式: " + fileExtension);
+            }
+//            String exePath = selectExePath(filePath);
+//            System.out.println(exePath);
+//
+//            // 构造外部命令
+//            ProcessBuilder processBuilder = new ProcessBuilder(
+//                    exePath, // 转换工具路径
+//                    localPath, // 输入文件路径
+//                    outputFilePath // 输出文件路径
+//            );
 
             // 设置工作目录（可选）
             String absolutePath = new File(LOCAL_OUTPUT_DIR).getAbsolutePath();
