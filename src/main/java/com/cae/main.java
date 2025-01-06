@@ -1,13 +1,14 @@
 package com.cae;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 public class main {
     public static void main(String[] args) {
-        //String filePath = "C:\\Users\\Bryce\\.cae\\interface-config.yaml";
+        //String filePath = "C:\\Users\\Bryce\\.cae\\interface-interface-config.yaml";
         // [note!!!] 这里的yaml文件路径我改成固定的相对路径了
 
-        String filePath = "D:\\idea_workspace\\TestJar\\src\\main\\resources\\config.yaml";
+        String filePath = "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\src\\main\\resources\\interface-config.yaml";
 //        CAE db = new CAE(filePath);
         CAE File = new CAE(filePath,true);
         String localPath= "C:\\Users\\Edwina\\Desktop\\JAVA\\CAE2_java-interface\\File-test";
@@ -33,9 +34,12 @@ public class main {
 
 
         //测试下载单个文件字符流√
-//        InputStream inputStream = File.GetFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "OFFSETS_TABLE", "SampleShip_KCS0009");
-//        if (inputStream != null) {
+//        try (
+//                InputStream inputStream = File.GetFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "OFFSETS_TABLE", "SampleShip_KCS0009");
+//        ){
 //            System.out.println("GET STREAM SUCCESS！");
+//        } catch (IOException e) {
+//            //e.printStackTrace();
 //        }
 //        //测试下载不存在的ID
 //        InputStream inputStream1 = File.GetFile("HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "HULL_3D_MODEL", "M7081001");
@@ -55,8 +59,8 @@ public class main {
 
 
         //测试上传
-        if (File.UploadFile(uploadFile, "HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "TRANSVERSE_AREA_CURVE", "SampleShip_KCS0009")) {
-            System.out.println("上传成功！");
+        if (File.UploadFile(uploadFile, "HULL_MODEL_AND_INFORMATION_DB", "HULL_PARAMETER_INFO", "HULL_3D_MODEL", "SampleShip_KCS0009")) {
+            //System.out.println("上传成功！");
         }
 //        //测试上传，不存在的记录
 //        if(File.UploadFile(uploadFile,"HULL_MODEL_AND_INFORMATION_DB","HULL_PARAMETER_INFO","OFFSETS_TABLE","M7081001")){

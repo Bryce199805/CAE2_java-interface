@@ -30,12 +30,12 @@ public class CAE {
     private static final String ERROR_MSG = "\033[31m\033[1m[DB Error]: \033[0m";   // 红色加粗
     private static final String SUCCESS_MSG = "\033[32m\033[1m[DB Message]: \033[0m";   // 绿色加粗
     //private static final Log_Recorder logger = new Log_Recorder();
-    //private String filePath = "src/main/resources/interface-config.yaml";
+    //private String filePath = "src/main/resources/interface-interface-config.yaml";
     private static final List<String> IGES_FORMATS = Arrays.asList(".igs", ".iges");
     private static final List<String> STEP_FORMATS = Arrays.asList(".stp", ".step");
     // 全局声明 exe 文件路径
-    private static final String IGES_EXE_PATH = "src/main/resources/Iges2Stl.exe";
-    private static final String STEP_EXE_PATH = "src/main/resources/Stp2Stl.exe";
+//    private static final String IGES_EXE_PATH = "src/main/resources/Iges2Stl.exe";
+//    private static final String STEP_EXE_PATH = "src/main/resources/Stp2Stl.exe";
     // 本地输出文件路径（你可以自定义该路径）
     private static final String LOCAL_OUTPUT_DIR = "src/main/resources/";
 
@@ -415,7 +415,8 @@ public class CAE {
 
             //todo 后缀是否合法——只有其中一个文件字段可以进行格式转换，同时检查另外两个文件字段是否对应正确
             if(!checkExtension(localPath,field)){
-                System.out.println(ERROR_MSG + String.format("field: [%s] File Extension is incorrect!",field));
+                //System.out.println(ERROR_MSG + String.format("field: [%s] File Extension is incorrect!",field));
+                return false;
             }
 
             //更新文件路径 & 在达梦中更新
@@ -426,11 +427,13 @@ public class CAE {
             CAEPath = this.Sql2CAEPath(dbName, tableName, field, id);
             //todo 针对 HULL_3D_MODEL 转换文件
             if ("HULL_3D_MODEL".equals(field)) {
-                String exeFilePath = processFiles(CAEPath, localPath);
+                String stlFilePath = processFiles(CAEPath, localPath);
                 //System.out.println(exeFilePath);
                 String newCAEPath = CAEPath.replaceAll("\\.[^.]+$", ".stl");
-                System.out.println(newCAEPath);
-                result1 = this.upload(newCAEPath, exeFilePath, dbName, tableName, id);
+                //System.out.println(newCAEPath);
+                result1 = this.upload(newCAEPath, stlFilePath, dbName, tableName, id);
+                File StlFile = new File(stlFilePath);
+                StlFile.delete();
             }
 
             //字段内容为空，自主更新桶名，ObjectName
@@ -445,7 +448,7 @@ public class CAE {
         if("HULL_3D_MODEL".equals(field)){
             if(result && result1){
                 System.out.println(SUCCESS_MSG + "File is successfully uploaded.");
-                return logAndReturn(result && result1,"上传文件",dbName,tableName);
+                return logAndReturn(result && result1,"上传文件",dbName,tableName) ;
             }
         }
         if(result){
@@ -459,12 +462,12 @@ public class CAE {
         String fileExtension = getFileExtension(localPath);
         if ("TRANSVERSE_AREA_CURVE".equals(field)) {
             if (!fileExtension.matches("(?i)\\.png|\\.jpg|\\.jpeg$")) {
-                System.out.println("对应文件格式不正确！(TRANSVERSE_AREA_CURVE 仅支持 png, jpg, jpeg)");
+                System.out.println(ERROR_MSG + String.format("field: [%s] File Extension is incorrect!   (TRANSVERSE_AREA_CURVE 仅支持 png, jpg, jpeg)",field));
                 return false;
             }
         } else if ("HULL_3D_MODEL".equals(field)) {
             if (!fileExtension.matches("(?i)\\.stp|\\.stl|\\.igs|\\.step|\\.iges$")) {
-                System.out.println("对应文件格式不正确！(HULL_3D_MODEL 仅支持 stp, stl, igs, step, iges)");
+                System.out.println(ERROR_MSG + String.format("field: [%s] File Extension is incorrect!   (HULL_3D_MODEL 仅支持 stp, stl, igs, step, iges)",field));
                 return false;
             }
         }
@@ -501,7 +504,7 @@ public class CAE {
             executorService.shutdownNow();
         }
 
-        System.out.println("所有文件处理完成，释放资源...");
+        System.out.println(SUCCESS_MSG + "所有文件处理完成，释放资源...");
         return buildOutputFilePath(CAEPath);
     }
 
@@ -526,7 +529,7 @@ public class CAE {
     public static String convertFile(String filePath,String localPath) {
         String outputFilePath = null;
         try {
-            System.out.println("开始转换文件: " + filePath);
+            System.out.println(SUCCESS_MSG + "开始转换文件: " + filePath);
             // 拼接输出文件路径
             outputFilePath = buildOutputFilePath(filePath);
 
@@ -534,9 +537,12 @@ public class CAE {
             String fileExtension = getFileExtension(filePath);
             ProcessBuilder processBuilder;
 
+            //System.out.println(System.getenv("PATH"));
+
             if (IGES_FORMATS.contains(fileExtension)) {
                 processBuilder = new ProcessBuilder(
-                        "Iges2Stl.exe", // 调用已经配置好环境变量的 Iges2Stl.exe
+                        "Iges2Stl.exe",
+//                        "Iges2Stl.exe "+ localPath + " " + outputFilePath // 调用已经配置好环境变量的 Iges2Stl.exe
                         localPath,
                         outputFilePath
                 );
@@ -570,13 +576,13 @@ public class CAE {
             int exitCode = process.waitFor();
 
             if (exitCode == 0) {
-                System.out.println("文件转换成功: " + outputFilePath);
+                System.out.println(SUCCESS_MSG + "文件转换成功: " + outputFilePath);
 
             } else {
-                System.err.println("文件转换失败，错误码: " + exitCode);
+                System.err.println(ERROR_MSG + "文件转换失败，错误码: " + exitCode);
             }
         } catch (Exception e) {
-            System.err.println("文件转换过程中出错: " + e.getMessage());
+            System.err.println(ERROR_MSG + "文件转换过程中出错: " + e.getMessage());
         }
         return outputFilePath;
     }
@@ -587,27 +593,27 @@ public class CAE {
     private static String buildOutputFilePath(String filePath) {
         // 获取输入文件的名称
         String fileName = new File(filePath).getName().replaceAll("\\.[^.]+$", ".stl");
-
+        //System.out.println(new File(LOCAL_OUTPUT_DIR).getAbsolutePath());
         // 拼接输出文件路径
-        return  new File(LOCAL_OUTPUT_DIR).getAbsolutePath() + fileName;
+        return  new File(LOCAL_OUTPUT_DIR).getAbsolutePath() + File.separator + fileName;
     }
 
-    /**
-     * 根据文件类型选择转换工具路径
-     */
-    private static String selectExePath(String filePath) {
-        String fileExtension = getFileExtension(filePath);
-
-        if (IGES_FORMATS.contains(fileExtension)) {
-            File iges_file = new File(IGES_EXE_PATH);
-            return iges_file.getAbsolutePath();
-        } else if (STEP_FORMATS.contains(fileExtension)) {
-            File iges_file = new File(IGES_EXE_PATH);
-            return iges_file.getAbsolutePath();
-        } else {
-            throw new IllegalArgumentException("不支持的文件格式: " + fileExtension);
-        }
-    }
+//    /**
+//     * 根据文件类型选择转换工具路径
+//     */
+//    private static String selectExePath(String filePath) {
+//        String fileExtension = getFileExtension(filePath);
+//
+//        if (IGES_FORMATS.contains(fileExtension)) {
+//            File iges_file = new File(IGES_EXE_PATH);
+//            return iges_file.getAbsolutePath();
+//        } else if (STEP_FORMATS.contains(fileExtension)) {
+//            File iges_file = new File(IGES_EXE_PATH);
+//            return iges_file.getAbsolutePath();
+//        } else {
+//            throw new IllegalArgumentException("不支持的文件格式: " + fileExtension);
+//        }
+//    }
 
 
     private boolean upload(String CAEPath, String localPath, String dbName, String tableName, String id) {
